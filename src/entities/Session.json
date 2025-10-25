@@ -1,0 +1,33 @@
+{
+  "name": "Session",
+  "type": "object",
+  "properties": {
+    "mentor_name": {
+      "type": "string",
+      "description": "Name of the mentor"
+    },
+    "time_slot": {
+      "type": "string",
+      "description": "Time slot (e.g., 9am, 10am, 1pm)"
+    },
+    "date": {
+      "type": "string",
+      "format": "date",
+      "description": "Session date"
+    },
+    "is_booked": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether the session is booked"
+    },
+    "booked_by": {
+      "type": "string",
+      "description": "Email of user who booked"
+    }
+  },
+  "required": [
+    "mentor_name",
+    "time_slot",
+    "date"
+  ]
+}
