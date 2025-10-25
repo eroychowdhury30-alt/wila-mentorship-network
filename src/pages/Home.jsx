@@ -11,6 +11,7 @@ import FilterBar from '../components/FilterBar';
 export default function Home() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [filters, setFilters] = useState({
     sortBy: 'firstName',
     experience: 'all',
@@ -27,19 +28,28 @@ export default function Home() {
       const currentUser = await base44.auth.me();
       setUser(currentUser);
       
-      if (!currentUser.onboarding_completed) {
+      // Check if user has completed onboarding
+      if (!currentUser.user_type || !currentUser.onboarding_completed) {
         navigate(createPageUrl('Onboarding'));
-      } else if (currentUser.user_type === 'mentor') {
+        return;
+      }
+      
+      // If user is a mentor, redirect to mentor dashboard
+      if (currentUser.user_type === 'mentor') {
         navigate(createPageUrl('MentorDashboard'));
+        return;
       }
     } catch (error) {
       console.error('Error checking user:', error);
+    } finally {
+      setIsCheckingAuth(false);
     }
   };
 
   const { data: mentors = [], isLoading } = useQuery({
     queryKey: ['mentors'],
     queryFn: () => base44.entities.Mentor.list(),
+    enabled: !isCheckingAuth,
   });
 
   const handleFilterChange = (key, value) => {
@@ -74,6 +84,14 @@ export default function Home() {
     }
     return 0;
   });
+
+  if (isCheckingAuth) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen">
