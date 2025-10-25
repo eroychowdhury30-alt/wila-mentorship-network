@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { Button } from '@/components/ui/button';
 import { Users } from 'lucide-react';
@@ -9,12 +9,33 @@ import MentorCard from '../components/MentorCard';
 import FilterBar from '../components/FilterBar';
 
 export default function Home() {
+  const navigate = useNavigate();
+  const [user, setUser] = useState(null);
   const [filters, setFilters] = useState({
     sortBy: 'firstName',
     experience: 'all',
     expertise: 'all',
     mentees: 'all'
   });
+
+  useEffect(() => {
+    checkUserOnboarding();
+  }, []);
+
+  const checkUserOnboarding = async () => {
+    try {
+      const currentUser = await base44.auth.me();
+      setUser(currentUser);
+      
+      if (!currentUser.onboarding_completed) {
+        navigate(createPageUrl('Onboarding'));
+      } else if (currentUser.user_type === 'mentor') {
+        navigate(createPageUrl('MentorDashboard'));
+      }
+    } catch (error) {
+      console.error('Error checking user:', error);
+    }
+  };
 
   const { data: mentors = [], isLoading } = useQuery({
     queryKey: ['mentors'],
