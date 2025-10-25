@@ -20,16 +20,17 @@ export default function Onboarding() {
       const currentUser = await base44.auth.me();
       setUser(currentUser);
       
-      if (currentUser.onboarding_completed) {
+      if (currentUser.onboarding_completed && currentUser.user_type) {
         if (currentUser.user_type === 'mentor') {
           navigate(createPageUrl('MentorDashboard'));
         } else {
           navigate(createPageUrl('Home'));
         }
+      } else {
+        setIsLoading(false);
       }
     } catch (error) {
       console.error('Error fetching user:', error);
-    } finally {
       setIsLoading(false);
     }
   };
@@ -49,7 +50,6 @@ export default function Onboarding() {
       }
     } catch (error) {
       console.error('Error updating user type:', error);
-    } finally {
       setIsLoading(false);
     }
   };

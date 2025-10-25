@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
-import { Calendar, X } from 'lucide-react';
+import { Calendar, Search } from 'lucide-react';
 import MentorCard from '../components/MentorCard';
 import TimeSlotCard from '../components/TimeSlotCard';
 import { toast } from 'sonner';
@@ -69,11 +69,17 @@ export default function Sessions() {
       {/* Featured Mentors Section */}
       <div className="bg-white py-12 px-6 border-b">
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {featuredMentors.map((mentor) => (
-              <MentorCard key={mentor.id} mentor={mentor} />
-            ))}
-          </div>
+          {mentorsLoading ? (
+            <div className="text-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {featuredMentors.map((mentor) => (
+                <MentorCard key={mentor.id} mentor={mentor} />
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
@@ -102,14 +108,18 @@ export default function Sessions() {
 
           {/* Calendar Schedule */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <div className="mb-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-2">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-semibold text-gray-900">
                 Mentorship Day - Friday August 29, 2025
               </h2>
-              <div className="flex items-center justify-end gap-4 text-sm">
-                <button className="text-gray-600 hover:text-gray-900">Timeline</button>
-                <button className="text-gray-600 hover:text-gray-900">Agenda</button>
-              </div>
+              <Button variant="ghost" size="icon">
+                <Search className="w-5 h-5 text-gray-500" />
+              </Button>
+            </div>
+
+            <div className="flex items-center justify-end gap-4 text-sm mb-6">
+              <button className="text-gray-600 hover:text-gray-900">Timeline</button>
+              <button className="text-gray-600 hover:text-gray-900">Agenda</button>
             </div>
 
             <div className="text-right text-sm text-gray-600 mb-4">
