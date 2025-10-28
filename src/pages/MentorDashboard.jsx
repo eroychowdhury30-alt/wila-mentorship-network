@@ -8,7 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Calendar, Briefcase, Users, Clock, ExternalLink, Plus, X } from 'lucide-react';
+import { Calendar, Briefcase, Users, Clock, ExternalLink, Plus, X, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import {
   Select,
@@ -70,10 +70,10 @@ export default function MentorDashboard() {
     }
   };
 
-  const { data: existingSessions = [] } = useQuery({
-    queryKey: ['mentor-sessions', user?.email],
-    queryFn: () => base44.entities.Session.filter({ mentor_name: user?.full_name }),
-    enabled: !!user?.full_name,
+  const { data: existingSessions = [], isLoading: sessionsLoading } = useQuery({
+    queryKey: ['mentor-sessions', mentorProfile?.full_name],
+    queryFn: () => base44.entities.Session.filter({ mentor_name: mentorProfile?.full_name }),
+    enabled: !!mentorProfile?.full_name,
   });
 
   const loadMentorProfile = async (email) => {
@@ -133,7 +133,21 @@ export default function MentorDashboard() {
     },
   });
 
+  const deleteSessionMutation = useMutation({
+    mutationFn: async (sessionId) => {
+      return base44.entities.Session.delete(sessionId);
+    },
+    onSuccess: () => {
+      toast.success('Session deleted successfully!');
+      queryClient.invalidateQueries(['mentor-sessions']);
+    },
+  });
+
   const handleSaveProfile = () => {
+    if (!profileData.full_name || !profileData.title || !profileData.company) {
+      toast.error('Please fill in all required fields');
+      return;
+    }
     saveProfileMutation.mutate(profileData);
   };
 
@@ -143,6 +157,12 @@ export default function MentorDashboard() {
       return;
     }
     saveAvailabilityMutation.mutate(availableSlots);
+  };
+
+  const handleDeleteSession = (sessionId) => {
+    if (confirm('Are you sure you want to delete this session?')) {
+      deleteSessionMutation.mutate(sessionId);
+    }
   };
 
   const toggleExpertise = (item) => {
@@ -194,33 +214,36 @@ export default function MentorDashboard() {
               <CardContent className="space-y-4">
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="full_name">Full Name</Label>
+                    <Label htmlFor="full_name">Full Name *</Label>
                     <Input
                       id="full_name"
                       value={profileData.full_name}
                       onChange={(e) => setProfileData({ ...profileData, full_name: e.target.value })}
                       disabled={!isEditing}
+                      placeholder="Enter your full name"
                     />
                   </div>
                   <div>
-                    <Label htmlFor="title">Title</Label>
+                    <Label htmlFor="title">Title *</Label>
                     <Input
                       id="title"
                       value={profileData.title}
                       onChange={(e) => setProfileData({ ...profileData, title: e.target.value })}
                       disabled={!isEditing}
+                      placeholder="e.g., Senior Director"
                     />
                   </div>
                 </div>
 
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="company">Company</Label>
+                    <Label htmlFor="company">Company *</Label>
                     <Input
                       id="company"
                       value={profileData.company}
                       onChange={(e) => setProfileData({ ...profileData, company: e.target.value })}
                       disabled={!isEditing}
+                      placeholder="e.g., Google"
                     />
                   </div>
                   <div>
@@ -341,16 +364,21 @@ export default function MentorDashboard() {
                   <div>
                     <Label>Select Available Time Slots</Label>
                     <div className="grid grid-cols-3 gap-2 mt-2">
-                      {TIME_SLOTS.map(slot => (
-                        <Button
-                          key={slot}
-                          variant={availableSlots.includes(slot) ? 'default' : 'outline'}
-                          onClick={() => toggleTimeSlot(slot)}
-                          className={availableSlots.includes(slot) ? 'bg-purple-600' : ''}
-                        >
-                          {slot}
-                        </Button>
-                      ))}
+                      {TIME_SLOTS.map(slot => {
+                        const isAlreadyBooked = existingSessions.some(s => s.time_slot === slot);
+                        return (
+                          <Button
+                            key={slot}
+                            variant={availableSlots.includes(slot) ? 'default' : 'outline'}
+                            onClick={() => toggleTimeSlot(slot)}
+                            className={availableSlots.includes(slot) ? 'bg-purple-600' : ''}
+                            disabled={isAlreadyBooked}
+                          >
+                            {slot}
+                            {isAlreadyBooked && ' ✓'}
+                          </Button>
+                        );
+                      })}
                     </div>
                   </div>
 
@@ -420,19 +448,35 @@ export default function MentorDashboard() {
                 <CardTitle>Your Sessions</CardTitle>
               </CardHeader>
               <CardContent>
-                {existingSessions.length > 0 ? (
+                {sessionsLoading ? (
+                  <div className="text-center py-4">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto"></div>
+                  </div>
+                ) : existingSessions.length > 0 ? (
                   <div className="space-y-2">
                     {existingSessions.map(session => (
                       <div key={session.id} className="flex items-center justify-between p-2 bg-gray-50 rounded">
-                        <span className="text-sm font-medium">{session.time_slot}</span>
-                        <Badge variant={session.is_booked ? 'secondary' : 'default'}>
-                          {session.is_booked ? 'Booked' : 'Available'}
-                        </Badge>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-medium">{session.time_slot}</span>
+                          <Badge variant={session.is_booked ? 'secondary' : 'default'}>
+                            {session.is_booked ? 'Booked' : 'Available'}
+                          </Badge>
+                        </div>
+                        {!session.is_booked && (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleDeleteSession(session.id)}
+                            className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        )}
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <p className="text-sm text-gray-500">No sessions scheduled yet</p>
+                  <p className="text-sm text-gray-500">No sessions scheduled yet. Add your availability above!</p>
                 )}
               </CardContent>
             </Card>
