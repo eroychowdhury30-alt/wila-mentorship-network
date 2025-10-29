@@ -32,6 +32,12 @@ export default function Layout({ children }) {
       const skipOnboardingPages = ['Welcome', 'Onboarding', 'MenteeQuestionnaire'];
       const currentPage = location.pathname.split('/').pop();
       
+      // If user is logged in and on Welcome page, redirect to Home
+      if (currentPage === 'Welcome' && currentUser.onboarding_completed && currentUser.user_type) {
+        navigate(createPageUrl('Home'));
+        return;
+      }
+      
       if (!skipOnboardingPages.includes(currentPage)) {
         // Check if user needs onboarding
         if (!currentUser.onboarding_completed || !currentUser.user_type) {
