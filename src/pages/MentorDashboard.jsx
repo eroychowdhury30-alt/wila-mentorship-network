@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -73,7 +72,7 @@ export default function MentorDashboard() {
     try {
       const currentUser = await base44.auth.me();
       setUser(currentUser);
-      loadMentorProfile(currentUser.email);
+      loadMentorProfile(currentUser);
     } catch (error) {
       console.error('Error loading user:', error);
     }
@@ -88,25 +87,43 @@ export default function MentorDashboard() {
     enabled: !!mentorProfile?.full_name,
   });
 
-  const loadMentorProfile = async (email) => {
+  const loadMentorProfile = async (currentUser) => {
     try {
-      const mentors = await base44.entities.Mentor.filter({ created_by: email });
-      if (mentors.length > 0) {
-        const profile = mentors[0];
-        setMentorProfile(profile);
+      const allMentors = await base44.entities.Mentor.filter({ created_by: currentUser.email });
+      
+      // Filter out the 27 sample mentors by checking if full_name matches user's name
+      // Admins who created sample data should only see their own profile if they created one
+      const userMentor = allMentors.find(m => 
+        m.full_name.toLowerCase() === currentUser.full_name.toLowerCase()
+      );
+      
+      if (userMentor) {
+        setMentorProfile(userMentor);
         setProfileData({
-          full_name: profile.full_name || '',
-          title: profile.title || '',
-          company: profile.company || '',
-          linkedin_url: profile.linkedin_url || '',
-          experience_years: profile.experience_years || 'Over 20 years',
-          expertise: profile.expertise || [],
-          mentors_to: profile.mentors_to || [],
-          bio: profile.bio || '',
-          status: profile.status || 'pending'
+          full_name: userMentor.full_name || '',
+          title: userMentor.title || '',
+          company: userMentor.company || '',
+          linkedin_url: userMentor.linkedin_url || '',
+          experience_years: userMentor.experience_years || 'Over 20 years',
+          expertise: userMentor.expertise || [],
+          mentors_to: userMentor.mentors_to || [],
+          bio: userMentor.bio || '',
+          status: userMentor.status || 'pending'
         });
         setIsEditing(false);
       } else {
+        // No profile matching user's name, show create form
+        setProfileData({
+          full_name: currentUser.full_name || '',
+          title: '',
+          company: '',
+          linkedin_url: '',
+          experience_years: 'Over 20 years',
+          expertise: [],
+          mentors_to: [],
+          bio: '',
+          status: 'pending'
+        });
         setIsEditing(true);
       }
     } catch (error) {
@@ -305,7 +322,7 @@ export default function MentorDashboard() {
               <h1 className="text-3xl font-bold text-gray-900 mb-2">Your Mentor Dashboard</h1>
               <p className="text-gray-600">Manage your profile and availability</p>
             </div>
-            <Badge className="bg-green-600 text-white">Active</Badge>
+            {mentorProfile && <Badge className="bg-green-600 text-white">Active</Badge>}
           </div>
         </div>
 
@@ -313,73 +330,75 @@ export default function MentorDashboard() {
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
             {/* Today's Schedule Calendar */}
-            <Card>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div className="flex-1">
-                    <CardTitle>Your Schedule</CardTitle>
-                    <p className="text-sm text-gray-600 mt-1">{formatDate(selectedDate)}</p>
+            {mentorProfile && (
+              <Card>
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1">
+                      <CardTitle>Your Schedule</CardTitle>
+                      <p className="text-sm text-gray-600 mt-1">{formatDate(selectedDate)}</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button variant="outline" className="w-[240px] justify-start text-left font-normal">
+                            <Calendar className="mr-2 h-4 w-4" />
+                            {formatDate(selectedDate)}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="end">
+                          <CalendarComponent
+                            mode="single"
+                            selected={selectedDate}
+                            onSelect={(date) => date && setSelectedDate(date)}
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button variant="outline" className="w-[240px] justify-start text-left font-normal">
-                          <Calendar className="mr-2 h-4 w-4" />
-                          {formatDate(selectedDate)}
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="end">
-                        <CalendarComponent
-                          mode="single"
-                          selected={selectedDate}
-                          onSelect={(date) => date && setSelectedDate(date)}
-                          initialFocus
-                        />
-                      </PopoverContent>
-                    </Popover>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                {sessionsLoading ? (
-                  <div className="text-center py-8">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto"></div>
-                  </div>
-                ) : bookedSessions.length === 0 ? (
-                  <div className="text-center py-8">
-                    <Calendar className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-                    <p className="text-gray-500">No sessions booked for this date</p>
-                    <p className="text-sm text-gray-400 mt-1">Your available slots will appear as they're booked</p>
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    {TIME_SLOTS.map(timeSlot => {
-                      const session = bookedSessions.find(s => s.time_slot === timeSlot);
-                      if (!session) return null;
-                      
-                      return (
-                        <div key={session.id} className="flex items-center gap-3 p-4 bg-purple-50 border border-purple-200 rounded-lg">
-                          <div className="flex-shrink-0">
-                            <div className="w-12 h-12 bg-purple-600 rounded-full flex items-center justify-center text-white font-semibold">
-                              {session.mentee_name?.split(' ').map(n => n[0]).join('') || 'M'}
+                </CardHeader>
+                <CardContent>
+                  {sessionsLoading ? (
+                    <div className="text-center py-8">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto"></div>
+                    </div>
+                  ) : bookedSessions.length === 0 ? (
+                    <div className="text-center py-8">
+                      <Calendar className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+                      <p className="text-gray-500">No sessions booked for this date</p>
+                      <p className="text-sm text-gray-400 mt-1">Your available slots will appear as they're booked</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {TIME_SLOTS.map(timeSlot => {
+                        const session = bookedSessions.find(s => s.time_slot === timeSlot);
+                        if (!session) return null;
+                        
+                        return (
+                          <div key={session.id} className="flex items-center gap-3 p-4 bg-purple-50 border border-purple-200 rounded-lg">
+                            <div className="flex-shrink-0">
+                              <div className="w-12 h-12 bg-purple-600 rounded-full flex items-center justify-center text-white font-semibold">
+                                {session.mentee_name?.split(' ').map(n => n[0]).join('') || 'M'}
+                              </div>
+                            </div>
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 mb-1">
+                                <Clock className="w-4 h-4 text-purple-600" />
+                                <span className="font-semibold text-gray-900">{timeSlot}</span>
+                                <Badge className="bg-purple-600 text-white text-xs">Booked</Badge>
+                              </div>
+                              <p className="text-sm text-gray-700 font-medium">{session.mentee_name || 'Mentee Name'}</p>
+                              <p className="text-xs text-gray-500">{session.booked_by}</p>
                             </div>
                           </div>
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-1">
-                              <Clock className="w-4 h-4 text-purple-600" />
-                              <span className="font-semibold text-gray-900">{timeSlot}</span>
-                              <Badge className="bg-purple-600 text-white text-xs">Booked</Badge>
-                            </div>
-                            <p className="text-sm text-gray-700 font-medium">{session.mentee_name || 'Mentee Name'}</p>
-                            <p className="text-xs text-gray-500">{session.booked_by}</p>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+                        );
+                      })}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            )}
 
             {/* Profile Section */}
             <Card>
@@ -625,27 +644,29 @@ export default function MentorDashboard() {
             )}
 
             {/* Sessions Summary */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Your Sessions Summary</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
-                  <div>
-                    <p className="text-sm text-gray-600">Booked</p>
-                    <p className="text-2xl font-bold text-green-600">{bookedSessions.length}</p>
+            {mentorProfile && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Your Sessions Summary</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                    <div>
+                      <p className="text-sm text-gray-600">Booked</p>
+                      <p className="text-2xl font-bold text-green-600">{bookedSessions.length}</p>
+                    </div>
+                    <Users className="w-8 h-8 text-green-600" />
                   </div>
-                  <Users className="w-8 h-8 text-green-600" />
-                </div>
-                <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
-                  <div>
-                    <p className="text-sm text-gray-600">Available</p>
-                    <p className="text-2xl font-bold text-blue-600">{availableSessions.length}</p>
+                  <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+                    <div>
+                      <p className="text-sm text-gray-600">Available</p>
+                      <p className="text-2xl font-bold text-blue-600">{availableSessions.length}</p>
+                    </div>
+                    <Calendar className="w-8 h-8 text-blue-600" />
                   </div>
-                  <Calendar className="w-8 h-8 text-blue-600" />
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            )}
 
             {/* Available Sessions to Delete */}
             {availableSessions.length > 0 && (
