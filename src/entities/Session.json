@@ -23,6 +23,10 @@
     "booked_by": {
       "type": "string",
       "description": "Email of user who booked"
+    },
+    "mentee_name": {
+      "type": "string",
+      "description": "Name of the mentee who booked"
     }
   },
   "required": [

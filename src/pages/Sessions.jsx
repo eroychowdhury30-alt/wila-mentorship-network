@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -27,7 +28,8 @@ export default function Sessions() {
       const user = await base44.auth.me();
       return base44.entities.Session.update(sessionId, {
         is_booked: true,
-        booked_by: user.email
+        booked_by: user.email,
+        mentee_name: user.full_name
       });
     },
     onSuccess: () => {
@@ -86,7 +88,7 @@ export default function Sessions() {
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-semibold text-gray-900">
-                Mentorship Day - Friday August 29, 2025
+                Mentorship Day - Tuesday October 28, 2025
               </h2>
               <Button variant="ghost" size="icon">
                 <Search className="w-5 h-5 text-gray-500" />
@@ -99,7 +101,7 @@ export default function Sessions() {
             </div>
 
             <div className="text-right text-sm text-gray-600 mb-4">
-              Aug 29, 2025
+              Oct 28, 2025
             </div>
 
             <div className="mb-4 text-sm font-medium text-gray-700 bg-gray-50 p-2 rounded">
@@ -167,7 +169,7 @@ export default function Sessions() {
               <Calendar className="w-5 h-5 text-gray-400 mt-0.5" />
               <div>
                 <p className="font-semibold text-gray-900">
-                  Fri Aug 29 2025, {selectedSession?.time_slot} - {selectedSession?.time_slot === '9am' ? '10:00am' : selectedSession?.time_slot === '10am' ? '11:00am' : selectedSession?.time_slot === '11am' ? '12:00pm' : selectedSession?.time_slot === '12pm' ? '1:00pm' : selectedSession?.time_slot === '1pm' ? '2:00pm' : selectedSession?.time_slot === '2pm' ? '3:00pm' : '4:00pm'}
+                  Tue Oct 28 2025, {selectedSession?.time_slot} - {selectedSession?.time_slot === '9am' ? '10:00am' : selectedSession?.time_slot === '10am' ? '11:00am' : selectedSession?.time_slot === '11am' ? '12:00pm' : selectedSession?.time_slot === '12pm' ? '1:00pm' : selectedSession?.time_slot === '1pm' ? '2:00pm' : selectedSession?.time_slot === '2pm' ? '3:00pm' : '4:00pm'}
                 </p>
                 <div className="mt-2">
                   <span className="inline-block bg-purple-600 text-white text-xs px-3 py-1 rounded">

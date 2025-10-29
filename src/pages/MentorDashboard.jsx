@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -123,7 +122,7 @@ export default function MentorDashboard() {
       const sessionData = slots.map(slot => ({
         mentor_name: profileData.full_name,
         time_slot: slot,
-        date: '2025-08-29',
+        date: '2025-10-28',
         is_booked: false
       }));
       
@@ -274,6 +273,9 @@ export default function MentorDashboard() {
     );
   }
 
+  const bookedSessions = existingSessions.filter(s => s.is_booked);
+  const availableSessions = existingSessions.filter(s => !s.is_booked);
+
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-6xl mx-auto">
@@ -283,15 +285,66 @@ export default function MentorDashboard() {
               <h1 className="text-3xl font-bold text-gray-900 mb-2">Mentor Dashboard</h1>
               <p className="text-gray-600">Manage your profile and availability</p>
             </div>
-            {mentorProfile && mentorProfile.status === 'approved' && (
-              <Badge className="bg-green-600 text-white">Active</Badge>
-            )}
+            <Badge className="bg-green-600 text-white">Active</Badge>
           </div>
         </div>
 
         <div className="grid lg:grid-cols-3 gap-6">
-          {/* Profile Section */}
+          {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
+            {/* Today's Schedule Calendar */}
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle>Today's Schedule</CardTitle>
+                    <p className="text-sm text-gray-600 mt-1">Tuesday, October 28, 2025</p>
+                  </div>
+                  <Calendar className="w-5 h-5 text-purple-600" />
+                </div>
+              </CardHeader>
+              <CardContent>
+                {sessionsLoading ? (
+                  <div className="text-center py-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto"></div>
+                  </div>
+                ) : bookedSessions.length === 0 ? (
+                  <div className="text-center py-8">
+                    <Calendar className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+                    <p className="text-gray-500">No sessions booked for today</p>
+                    <p className="text-sm text-gray-400 mt-1">Your available slots will appear as they're booked</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {TIME_SLOTS.map(timeSlot => {
+                      const session = bookedSessions.find(s => s.time_slot === timeSlot);
+                      if (!session) return null;
+                      
+                      return (
+                        <div key={session.id} className="flex items-center gap-3 p-4 bg-purple-50 border border-purple-200 rounded-lg">
+                          <div className="flex-shrink-0">
+                            <div className="w-12 h-12 bg-purple-600 rounded-full flex items-center justify-center text-white font-semibold">
+                              {session.mentee_name?.split(' ').map(n => n[0]).join('') || 'M'}
+                            </div>
+                          </div>
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <Clock className="w-4 h-4 text-purple-600" />
+                              <span className="font-semibold text-gray-900">{timeSlot}</span>
+                              <Badge className="bg-purple-600 text-white text-xs">Booked</Badge>
+                            </div>
+                            <p className="text-sm text-gray-700 font-medium">{session.mentee_name || 'Mentee Name'}</p>
+                            <p className="text-xs text-gray-500">{session.booked_by}</p>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Profile Section */}
             <Card>
               <CardHeader>
                 <div className="flex items-center justify-between">
@@ -450,7 +503,7 @@ export default function MentorDashboard() {
               <Card>
                 <CardHeader>
                   <CardTitle>Set Availability for Mentorship Day</CardTitle>
-                  <p className="text-sm text-gray-600">Friday, August 29, 2025</p>
+                  <p className="text-sm text-gray-600">Tuesday, October 28, 2025</p>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
@@ -534,44 +587,54 @@ export default function MentorDashboard() {
               </Card>
             )}
 
-            {/* Current Sessions */}
+            {/* Sessions Summary */}
             <Card>
               <CardHeader>
-                <CardTitle>Your Sessions</CardTitle>
+                <CardTitle>Sessions Summary</CardTitle>
               </CardHeader>
-              <CardContent>
-                {sessionsLoading ? (
-                  <div className="text-center py-4">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto"></div>
+              <CardContent className="space-y-4">
+                <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                  <div>
+                    <p className="text-sm text-gray-600">Booked</p>
+                    <p className="text-2xl font-bold text-green-600">{bookedSessions.length}</p>
                   </div>
-                ) : existingSessions.length > 0 ? (
+                  <Users className="w-8 h-8 text-green-600" />
+                </div>
+                <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+                  <div>
+                    <p className="text-sm text-gray-600">Available</p>
+                    <p className="text-2xl font-bold text-blue-600">{availableSessions.length}</p>
+                  </div>
+                  <Calendar className="w-8 h-8 text-blue-600" />
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Available Sessions to Delete */}
+            {availableSessions.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Available Slots</CardTitle>
+                </CardHeader>
+                <CardContent>
                   <div className="space-y-2">
-                    {existingSessions.map(session => (
+                    {availableSessions.map(session => (
                       <div key={session.id} className="flex items-center justify-between p-2 bg-gray-50 rounded">
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm font-medium">{session.time_slot}</span>
-                          <Badge variant={session.is_booked ? 'secondary' : 'default'}>
-                            {session.is_booked ? 'Booked' : 'Available'}
-                          </Badge>
-                        </div>
-                        {!session.is_booked && (
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleDeleteSession(session.id)}
-                            className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                        )}
+                        <span className="text-sm font-medium">{session.time_slot}</span>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleDeleteSession(session.id)}
+                          className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
                       </div>
                     ))}
                   </div>
-                ) : (
-                  <p className="text-sm text-gray-500">No sessions scheduled yet. Add your availability above!</p>
-                )}
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            )}
           </div>
         </div>
       </div>
