@@ -1,4 +1,6 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
+import { createPageUrl } from '@/utils';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -95,13 +97,15 @@ export default function MentorCard({ mentor, isMentee = false }) {
           </Button>
         )}
         {isMentee && (
-          <Button 
-            variant="outline"
-            className="flex-1 border-gray-300 hover:bg-gray-50"
-          >
-            <UserPlus className="w-4 h-4 mr-2" />
-            Sign Up
-          </Button>
+          <Link to={createPageUrl('Sessions')} className="flex-1">
+            <Button 
+              variant="outline"
+              className="w-full border-gray-300 hover:bg-gray-50"
+            >
+              <UserPlus className="w-4 h-4 mr-2" />
+              Sign Up
+            </Button>
+          </Link>
         )}
       </div>
     </Card>
