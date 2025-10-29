@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -17,6 +18,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar as CalendarComponent } from '@/components/ui/calendar'; // Renamed to avoid conflict
 
 const EXPERTISE_OPTIONS = [
   'Executive Leadership',
@@ -55,6 +58,7 @@ export default function MentorDashboard() {
     status: 'pending'
   });
   const [availableSlots, setAvailableSlots] = useState([]);
+  const [selectedDate, setSelectedDate] = useState(new Date('2025-10-28')); // Initialize with the specified date
   const queryClient = useQueryClient();
 
   useEffect(() => {
@@ -72,8 +76,11 @@ export default function MentorDashboard() {
   };
 
   const { data: existingSessions = [], isLoading: sessionsLoading } = useQuery({
-    queryKey: ['mentor-sessions', mentorProfile?.full_name],
-    queryFn: () => base44.entities.Session.filter({ mentor_name: mentorProfile?.full_name }),
+    queryKey: ['mentor-sessions', mentorProfile?.full_name, selectedDate.toISOString().split('T')[0]],
+    queryFn: () => base44.entities.Session.filter({
+      mentor_name: mentorProfile?.full_name,
+      date: selectedDate.toISOString().split('T')[0]
+    }),
     enabled: !!mentorProfile?.full_name,
   });
 
@@ -122,10 +129,10 @@ export default function MentorDashboard() {
       const sessionData = slots.map(slot => ({
         mentor_name: profileData.full_name,
         time_slot: slot,
-        date: '2025-10-28',
+        date: selectedDate.toISOString().split('T')[0],
         is_booked: false
       }));
-      
+
       return base44.entities.Session.bulkCreate(sessionData);
     },
     onSuccess: () => {
@@ -191,6 +198,15 @@ export default function MentorDashboard() {
     );
   };
 
+  const formatDate = (date) => {
+    return date.toLocaleDateString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
+
   // Show pending approval message
   if (mentorProfile && mentorProfile.status === 'pending') {
     return (
@@ -204,7 +220,7 @@ export default function MentorDashboard() {
           </CardHeader>
           <CardContent className="text-center space-y-4">
             <p className="text-gray-600">
-              Your mentor application has been submitted and is awaiting admin approval. 
+              Your mentor application has been submitted and is awaiting admin approval.
               You'll receive access to the dashboard once your profile is reviewed.
             </p>
             <div className="bg-purple-50 p-4 rounded-lg">
@@ -234,7 +250,7 @@ export default function MentorDashboard() {
           </CardHeader>
           <CardContent className="text-center space-y-4">
             <p className="text-gray-600">
-              Your mentor account has been temporarily paused by the administrator. 
+              Your mentor account has been temporarily paused by the administrator.
               Your profile is not visible to mentees during this time. Please contact the admin for more information.
             </p>
             <div className="bg-yellow-50 p-4 rounded-lg">
@@ -261,7 +277,7 @@ export default function MentorDashboard() {
           </CardHeader>
           <CardContent className="text-center space-y-4">
             <p className="text-gray-600">
-              Unfortunately, your mentor application was not approved at this time. 
+              Unfortunately, your mentor application was not approved at this time.
               Please contact the admin for more information.
             </p>
             <Button onClick={() => setIsEditing(true)} variant="outline" className="w-full">
@@ -296,11 +312,28 @@ export default function MentorDashboard() {
             <Card>
               <CardHeader>
                 <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle>Today's Schedule</CardTitle>
-                    <p className="text-sm text-gray-600 mt-1">Tuesday, October 28, 2025</p>
+                  <div className="flex-1">
+                    <CardTitle>Schedule</CardTitle>
+                    <p className="text-sm text-gray-600 mt-1">{formatDate(selectedDate)}</p>
                   </div>
-                  <Calendar className="w-5 h-5 text-purple-600" />
+                  <div className="flex items-center gap-2">
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button variant="outline" className="w-[240px] justify-start text-left font-normal">
+                          <Calendar className="mr-2 h-4 w-4" />
+                          {formatDate(selectedDate)}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="end">
+                        <CalendarComponent
+                          mode="single"
+                          selected={selectedDate}
+                          onSelect={(date) => date && setSelectedDate(date)}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+                  </div>
                 </div>
               </CardHeader>
               <CardContent>
@@ -311,7 +344,7 @@ export default function MentorDashboard() {
                 ) : bookedSessions.length === 0 ? (
                   <div className="text-center py-8">
                     <Calendar className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-                    <p className="text-gray-500">No sessions booked for today</p>
+                    <p className="text-gray-500">No sessions booked for this date</p>
                     <p className="text-sm text-gray-400 mt-1">Your available slots will appear as they're booked</p>
                   </div>
                 ) : (
@@ -319,7 +352,7 @@ export default function MentorDashboard() {
                     {TIME_SLOTS.map(timeSlot => {
                       const session = bookedSessions.find(s => s.time_slot === timeSlot);
                       if (!session) return null;
-                      
+
                       return (
                         <div key={session.id} className="flex items-center gap-3 p-4 bg-purple-50 border border-purple-200 rounded-lg">
                           <div className="flex-shrink-0">
@@ -503,7 +536,7 @@ export default function MentorDashboard() {
               <Card>
                 <CardHeader>
                   <CardTitle>Set Availability for Mentorship Day</CardTitle>
-                  <p className="text-sm text-gray-600">Tuesday, October 28, 2025</p>
+                  <p className="text-sm text-gray-600">{formatDate(selectedDate)}</p>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>

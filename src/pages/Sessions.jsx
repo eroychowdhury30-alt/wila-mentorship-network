@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -12,15 +11,24 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 
 export default function Sessions() {
   const [selectedSession, setSelectedSession] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(new Date('2025-10-28'));
   const queryClient = useQueryClient();
 
   const { data: sessions = [], isLoading: sessionsLoading } = useQuery({
-    queryKey: ['sessions'],
-    queryFn: () => base44.entities.Session.list(),
+    queryKey: ['sessions', selectedDate.toISOString().split('T')[0]],
+    queryFn: () => base44.entities.Session.filter({ 
+      date: selectedDate.toISOString().split('T')[0]
+    }),
   });
 
   const bookSessionMutation = useMutation({
@@ -59,6 +67,23 @@ export default function Sessions() {
     return sessions.filter(s => s.time_slot === time);
   };
 
+  const formatDate = (date) => {
+    return date.toLocaleDateString('en-US', { 
+      weekday: 'long', 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    });
+  };
+
+  const formatShortDate = (date) => {
+    return date.toLocaleDateString('en-US', { 
+      month: 'short', 
+      day: 'numeric',
+      year: 'numeric'
+    });
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Session Sign Up Info Section */}
@@ -88,11 +113,29 @@ export default function Sessions() {
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-semibold text-gray-900">
-                Mentorship Day - Tuesday October 28, 2025
+                Mentorship Day - {formatDate(selectedDate)}
               </h2>
-              <Button variant="ghost" size="icon">
-                <Search className="w-5 h-5 text-gray-500" />
-              </Button>
+              <div className="flex items-center gap-2">
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" className="w-[240px] justify-start text-left font-normal">
+                      <Calendar className="mr-2 h-4 w-4" />
+                      {formatDate(selectedDate)}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="end">
+                    <CalendarComponent
+                      mode="single"
+                      selected={selectedDate}
+                      onSelect={(date) => date && setSelectedDate(date)}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+                <Button variant="ghost" size="icon">
+                  <Search className="w-5 h-5 text-gray-500" />
+                </Button>
+              </div>
             </div>
 
             <div className="flex items-center justify-end gap-4 text-sm mb-6">
@@ -101,7 +144,7 @@ export default function Sessions() {
             </div>
 
             <div className="text-right text-sm text-gray-600 mb-4">
-              Oct 28, 2025
+              {formatShortDate(selectedDate)}
             </div>
 
             <div className="mb-4 text-sm font-medium text-gray-700 bg-gray-50 p-2 rounded">
@@ -111,6 +154,12 @@ export default function Sessions() {
             {sessionsLoading ? (
               <div className="text-center py-12">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
+              </div>
+            ) : sessions.length === 0 ? (
+              <div className="text-center py-12">
+                <Calendar className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+                <p className="text-gray-500">No sessions available for this date</p>
+                <p className="text-sm text-gray-400 mt-1">Please select a different date</p>
               </div>
             ) : (
               <div className="overflow-x-auto">
@@ -169,7 +218,7 @@ export default function Sessions() {
               <Calendar className="w-5 h-5 text-gray-400 mt-0.5" />
               <div>
                 <p className="font-semibold text-gray-900">
-                  Tue Oct 28 2025, {selectedSession?.time_slot} - {selectedSession?.time_slot === '9am' ? '10:00am' : selectedSession?.time_slot === '10am' ? '11:00am' : selectedSession?.time_slot === '11am' ? '12:00pm' : selectedSession?.time_slot === '12pm' ? '1:00pm' : selectedSession?.time_slot === '1pm' ? '2:00pm' : selectedSession?.time_slot === '2pm' ? '3:00pm' : '4:00pm'}
+                  {selectedSession && formatDate(new Date(selectedSession.date))}, {selectedSession?.time_slot} - {selectedSession?.time_slot === '9am' ? '10:00am' : selectedSession?.time_slot === '10am' ? '11:00am' : selectedSession?.time_slot === '11am' ? '12:00pm' : selectedSession?.time_slot === '12pm' ? '1:00pm' : selectedSession?.time_slot === '1pm' ? '2:00pm' : selectedSession?.time_slot === '2pm' ? '3:00pm' : '4:00pm'}
                 </p>
                 <div className="mt-2">
                   <span className="inline-block bg-purple-600 text-white text-xs px-3 py-1 rounded">
