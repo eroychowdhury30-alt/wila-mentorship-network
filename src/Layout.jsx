@@ -1,6 +1,5 @@
-
 import React, { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
@@ -11,12 +10,14 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  DropdownMenuSeparator } from
-"@/components/ui/dropdown-menu";
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
 
 export default function Layout({ children }) {
   const [user, setUser] = useState(null);
+  const [isCheckingOnboarding, setIsCheckingOnboarding] = useState(true);
   const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     loadUser();
@@ -26,8 +27,18 @@ export default function Layout({ children }) {
     try {
       const currentUser = await base44.auth.me();
       setUser(currentUser);
+      
+      // Check if user needs onboarding (not on onboarding page already)
+      if (!location.pathname.includes('Onboarding')) {
+        if (!currentUser.onboarding_completed || !currentUser.user_type) {
+          navigate(createPageUrl('Onboarding'));
+          return;
+        }
+      }
     } catch (error) {
       console.error('Error loading user:', error);
+    } finally {
+      setIsCheckingOnboarding(false);
     }
   };
 
@@ -38,6 +49,15 @@ export default function Layout({ children }) {
   // Don't show nav on onboarding page
   if (location.pathname.includes('Onboarding')) {
     return <div className="min-h-screen">{children}</div>;
+  }
+
+  // Show loading while checking onboarding status
+  if (isCheckingOnboarding && user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+      </div>
+    );
   }
 
   return (
@@ -54,17 +74,17 @@ export default function Layout({ children }) {
             </Link>
 
             <div className="flex items-center gap-4">
-              {user?.role === 'admin' &&
-              <Link to={createPageUrl('AdminDashboard')}>
+              {user?.role === 'admin' && (
+                <Link to={createPageUrl('AdminDashboard')}>
                   <Button variant="ghost" className="gap-2">
                     <Shield className="w-4 h-4" />
                     <span className="hidden md:inline">Admin Panel</span>
                   </Button>
                 </Link>
-              }
+              )}
 
-              {user?.user_type === 'mentee' &&
-              <>
+              {user?.user_type === 'mentee' && (
+                <>
                   <Link to={createPageUrl('Home')}>
                     <Button variant="ghost" className="gap-2">
                       <Users className="w-4 h-4" />
@@ -78,10 +98,10 @@ export default function Layout({ children }) {
                     </Button>
                   </Link>
                 </>
-              }
+              )}
 
-              {user?.user_type === 'mentor' &&
-              <>
+              {user?.user_type === 'mentor' && (
+                <>
                   <Link to={createPageUrl('Home')}>
                     <Button variant="ghost" className="gap-2">
                       <Users className="w-4 h-4" />
@@ -91,18 +111,18 @@ export default function Layout({ children }) {
                   <Link to={createPageUrl('MentorDashboard')}>
                     <Button variant="ghost" className="gap-2">
                       <LayoutDashboard className="w-4 h-4" />
-                      <span className="hidden md:inline">Profile</span>
+                      <span className="hidden md:inline">Dashboard</span>
                     </Button>
                   </Link>
                 </>
-              }
+              )}
 
-              {user ?
-              <DropdownMenu>
+              {user ? (
+                <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="outline" className="gap-2">
                       <div className="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center text-white text-sm font-semibold">
-                        {user.full_name?.split(' ').map((n) => n[0]).join('') || 'U'}
+                        {user.full_name?.split(' ').map(n => n[0]).join('') || 'U'}
                       </div>
                       <div className="text-left hidden md:block">
                         <p className="text-sm font-medium text-gray-900">{user.full_name}</p>
@@ -115,21 +135,21 @@ export default function Layout({ children }) {
                       <p className="text-sm font-medium">{user.full_name}</p>
                       <p className="text-xs text-gray-500">{user.email}</p>
                       <p className="text-xs text-purple-600 capitalize mt-1">{user.user_type} Account</p>
-                      {user.role === 'admin' &&
-                    <Badge className="mt-1 bg-orange-500">Admin</Badge>
-                    }
+                      {user.role === 'admin' && (
+                        <Badge className="mt-1 bg-orange-500">Admin</Badge>
+                      )}
                     </div>
                     <DropdownMenuSeparator />
-                    {user.role === 'admin' &&
-                  <DropdownMenuItem asChild>
+                    {user.role === 'admin' && (
+                      <DropdownMenuItem asChild>
                         <Link to={createPageUrl('AdminDashboard')} className="cursor-pointer">
                           <Shield className="w-4 h-4 mr-2" />
                           Admin Panel
                         </Link>
                       </DropdownMenuItem>
-                  }
-                    {user.user_type === 'mentee' &&
-                  <>
+                    )}
+                    {user.user_type === 'mentee' && (
+                      <>
                         <DropdownMenuItem asChild>
                           <Link to={createPageUrl('Home')} className="cursor-pointer">
                             <Users className="w-4 h-4 mr-2" />
@@ -143,9 +163,9 @@ export default function Layout({ children }) {
                           </Link>
                         </DropdownMenuItem>
                       </>
-                  }
-                    {user.user_type === 'mentor' &&
-                  <>
+                    )}
+                    {user.user_type === 'mentor' && (
+                      <>
                         <DropdownMenuItem asChild>
                           <Link to={createPageUrl('Home')} className="cursor-pointer">
                             <Users className="w-4 h-4 mr-2" />
@@ -159,19 +179,19 @@ export default function Layout({ children }) {
                           </Link>
                         </DropdownMenuItem>
                       </>
-                  }
+                    )}
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={handleLogout} className="text-red-600 cursor-pointer">
                       <LogOut className="w-4 h-4 mr-2" />
                       Logout
                     </DropdownMenuItem>
                   </DropdownMenuContent>
-                </DropdownMenu> :
-
-              <Button onClick={() => base44.auth.redirectToLogin()} className="bg-purple-600 hover:bg-purple-700">
+                </DropdownMenu>
+              ) : (
+                <Button onClick={() => base44.auth.redirectToLogin()} className="bg-purple-600 hover:bg-purple-700">
                   Sign In
                 </Button>
-              }
+              )}
             </div>
           </div>
         </div>
@@ -179,6 +199,6 @@ export default function Layout({ children }) {
 
       {/* Main Content */}
       {children}
-    </div>);
-
+    </div>
+  );
 }
