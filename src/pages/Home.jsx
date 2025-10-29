@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
@@ -118,15 +119,17 @@ export default function Home() {
                 >
                   Browse Mentors
                 </Button>
-                <Link to={createPageUrl('Sessions')}>
-                  <Button
-                    size="lg"
-                    variant="outline"
-                    className="bg-white hover:bg-gray-100 text-purple-600 font-semibold px-8 border-0"
-                  >
-                    Mentor Session Sign Up
-                  </Button>
-                </Link>
+                {user.user_type === 'mentee' && (
+                  <Link to={createPageUrl('Sessions')}>
+                    <Button
+                      size="lg"
+                      variant="outline"
+                      className="bg-white hover:bg-gray-100 text-purple-600 font-semibold px-8 border-0"
+                    >
+                      Mentor Session Sign Up
+                    </Button>
+                  </Link>
+                )}
               </>
             ) : (
               <Button
@@ -177,7 +180,7 @@ export default function Home() {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {sortedMentors.map((mentor) => (
-                  <MentorCard key={mentor.id} mentor={mentor} />
+                  <MentorCard key={mentor.id} mentor={mentor} isMentee={user.user_type === 'mentee'} />
                 ))}
               </div>
             )}

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -80,12 +81,20 @@ export default function Layout({ children }) {
               )}
 
               {user?.user_type === 'mentor' && (
-                <Link to={createPageUrl('MentorDashboard')}>
-                  <Button variant="ghost" className="gap-2">
-                    <LayoutDashboard className="w-4 h-4" />
-                    <span className="hidden md:inline">Dashboard</span>
-                  </Button>
-                </Link>
+                <>
+                  <Link to={createPageUrl('Home')}>
+                    <Button variant="ghost" className="gap-2">
+                      <Users className="w-4 h-4" />
+                      <span className="hidden md:inline">Browse Mentors</span>
+                    </Button>
+                  </Link>
+                  <Link to={createPageUrl('MentorDashboard')}>
+                    <Button variant="ghost" className="gap-2">
+                      <LayoutDashboard className="w-4 h-4" />
+                      <span className="hidden md:inline">Dashboard</span>
+                    </Button>
+                  </Link>
+                </>
               )}
 
               {user ? (
@@ -136,12 +145,20 @@ export default function Layout({ children }) {
                       </>
                     )}
                     {user.user_type === 'mentor' && (
-                      <DropdownMenuItem asChild>
-                        <Link to={createPageUrl('MentorDashboard')} className="cursor-pointer">
-                          <LayoutDashboard className="w-4 h-4 mr-2" />
-                          My Dashboard
-                        </Link>
-                      </DropdownMenuItem>
+                      <>
+                        <DropdownMenuItem asChild>
+                          <Link to={createPageUrl('Home')} className="cursor-pointer">
+                            <Users className="w-4 h-4 mr-2" />
+                            Browse Mentors
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link to={createPageUrl('MentorDashboard')} className="cursor-pointer">
+                            <LayoutDashboard className="w-4 h-4 mr-2" />
+                            My Dashboard
+                          </Link>
+                        </DropdownMenuItem>
+                      </>
                     )}
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={handleLogout} className="text-red-600 cursor-pointer">

@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Briefcase, Users, Clock, ExternalLink, UserPlus } from 'lucide-react';
 
-export default function MentorCard({ mentor }) {
+export default function MentorCard({ mentor, isMentee = false }) {
   const getExperienceBadgeColor = (exp) => {
     if (exp.includes('Over 20')) return 'bg-yellow-100 text-yellow-800 border-yellow-300';
     if (exp.includes('11-20')) return 'bg-purple-100 text-purple-800 border-purple-300';
@@ -84,23 +84,25 @@ export default function MentorCard({ mentor }) {
         )}
       </div>
 
-      <div className="flex gap-2 pt-4 border-t">
+      <div className={`flex gap-2 pt-4 border-t ${!isMentee && 'justify-center'}`}>
         {mentor.linkedin_url && (
           <Button 
-            className="flex-1 bg-purple-600 hover:bg-purple-700 text-white"
+            className={`${isMentee ? 'flex-1' : ''} bg-purple-600 hover:bg-purple-700 text-white`}
             onClick={() => window.open(mentor.linkedin_url, '_blank')}
           >
             <ExternalLink className="w-4 h-4 mr-2" />
             LinkedIn
           </Button>
         )}
-        <Button 
-          variant="outline"
-          className="flex-1 border-gray-300 hover:bg-gray-50"
-        >
-          <UserPlus className="w-4 h-4 mr-2" />
-          Sign Up
-        </Button>
+        {isMentee && (
+          <Button 
+            variant="outline"
+            className="flex-1 border-gray-300 hover:bg-gray-50"
+          >
+            <UserPlus className="w-4 h-4 mr-2" />
+            Sign Up
+          </Button>
+        )}
       </div>
     </Card>
   );
