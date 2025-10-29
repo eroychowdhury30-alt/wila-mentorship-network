@@ -4,7 +4,7 @@ import { createPageUrl } from "@/utils";
 import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Users, Calendar, LayoutDashboard, LogOut, Menu, Shield } from "lucide-react";
+import { Users, Calendar, LayoutDashboard, LogOut, Shield } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -28,15 +28,39 @@ export default function Layout({ children }) {
       const currentUser = await base44.auth.me();
       setUser(currentUser);
       
-      // Check if user needs onboarding (not on onboarding page already)
-      if (!location.pathname.includes('Onboarding')) {
+      // Skip onboarding check for these pages
+      const skipOnboardingPages = ['Welcome', 'Onboarding', 'MenteeQuestionnaire'];
+      const currentPage = location.pathname.split('/').pop();
+      
+      if (!skipOnboardingPages.includes(currentPage)) {
+        // Check if user needs onboarding
         if (!currentUser.onboarding_completed || !currentUser.user_type) {
-          navigate(createPageUrl('Onboarding'));
+          // Check if they have an intended user type from localStorage
+          const intendedUserType = localStorage.getItem('intended_user_type');
+          
+          if (intendedUserType) {
+            // Update user with intended type
+            await base44.auth.updateMe({ user_type: intendedUserType });
+            localStorage.removeItem('intended_user_type');
+            
+            // Redirect based on type
+            if (intendedUserType === 'mentee') {
+              navigate(createPageUrl('MenteeQuestionnaire'));
+            } else {
+              navigate(createPageUrl('MentorDashboard'));
+            }
+          } else {
+            // No intended type, send to welcome
+            navigate(createPageUrl('Welcome'));
+          }
           return;
         }
       }
     } catch (error) {
-      console.error('Error loading user:', error);
+      // User is not logged in
+      if (!location.pathname.includes('Welcome')) {
+        navigate(createPageUrl('Welcome'));
+      }
     } finally {
       setIsCheckingOnboarding(false);
     }
@@ -46,13 +70,16 @@ export default function Layout({ children }) {
     base44.auth.logout();
   };
 
-  // Don't show nav on onboarding page
-  if (location.pathname.includes('Onboarding')) {
+  // Don't show nav on these pages
+  const noNavPages = ['Welcome', 'Onboarding', 'MenteeQuestionnaire'];
+  const currentPage = location.pathname.split('/').pop();
+  
+  if (noNavPages.includes(currentPage)) {
     return <div className="min-h-screen">{children}</div>;
   }
 
   // Show loading while checking onboarding status
-  if (isCheckingOnboarding && user) {
+  if (isCheckingOnboarding) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
@@ -188,7 +215,7 @@ export default function Layout({ children }) {
                   </DropdownMenuContent>
                 </DropdownMenu>
               ) : (
-                <Button onClick={() => base44.auth.redirectToLogin()} className="bg-purple-600 hover:bg-purple-700">
+                <Button onClick={() => navigate(createPageUrl('Welcome'))} className="bg-purple-600 hover:bg-purple-700">
                   Sign In
                 </Button>
               )}
