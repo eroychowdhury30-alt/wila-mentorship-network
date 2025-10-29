@@ -9,7 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Calendar, Briefcase, Users, Clock, ExternalLink, Plus, X, Trash2, XCircle } from 'lucide-react';
+import { Calendar, Briefcase, Users, Clock, ExternalLink, Plus, X, Trash2, XCircle, Pause } from 'lucide-react';
 import { toast } from 'sonner';
 import {
   Select,
@@ -222,6 +222,33 @@ export default function MentorDashboard() {
     );
   }
 
+  // Show paused message
+  if (mentorProfile && mentorProfile.status === 'paused') {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
+        <Card className="max-w-md w-full">
+          <CardHeader className="text-center">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-yellow-100 rounded-full mb-4 mx-auto">
+              <Pause className="w-8 h-8 text-yellow-600" />
+            </div>
+            <CardTitle className="text-2xl">Account Paused</CardTitle>
+          </CardHeader>
+          <CardContent className="text-center space-y-4">
+            <p className="text-gray-600">
+              Your mentor account has been temporarily paused by the administrator. 
+              Your profile is not visible to mentees during this time. Please contact the admin for more information.
+            </p>
+            <div className="bg-yellow-50 p-4 rounded-lg">
+              <p className="text-sm font-medium text-yellow-900 mb-2">Your Profile:</p>
+              <p className="text-sm text-yellow-700">{profileData.full_name}</p>
+              <p className="text-xs text-yellow-600">{profileData.title} at {profileData.company}</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   // Show rejected message
   if (mentorProfile && mentorProfile.status === 'rejected') {
     return (
@@ -251,8 +278,15 @@ export default function MentorDashboard() {
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-6xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Mentor Dashboard</h1>
-          <p className="text-gray-600">Manage your profile and availability</p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">Mentor Dashboard</h1>
+              <p className="text-gray-600">Manage your profile and availability</p>
+            </div>
+            {mentorProfile && mentorProfile.status === 'approved' && (
+              <Badge className="bg-green-600 text-white">Active</Badge>
+            )}
+          </div>
         </div>
 
         <div className="grid lg:grid-cols-3 gap-6">

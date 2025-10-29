@@ -57,10 +57,11 @@
       "enum": [
         "pending",
         "approved",
-        "rejected"
+        "rejected",
+        "paused"
       ],
       "default": "pending",
-      "description": "Approval status"
+      "description": "Approval status: pending, approved, rejected, or paused"
     }
   },
   "required": [

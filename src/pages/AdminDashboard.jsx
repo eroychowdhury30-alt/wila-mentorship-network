@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Shield, Users, UserCheck, UserX, Clock, CheckCircle, XCircle, Trash2 } from 'lucide-react';
+import { Shield, Users, UserCheck, UserX, Clock, CheckCircle, XCircle, Trash2, Pause, Play } from 'lucide-react';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
@@ -44,6 +44,11 @@ export default function AdminDashboard() {
     queryFn: () => base44.entities.Mentor.filter({ status: 'approved' }),
   });
 
+  const { data: pausedMentors = [] } = useQuery({
+    queryKey: ['paused-mentors'],
+    queryFn: () => base44.entities.Mentor.filter({ status: 'paused' }),
+  });
+
   const { data: allUsers = [] } = useQuery({
     queryKey: ['all-users'],
     queryFn: () => base44.entities.User.list(),
@@ -71,11 +76,30 @@ export default function AdminDashboard() {
     },
   });
 
+  const pauseMentorMutation = useMutation({
+    mutationFn: (mentorId) => base44.entities.Mentor.update(mentorId, { status: 'paused' }),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['approved-mentors']);
+      queryClient.invalidateQueries(['paused-mentors']);
+      toast.success('Mentor paused');
+    },
+  });
+
+  const activateMentorMutation = useMutation({
+    mutationFn: (mentorId) => base44.entities.Mentor.update(mentorId, { status: 'approved' }),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['approved-mentors']);
+      queryClient.invalidateQueries(['paused-mentors']);
+      toast.success('Mentor activated!');
+    },
+  });
+
   const deleteMentorMutation = useMutation({
     mutationFn: (mentorId) => base44.entities.Mentor.delete(mentorId),
     onSuccess: () => {
       queryClient.invalidateQueries(['pending-mentors']);
       queryClient.invalidateQueries(['approved-mentors']);
+      queryClient.invalidateQueries(['paused-mentors']);
       toast.success('Mentor removed');
     },
   });
@@ -99,6 +123,7 @@ export default function AdminDashboard() {
   const menteeUsers = allUsers.filter(u => u.user_type === 'mentee');
   const mentorUsers = allUsers.filter(u => u.user_type === 'mentor');
   const bookedSessions = allSessions.filter(s => s.is_booked);
+  const activeMentors = approvedMentors.length;
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
@@ -112,14 +137,14 @@ export default function AdminDashboard() {
         </div>
 
         {/* Stats Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8">
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-medium text-gray-600">Pending Approvals</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold text-orange-600">{pendingMentors.length}</div>
-              <p className="text-xs text-gray-500 mt-1">Mentors awaiting review</p>
+              <p className="text-xs text-gray-500 mt-1">Awaiting review</p>
             </CardContent>
           </Card>
 
@@ -128,8 +153,18 @@ export default function AdminDashboard() {
               <CardTitle className="text-sm font-medium text-gray-600">Active Mentors</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-purple-600">{approvedMentors.length}</div>
-              <p className="text-xs text-gray-500 mt-1">Approved mentors</p>
+              <div className="text-3xl font-bold text-green-600">{activeMentors}</div>
+              <p className="text-xs text-gray-500 mt-1">Approved & visible</p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium text-gray-600">Paused Mentors</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold text-yellow-600">{pausedMentors.length}</div>
+              <p className="text-xs text-gray-500 mt-1">Temporarily inactive</p>
             </CardContent>
           </Card>
 
@@ -148,7 +183,7 @@ export default function AdminDashboard() {
               <CardTitle className="text-sm font-medium text-gray-600">Booked Sessions</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-green-600">{bookedSessions.length}</div>
+              <div className="text-3xl font-bold text-purple-600">{bookedSessions.length}</div>
               <p className="text-xs text-gray-500 mt-1">Total bookings</p>
             </CardContent>
           </Card>
@@ -159,15 +194,19 @@ export default function AdminDashboard() {
           <TabsList>
             <TabsTrigger value="pending" className="gap-2">
               <Clock className="w-4 h-4" />
-              Pending Mentors ({pendingMentors.length})
+              Pending ({pendingMentors.length})
             </TabsTrigger>
-            <TabsTrigger value="mentors" className="gap-2">
+            <TabsTrigger value="active" className="gap-2">
               <UserCheck className="w-4 h-4" />
-              Active Mentors ({approvedMentors.length})
+              Active ({activeMentors})
+            </TabsTrigger>
+            <TabsTrigger value="paused" className="gap-2">
+              <Pause className="w-4 h-4" />
+              Paused ({pausedMentors.length})
             </TabsTrigger>
             <TabsTrigger value="users" className="gap-2">
               <Users className="w-4 h-4" />
-              All Users ({allUsers.length})
+              Users ({allUsers.length})
             </TabsTrigger>
           </TabsList>
 
@@ -258,40 +297,118 @@ export default function AdminDashboard() {
           </TabsContent>
 
           {/* Active Mentors */}
-          <TabsContent value="mentors">
+          <TabsContent value="active">
             <Card>
               <CardHeader>
                 <CardTitle>Active Mentors</CardTitle>
               </CardHeader>
               <CardContent>
                 {approvedMentors.length === 0 ? (
-                  <p className="text-center text-gray-500 py-8">No approved mentors yet</p>
+                  <p className="text-center text-gray-500 py-8">No active mentors</p>
                 ) : (
                   <div className="space-y-3">
                     {approvedMentors.map((mentor) => (
                       <div key={mentor.id} className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center text-purple-600 font-semibold text-sm">
+                          <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center text-green-600 font-semibold text-sm">
                             {mentor.full_name.split(' ').map(n => n[0]).join('')}
                           </div>
                           <div>
-                            <p className="font-medium">{mentor.full_name}</p>
+                            <div className="flex items-center gap-2">
+                              <p className="font-medium">{mentor.full_name}</p>
+                              <Badge className="bg-green-600 text-white text-xs">Active</Badge>
+                            </div>
                             <p className="text-sm text-gray-600">{mentor.title} at {mentor.company}</p>
                           </div>
                         </div>
-                        <Button
-                          onClick={() => {
-                            if (confirm(`Remove ${mentor.full_name} from the platform?`)) {
-                              deleteMentorMutation.mutate(mentor.id);
-                            }
-                          }}
-                          variant="ghost"
-                          size="sm"
-                          className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                        >
-                          <Trash2 className="w-4 h-4 mr-2" />
-                          Remove
-                        </Button>
+                        <div className="flex gap-2">
+                          <Button
+                            onClick={() => {
+                              if (confirm(`Pause ${mentor.full_name}'s account?`)) {
+                                pauseMentorMutation.mutate(mentor.id);
+                              }
+                            }}
+                            variant="outline"
+                            size="sm"
+                            className="text-yellow-600 hover:text-yellow-700 hover:bg-yellow-50"
+                          >
+                            <Pause className="w-4 h-4 mr-2" />
+                            Pause
+                          </Button>
+                          <Button
+                            onClick={() => {
+                              if (confirm(`Remove ${mentor.full_name} from the platform?`)) {
+                                deleteMentorMutation.mutate(mentor.id);
+                              }
+                            }}
+                            variant="ghost"
+                            size="sm"
+                            className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                          >
+                            <Trash2 className="w-4 h-4 mr-2" />
+                            Remove
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Paused Mentors */}
+          <TabsContent value="paused">
+            <Card>
+              <CardHeader>
+                <CardTitle>Paused Mentors</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {pausedMentors.length === 0 ? (
+                  <p className="text-center text-gray-500 py-8">No paused mentors</p>
+                ) : (
+                  <div className="space-y-3">
+                    {pausedMentors.map((mentor) => (
+                      <div key={mentor.id} className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center text-yellow-600 font-semibold text-sm">
+                            {mentor.full_name.split(' ').map(n => n[0]).join('')}
+                          </div>
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <p className="font-medium">{mentor.full_name}</p>
+                              <Badge className="bg-yellow-600 text-white text-xs">Paused</Badge>
+                            </div>
+                            <p className="text-sm text-gray-600">{mentor.title} at {mentor.company}</p>
+                          </div>
+                        </div>
+                        <div className="flex gap-2">
+                          <Button
+                            onClick={() => {
+                              if (confirm(`Activate ${mentor.full_name}'s account?`)) {
+                                activateMentorMutation.mutate(mentor.id);
+                              }
+                            }}
+                            className="bg-green-600 hover:bg-green-700"
+                            size="sm"
+                          >
+                            <Play className="w-4 h-4 mr-2" />
+                            Activate
+                          </Button>
+                          <Button
+                            onClick={() => {
+                              if (confirm(`Remove ${mentor.full_name} from the platform?`)) {
+                                deleteMentorMutation.mutate(mentor.id);
+                              }
+                            }}
+                            variant="ghost"
+                            size="sm"
+                            className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                          >
+                            <Trash2 className="w-4 h-4 mr-2" />
+                            Remove
+                          </Button>
+                        </div>
                       </div>
                     ))}
                   </div>
