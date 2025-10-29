@@ -5,6 +5,7 @@ import Onboarding from './pages/Onboarding';
 import MentorDashboard from './pages/MentorDashboard';
 import AdminDashboard from './pages/AdminDashboard';
 import Welcome from './pages/Welcome';
+import MenteeQuestionnaire from './pages/MenteeQuestionnaire';
 import Layout from './Layout.jsx';
 
 
@@ -16,6 +17,7 @@ export const PAGES = {
     "MentorDashboard": MentorDashboard,
     "AdminDashboard": AdminDashboard,
     "Welcome": Welcome,
+    "MenteeQuestionnaire": MenteeQuestionnaire,
 }
 
 export const pagesConfig = {
