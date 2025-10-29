@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Link, useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { Button } from '@/components/ui/button';
-import { Users, LogIn } from 'lucide-react';
+import { Users } from 'lucide-react';
 import MentorCard from '../components/MentorCard';
 import FilterBar from '../components/FilterBar';
 
@@ -28,8 +28,8 @@ export default function Home() {
       const currentUser = await base44.auth.me();
       setUser(currentUser);
     } catch (error) {
-      // User is not logged in - redirect to Welcome
-      navigate(createPageUrl('Welcome'));
+      // User is not logged in - Layout will handle redirect to Welcome
+      console.log('User not logged in');
     } finally {
       setIsCheckingAuth(false);
     }
@@ -92,7 +92,7 @@ export default function Home() {
     );
   }
 
-  // If no user, show nothing (will redirect in useEffect)
+  // If no user, Layout will redirect to Welcome
   if (!user) {
     return null;
   }
