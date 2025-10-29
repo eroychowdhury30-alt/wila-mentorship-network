@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
@@ -29,8 +28,8 @@ export default function Home() {
       const currentUser = await base44.auth.me();
       setUser(currentUser);
     } catch (error) {
-      // User is not logged in
-      console.log('User not logged in');
+      // User is not logged in - redirect to Welcome
+      navigate(createPageUrl('Welcome'));
     } finally {
       setIsCheckingAuth(false);
     }
@@ -93,6 +92,11 @@ export default function Home() {
     );
   }
 
+  // If no user, show nothing (will redirect in useEffect)
+  if (!user) {
+    return null;
+  }
+
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
@@ -119,108 +123,68 @@ export default function Home() {
             community who are ready to guide your professional journey
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
-            {user ? (
-              <>
+            <Button
+              size="lg"
+              onClick={scrollToMentors}
+              className="bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-semibold px-8"
+            >
+              Browse Mentors
+            </Button>
+            {user.user_type === 'mentee' && (
+              <Link to={createPageUrl('Sessions')}>
                 <Button
                   size="lg"
-                  onClick={scrollToMentors}
-                  className="bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-semibold px-8"
+                  variant="outline"
+                  className="bg-white hover:bg-gray-100 text-purple-600 font-semibold px-8 border-0"
                 >
-                  Browse Mentors
+                  Mentor Session Sign Up
                 </Button>
-                {user.user_type === 'mentee' && (
-                  <Link to={createPageUrl('Sessions')}>
-                    <Button
-                      size="lg"
-                      variant="outline"
-                      className="bg-white hover:bg-gray-100 text-purple-600 font-semibold px-8 border-0"
-                    >
-                      Mentor Session Sign Up
-                    </Button>
-                  </Link>
-                )}
-              </>
-            ) : (
-              <Button
-                onClick={() => navigate(createPageUrl('Welcome'))}
-                size="lg"
-                className="bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-semibold px-8"
-              >
-                <LogIn className="w-5 h-5 mr-2" />
-                Get Started
-              </Button>
+              </Link>
             )}
           </div>
         </div>
       </div>
 
       {/* Mentor Directory Section */}
-      {user ? (
-        <div id="mentor-directory" className="py-16 px-6 bg-gray-50">
-          <div className="max-w-7xl mx-auto">
-            <div className="text-center mb-12">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-purple-600 rounded-full mb-4">
-                <Users className="w-8 h-8 text-white" />
-              </div>
-              <h2 className="text-4xl font-bold text-purple-600 mb-4">
-                Mentor Directory
-              </h2>
+      <div id="mentor-directory" className="py-16 px-6 bg-gray-50">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-purple-600 rounded-full mb-4">
+              <Users className="w-8 h-8 text-white" />
             </div>
-
-            <FilterBar
-              filters={filters}
-              onFilterChange={handleFilterChange}
-              onClearAll={handleClearAll}
-            />
-
-            <div className="mb-6">
-              <h3 className="text-lg font-semibold text-gray-900">
-                {sortedMentors.length} Mentors Found
-              </h3>
-              <p className="text-gray-600 text-sm">
-                Browse profiles or use the controls above to refine your search
-              </p>
-            </div>
-
-            {isLoading ? (
-              <div className="text-center py-12">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {sortedMentors.map((mentor) => (
-                  <MentorCard key={mentor.id} mentor={mentor} isMentee={user.user_type === 'mentee'} />
-                ))}
-              </div>
-            )}
+            <h2 className="text-4xl font-bold text-purple-600 mb-4">
+              Mentor Directory
+            </h2>
           </div>
-        </div>
-      ) : (
-        <div className="py-16 px-6 bg-gray-50">
-          <div className="max-w-3xl mx-auto text-center">
-            <div className="bg-white rounded-lg shadow-lg p-12">
-              <div className="inline-flex items-center justify-center w-20 h-20 bg-purple-100 rounded-full mb-6">
-                <Users className="w-10 h-10 text-purple-600" />
-              </div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-4">
-                Sign In to Browse Mentors
-              </h2>
-              <p className="text-lg text-gray-600 mb-8">
-                Create an account or sign in to access our directory of accomplished women leaders 
-                and book 1-on-1 mentorship sessions.
-              </p>
-              <Button
-                onClick={() => base44.auth.redirectToLogin()}
-                size="lg"
-                className="bg-purple-600 hover:bg-purple-700 text-white font-semibold px-12"
-              >
-                <LogIn className="w-5 h-5 mr-2" />
-                Sign In / Create Account
-              </Button>
-            </div>
+
+          <FilterBar
+            filters={filters}
+            onFilterChange={handleFilterChange}
+            onClearAll={handleClearAll}
+          />
+
+          <div className="mb-6">
+            <h3 className="text-lg font-semibold text-gray-900">
+              {sortedMentors.length} Mentors Found
+            </h3>
+            <p className="text-gray-600 text-sm">
+              Browse profiles or use the controls above to refine your search
+            </p>
           </div>
+
+          {isLoading ? (
+            <div className="text-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {sortedMentors.map((mentor) => (
+                <MentorCard key={mentor.id} mentor={mentor} isMentee={user.user_type === 'mentee'} />
+              ))}
+            </div>
+          )}
         </div>
-      )}
+      </div>
     </div>
   );
 }
