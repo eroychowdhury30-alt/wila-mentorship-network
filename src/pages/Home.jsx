@@ -4,13 +4,14 @@ import { useQuery } from '@tanstack/react-query';
 import { Link, useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { Button } from '@/components/ui/button';
-import { Users } from 'lucide-react';
+import { Users, LogIn } from 'lucide-react';
 import MentorCard from '../components/MentorCard';
 import FilterBar from '../components/FilterBar';
 
 export default function Home() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [filters, setFilters] = useState({
     sortBy: 'firstName',
     experience: 'all',
@@ -27,13 +28,15 @@ export default function Home() {
       const currentUser = await base44.auth.me();
       setUser(currentUser);
       
-      // Only redirect if user is logged in AND is a mentor
+      // Redirect mentors to their dashboard
       if (currentUser.user_type === 'mentor') {
         navigate(createPageUrl('MentorDashboard'));
       }
     } catch (error) {
-      // User is not logged in - that's fine, they can still browse mentors
-      console.log('User not logged in - showing public mentor directory');
+      // User is not logged in
+      console.log('User not logged in');
+    } finally {
+      setIsCheckingAuth(false);
     }
   };
 
@@ -43,6 +46,7 @@ export default function Home() {
       const allMentors = await base44.entities.Mentor.list();
       return allMentors.filter(m => m.status === 'approved');
     },
+    enabled: !!user,
   });
 
   const handleFilterChange = (key, value) => {
@@ -78,6 +82,14 @@ export default function Home() {
     return 0;
   });
 
+  if (isCheckingAuth) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
@@ -104,65 +116,105 @@ export default function Home() {
             community who are ready to guide your professional journey
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
-            <Button
-              size="lg"
-              className="bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-semibold px-8"
-            >
-              Browse Mentors
-            </Button>
-            <Link to={createPageUrl('Sessions')}>
+            {user ? (
+              <>
+                <Button
+                  size="lg"
+                  className="bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-semibold px-8"
+                >
+                  Browse Mentors
+                </Button>
+                <Link to={createPageUrl('Sessions')}>
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    className="bg-white hover:bg-gray-100 text-purple-600 font-semibold px-8 border-0"
+                  >
+                    Mentor Session Sign Up
+                  </Button>
+                </Link>
+              </>
+            ) : (
               <Button
+                onClick={() => base44.auth.redirectToLogin()}
                 size="lg"
-                variant="outline"
-                className="bg-white hover:bg-gray-100 text-purple-600 font-semibold px-8 border-0"
+                className="bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-semibold px-8"
               >
-                Mentor Session Sign Up
+                <LogIn className="w-5 h-5 mr-2" />
+                Sign In to Browse Mentors
               </Button>
-            </Link>
+            )}
           </div>
         </div>
       </div>
 
       {/* Mentor Directory Section */}
-      <div className="py-16 px-6 bg-gray-50">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-12">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-purple-600 rounded-full mb-4">
-              <Users className="w-8 h-8 text-white" />
+      {user ? (
+        <div className="py-16 px-6 bg-gray-50">
+          <div className="max-w-7xl mx-auto">
+            <div className="text-center mb-12">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-purple-600 rounded-full mb-4">
+                <Users className="w-8 h-8 text-white" />
+              </div>
+              <h2 className="text-4xl font-bold text-purple-600 mb-4">
+                Mentor Directory
+              </h2>
             </div>
-            <h2 className="text-4xl font-bold text-purple-600 mb-4">
-              Mentor Directory
-            </h2>
+
+            <FilterBar
+              filters={filters}
+              onFilterChange={handleFilterChange}
+              onClearAll={handleClearAll}
+            />
+
+            <div className="mb-6">
+              <h3 className="text-lg font-semibold text-gray-900">
+                {sortedMentors.length} Mentors Found
+              </h3>
+              <p className="text-gray-600 text-sm">
+                Browse profiles or use the controls above to refine your search
+              </p>
+            </div>
+
+            {isLoading ? (
+              <div className="text-center py-12">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {sortedMentors.map((mentor) => (
+                  <MentorCard key={mentor.id} mentor={mentor} />
+                ))}
+              </div>
+            )}
           </div>
-
-          <FilterBar
-            filters={filters}
-            onFilterChange={handleFilterChange}
-            onClearAll={handleClearAll}
-          />
-
-          <div className="mb-6">
-            <h3 className="text-lg font-semibold text-gray-900">
-              {sortedMentors.length} Mentors Found
-            </h3>
-            <p className="text-gray-600 text-sm">
-              Browse profiles or use the controls above to refine your search
-            </p>
-          </div>
-
-          {isLoading ? (
-            <div className="text-center py-12">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {sortedMentors.map((mentor) => (
-                <MentorCard key={mentor.id} mentor={mentor} />
-              ))}
-            </div>
-          )}
         </div>
-      </div>
+      ) : (
+        <div className="py-16 px-6 bg-gray-50">
+          <div className="max-w-3xl mx-auto text-center">
+            <div className="bg-white rounded-lg shadow-lg p-12">
+              <div className="inline-flex items-center justify-center w-20 h-20 bg-purple-100 rounded-full mb-6">
+                <Users className="w-10 h-10 text-purple-600" />
+              </div>
+              <h2 className="text-3xl font-bold text-gray-900 mb-4">
+                Sign In to Browse Mentors
+              </h2>
+              <p className="text-lg text-gray-600 mb-8">
+                Create an account or sign in to access our directory of accomplished women leaders 
+                and book 1-on-1 mentorship sessions.
+              </p>
+              <Button
+                onClick={() => base44.auth.redirectToLogin()}
+                size="lg"
+                className="bg-purple-600 hover:bg-purple-700 text-white font-semibold px-12"
+              >
+                <LogIn className="w-5 h-5 mr-2" />
+                Sign In / Create Account
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

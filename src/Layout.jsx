@@ -1,11 +1,10 @@
-
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge"; // Added Badge import
-import { Users, Calendar, LayoutDashboard, LogOut, Menu, Shield } from "lucide-react"; // Added Shield import
+import { Badge } from "@/components/ui/badge";
+import { Users, Calendar, LayoutDashboard, LogOut, Menu, Shield } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -46,7 +45,7 @@ export default function Layout({ children }) {
       <nav className="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
-            <Link to={createPageUrl(user?.user_type === 'mentor' ? 'MentorDashboard' : 'Home')} className="flex items-center gap-3">
+            <Link to={createPageUrl('Home')} className="flex items-center gap-3">
               <div className="w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center">
                 <div className="text-white font-bold text-sm">WILA</div>
               </div>
@@ -54,7 +53,7 @@ export default function Layout({ children }) {
             </Link>
 
             <div className="flex items-center gap-4">
-              {user?.role === 'admin' && ( // Added Admin Panel link to nav bar
+              {user?.role === 'admin' && (
                 <Link to={createPageUrl('AdminDashboard')}>
                   <Button variant="ghost" className="gap-2">
                     <Shield className="w-4 h-4" />
@@ -89,7 +88,7 @@ export default function Layout({ children }) {
                 </Link>
               )}
 
-              {user && (
+              {user ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="outline" className="gap-2">
@@ -107,12 +106,12 @@ export default function Layout({ children }) {
                       <p className="text-sm font-medium">{user.full_name}</p>
                       <p className="text-xs text-gray-500">{user.email}</p>
                       <p className="text-xs text-purple-600 capitalize mt-1">{user.user_type} Account</p>
-                      {user.role === 'admin' && ( // Added Admin badge
+                      {user.role === 'admin' && (
                         <Badge className="mt-1 bg-orange-500">Admin</Badge>
                       )}
                     </div>
                     <DropdownMenuSeparator />
-                    {user.role === 'admin' && ( // Added Admin Panel link to dropdown
+                    {user.role === 'admin' && (
                       <DropdownMenuItem asChild>
                         <Link to={createPageUrl('AdminDashboard')} className="cursor-pointer">
                           <Shield className="w-4 h-4 mr-2" />
@@ -151,6 +150,10 @@ export default function Layout({ children }) {
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
+              ) : (
+                <Button onClick={() => base44.auth.redirectToLogin()} className="bg-purple-600 hover:bg-purple-700">
+                  Sign In
+                </Button>
               )}
             </div>
           </div>
