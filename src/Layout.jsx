@@ -15,60 +15,53 @@ import {
 
 export default function Layout({ children }) {
   const [user, setUser] = useState(null);
-  const [isCheckingOnboarding, setIsCheckingOnboarding] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
   const location = useLocation();
   const navigate = useNavigate();
 
   useEffect(() => {
     loadUser();
-  }, []);
+  }, [location.pathname]);
 
   const loadUser = async () => {
+    const currentPage = location.pathname.split('/').pop();
+    const publicPages = ['Welcome'];
+    
     try {
       const currentUser = await base44.auth.me();
       setUser(currentUser);
+      setIsLoading(false);
       
-      // Skip onboarding check for these pages
-      const skipOnboardingPages = ['Welcome', 'Onboarding', 'MenteeQuestionnaire'];
-      const currentPage = location.pathname.split('/').pop();
-      
-      // If user is logged in and on Welcome page, redirect to Home
-      if (currentPage === 'Welcome' && currentUser.onboarding_completed && currentUser.user_type) {
-        navigate(createPageUrl('Home'));
+      // If logged in and on Welcome, redirect to Home
+      if (currentPage === 'Welcome' && currentUser.onboarding_completed) {
+        navigate(createPageUrl('Home'), { replace: true });
         return;
       }
       
-      if (!skipOnboardingPages.includes(currentPage)) {
-        // Check if user needs onboarding
-        if (!currentUser.onboarding_completed || !currentUser.user_type) {
-          // Check if they have an intended user type from localStorage
-          const intendedUserType = localStorage.getItem('intended_user_type');
+      // Handle onboarding
+      if (!currentUser.onboarding_completed || !currentUser.user_type) {
+        const intendedUserType = localStorage.getItem('intended_user_type');
+        
+        if (intendedUserType && currentPage !== 'MenteeQuestionnaire') {
+          await base44.auth.updateMe({ user_type: intendedUserType });
+          localStorage.removeItem('intended_user_type');
           
-          if (intendedUserType) {
-            // Update user with intended type
-            await base44.auth.updateMe({ user_type: intendedUserType });
-            localStorage.removeItem('intended_user_type');
-            
-            // Redirect based on type
-            if (intendedUserType === 'mentee') {
-              navigate(createPageUrl('MenteeQuestionnaire'));
-            } else {
-              navigate(createPageUrl('MentorDashboard'));
-            }
+          if (intendedUserType === 'mentee') {
+            navigate(createPageUrl('MenteeQuestionnaire'), { replace: true });
           } else {
-            // No intended type, send to welcome
-            navigate(createPageUrl('Welcome'));
+            navigate(createPageUrl('MentorDashboard'), { replace: true });
           }
-          return;
         }
       }
     } catch (error) {
-      // User is not logged in
-      if (!location.pathname.includes('Welcome')) {
-        navigate(createPageUrl('Welcome'));
+      // Not logged in
+      setUser(null);
+      setIsLoading(false);
+      
+      // Redirect to Welcome if not on a public page
+      if (!publicPages.includes(currentPage)) {
+        navigate(createPageUrl('Welcome'), { replace: true });
       }
-    } finally {
-      setIsCheckingOnboarding(false);
     }
   };
 
@@ -76,16 +69,19 @@ export default function Layout({ children }) {
     base44.auth.logout();
   };
 
-  // Don't show nav on these pages
-  const noNavPages = ['Welcome', 'Onboarding', 'MenteeQuestionnaire'];
   const currentPage = location.pathname.split('/').pop();
+  const noNavPages = ['Welcome', 'Onboarding', 'MenteeQuestionnaire'];
   
+  // Don't show nav on certain pages
   if (noNavPages.includes(currentPage)) {
+    if (isLoading) {
+      return <div className="min-h-screen">{children}</div>;
+    }
     return <div className="min-h-screen">{children}</div>;
   }
 
-  // Show loading while checking onboarding status
-  if (isCheckingOnboarding) {
+  // Show minimal loading for protected pages
+  if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
