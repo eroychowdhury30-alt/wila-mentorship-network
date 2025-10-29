@@ -3,7 +3,6 @@ import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Calendar, Search } from 'lucide-react';
-import MentorCard from '../components/MentorCard';
 import TimeSlotCard from '../components/TimeSlotCard';
 import { toast } from 'sonner';
 import {
@@ -17,11 +16,6 @@ export default function Sessions() {
   const [selectedSession, setSelectedSession] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const queryClient = useQueryClient();
-
-  const { data: mentors = [], isLoading: mentorsLoading } = useQuery({
-    queryKey: ['mentors'],
-    queryFn: () => base44.entities.Mentor.list(),
-  });
 
   const { data: sessions = [], isLoading: sessionsLoading } = useQuery({
     queryKey: ['sessions'],
@@ -57,7 +51,6 @@ export default function Sessions() {
     }
   };
 
-  const featuredMentors = mentors.slice(0, 3);
   const timeSlots = ['9am', '10am', '11am', '12pm', '1pm', '2pm', '3pm'];
   
   const getSessionsForTimeSlot = (time) => {
@@ -66,23 +59,6 @@ export default function Sessions() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Featured Mentors Section */}
-      <div className="bg-white py-12 px-6 border-b">
-        <div className="max-w-7xl mx-auto">
-          {mentorsLoading ? (
-            <div className="text-center py-12">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {featuredMentors.map((mentor) => (
-                <MentorCard key={mentor.id} mentor={mentor} />
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
-
       {/* Session Sign Up Info Section */}
       <div className="py-16 px-6">
         <div className="max-w-6xl mx-auto">
