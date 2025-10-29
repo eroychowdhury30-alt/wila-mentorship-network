@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
@@ -77,6 +76,13 @@ export default function Home() {
     return 0;
   });
 
+  const scrollToMentors = () => {
+    const mentorSection = document.getElementById('mentor-directory');
+    if (mentorSection) {
+      mentorSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
   if (isCheckingAuth) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -115,6 +121,7 @@ export default function Home() {
               <>
                 <Button
                   size="lg"
+                  onClick={scrollToMentors}
                   className="bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-semibold px-8"
                 >
                   Browse Mentors
@@ -147,7 +154,7 @@ export default function Home() {
 
       {/* Mentor Directory Section */}
       {user ? (
-        <div className="py-16 px-6 bg-gray-50">
+        <div id="mentor-directory" className="py-16 px-6 bg-gray-50">
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-12">
               <div className="inline-flex items-center justify-center w-16 h-16 bg-purple-600 rounded-full mb-4">
