@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -227,7 +228,7 @@ export default function MentorDashboard() {
               You'll receive access to the dashboard once your profile is reviewed.
             </p>
             <div className="bg-purple-50 p-4 rounded-lg">
-              <p className="text-sm font-medium text-purple-900 mb-2">Your Profile:</p>
+              <p className="text-sm font-medium text-purple-900 mb-2">Your Application:</p>
               <p className="text-sm text-purple-700">{profileData.full_name}</p>
               <p className="text-xs text-purple-600">{profileData.title} at {profileData.company}</p>
             </div>
@@ -257,7 +258,7 @@ export default function MentorDashboard() {
               Your profile is not visible to mentees during this time. Please contact the admin for more information.
             </p>
             <div className="bg-yellow-50 p-4 rounded-lg">
-              <p className="text-sm font-medium text-yellow-900 mb-2">Your Profile:</p>
+              <p className="text-sm font-medium text-yellow-900 mb-2">Your Account:</p>
               <p className="text-sm text-yellow-700">{profileData.full_name}</p>
               <p className="text-xs text-yellow-600">{profileData.title} at {profileData.company}</p>
             </div>
@@ -301,7 +302,7 @@ export default function MentorDashboard() {
         <div className="mb-8">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">Mentor Dashboard</h1>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">Your Mentor Dashboard</h1>
               <p className="text-gray-600">Manage your profile and availability</p>
             </div>
             <Badge className="bg-green-600 text-white">Active</Badge>
@@ -316,7 +317,7 @@ export default function MentorDashboard() {
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div className="flex-1">
-                    <CardTitle>Schedule</CardTitle>
+                    <CardTitle>Your Schedule</CardTitle>
                     <p className="text-sm text-gray-600 mt-1">{formatDate(selectedDate)}</p>
                   </div>
                   <div className="flex items-center gap-2">
@@ -384,7 +385,7 @@ export default function MentorDashboard() {
             <Card>
               <CardHeader>
                 <div className="flex items-center justify-between">
-                  <CardTitle>Profile Information</CardTitle>
+                  <CardTitle>Your Profile Information</CardTitle>
                   {mentorProfile && !isEditing && (
                     <Button onClick={() => setIsEditing(true)} variant="outline" size="sm">
                       Edit Profile
@@ -538,7 +539,7 @@ export default function MentorDashboard() {
             {mentorProfile && (
               <Card>
                 <CardHeader>
-                  <CardTitle>Set Availability for Mentorship Day</CardTitle>
+                  <CardTitle>Set Your Availability for Mentorship Day</CardTitle>
                   <p className="text-sm text-gray-600">{formatDate(selectedDate)}</p>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -584,7 +585,7 @@ export default function MentorDashboard() {
             {mentorProfile && (
               <Card>
                 <CardHeader>
-                  <CardTitle>Profile Preview</CardTitle>
+                  <CardTitle>Your Profile Preview</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="text-center">
@@ -626,7 +627,7 @@ export default function MentorDashboard() {
             {/* Sessions Summary */}
             <Card>
               <CardHeader>
-                <CardTitle>Sessions Summary</CardTitle>
+                <CardTitle>Your Sessions Summary</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
@@ -650,7 +651,7 @@ export default function MentorDashboard() {
             {availableSessions.length > 0 && (
               <Card>
                 <CardHeader>
-                  <CardTitle>Available Slots</CardTitle>
+                  <CardTitle>Your Available Slots</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2">
