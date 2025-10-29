@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
-import { Calendar, Search } from 'lucide-react';
+import { Calendar, Search, AlertCircle } from 'lucide-react';
 import TimeSlotCard from '../components/TimeSlotCard';
 import { toast } from 'sonner';
 import {
@@ -17,12 +17,24 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { Calendar as CalendarComponent } from '@/components/ui/calendar';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 export default function Sessions() {
   const [selectedSession, setSelectedSession] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date('2025-10-28'));
+  const [currentUser, setCurrentUser] = useState(null);
   const queryClient = useQueryClient();
+
+  // Get current user
+  const { data: user } = useQuery({
+    queryKey: ['current-user'],
+    queryFn: async () => {
+      const userData = await base44.auth.me();
+      setCurrentUser(userData);
+      return userData;
+    },
+  });
 
   const { data: sessions = [], isLoading: sessionsLoading } = useQuery({
     queryKey: ['sessions', selectedDate.toISOString().split('T')[0]],
@@ -30,6 +42,19 @@ export default function Sessions() {
       date: selectedDate.toISOString().split('T')[0]
     }),
   });
+
+  // Check if user has already booked a session for the selected date
+  const { data: userBookedSessions = [] } = useQuery({
+    queryKey: ['user-booked-sessions', currentUser?.email, selectedDate.toISOString().split('T')[0]],
+    queryFn: () => base44.entities.Session.filter({ 
+      booked_by: currentUser?.email,
+      date: selectedDate.toISOString().split('T')[0]
+    }),
+    enabled: !!currentUser?.email,
+  });
+
+  const hasBookedSession = userBookedSessions.length > 0;
+  const bookedSession = userBookedSessions[0];
 
   const bookSessionMutation = useMutation({
     mutationFn: async (sessionId) => {
@@ -42,6 +67,7 @@ export default function Sessions() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries(['sessions']);
+      queryClient.invalidateQueries(['user-booked-sessions']);
       toast.success('Session booked successfully!');
       setShowModal(false);
       setSelectedSession(null);
@@ -49,6 +75,11 @@ export default function Sessions() {
   });
 
   const handleSessionClick = (session) => {
+    if (hasBookedSession) {
+      toast.error('You have already booked a session for this date. You can only book one 30-minute session per day.');
+      return;
+    }
+    
     if (!session.is_booked) {
       setSelectedSession(session);
       setShowModal(true);
@@ -56,6 +87,11 @@ export default function Sessions() {
   };
 
   const handleSignup = () => {
+    if (hasBookedSession) {
+      toast.error('You have already booked a session for this date.');
+      return;
+    }
+    
     if (selectedSession) {
       bookSessionMutation.mutate(selectedSession.id);
     }
@@ -97,7 +133,7 @@ export default function Sessions() {
               Mentorship Day Session Sign Up
             </h1>
             <p className="text-lg text-gray-700 max-w-3xl mx-auto leading-relaxed">
-              On Mentorship Day, mentors offer (free) 1-on-1 sessions (45min) in select hours. A{' '}
+              On Mentorship Day, mentors offer (free) 1-on-1 sessions (30min) in select hours. A{' '}
               <span className="inline-flex items-center">
                 <Calendar className="w-4 h-4 mx-1" />
               </span>{' '}
@@ -107,7 +143,23 @@ export default function Sessions() {
               </span>{' '}
               icon, it means the mentor for that session is already booked. You will receive a confirmation email from Teamup after the booking.
             </p>
+            <p className="text-md text-purple-600 font-semibold mt-4">
+              Note: You can only book one 30-minute session per day.
+            </p>
           </div>
+
+          {/* Already Booked Alert */}
+          {hasBookedSession && (
+            <Alert className="mb-6 border-green-200 bg-green-50">
+              <AlertCircle className="h-4 w-4 text-green-600" />
+              <AlertTitle className="text-green-900">Session Already Booked!</AlertTitle>
+              <AlertDescription className="text-green-800">
+                You have already booked a session with <strong>{bookedSession.mentor_name}</strong> at{' '}
+                <strong>{bookedSession.time_slot}</strong> on {formatDate(selectedDate)}. 
+                You can only book one session per day.
+              </AlertDescription>
+            </Alert>
+          )}
 
           {/* Calendar Schedule */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
@@ -185,6 +237,7 @@ export default function Sessions() {
                                 key={session.id}
                                 session={session}
                                 onClick={() => handleSessionClick(session)}
+                                disabled={hasBookedSession}
                               />
                             ))}
                           </div>
@@ -218,7 +271,7 @@ export default function Sessions() {
               <Calendar className="w-5 h-5 text-gray-400 mt-0.5" />
               <div>
                 <p className="font-semibold text-gray-900">
-                  {selectedSession && formatDate(new Date(selectedSession.date))}, {selectedSession?.time_slot} - {selectedSession?.time_slot === '9am' ? '10:00am' : selectedSession?.time_slot === '10am' ? '11:00am' : selectedSession?.time_slot === '11am' ? '12:00pm' : selectedSession?.time_slot === '12pm' ? '1:00pm' : selectedSession?.time_slot === '1pm' ? '2:00pm' : selectedSession?.time_slot === '2pm' ? '3:00pm' : '4:00pm'}
+                  {selectedSession && formatDate(new Date(selectedSession.date))}, {selectedSession?.time_slot} - {selectedSession?.time_slot === '9am' ? '9:30am' : selectedSession?.time_slot === '10am' ? '10:30am' : selectedSession?.time_slot === '11am' ? '11:30am' : selectedSession?.time_slot === '12pm' ? '12:30pm' : selectedSession?.time_slot === '1pm' ? '1:30pm' : selectedSession?.time_slot === '2pm' ? '2:30pm' : '3:30pm'}
                 </p>
                 <div className="mt-2">
                   <span className="inline-block bg-purple-600 text-white text-xs px-3 py-1 rounded">
@@ -229,17 +282,26 @@ export default function Sessions() {
             </div>
 
             <div className="text-sm text-gray-500">
-              Created 3 months ago, last updated 3 months ago
+              30-minute mentorship session
             </div>
+
+            {hasBookedSession && (
+              <Alert className="border-red-200 bg-red-50">
+                <AlertCircle className="h-4 w-4 text-red-600" />
+                <AlertDescription className="text-red-800">
+                  You have already booked a session for this date. You can only book one session per day.
+                </AlertDescription>
+              </Alert>
+            )}
 
             <div className="space-y-3 pt-4">
               <Button
                 onClick={handleSignup}
-                disabled={bookSessionMutation.isPending}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3"
+                disabled={bookSessionMutation.isPending || hasBookedSession}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Calendar className="w-4 h-4 mr-2" />
-                {bookSessionMutation.isPending ? 'Booking...' : 'Signup'}
+                {hasBookedSession ? 'Already Booked a Session Today' : bookSessionMutation.isPending ? 'Booking...' : 'Signup'}
               </Button>
               
               <Button
