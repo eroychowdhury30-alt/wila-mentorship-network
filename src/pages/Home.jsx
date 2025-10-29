@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
@@ -48,7 +49,10 @@ export default function Home() {
 
   const { data: mentors = [], isLoading } = useQuery({
     queryKey: ['mentors'],
-    queryFn: () => base44.entities.Mentor.list(),
+    queryFn: async () => {
+      const allMentors = await base44.entities.Mentor.list();
+      return allMentors.filter(m => m.status === 'approved');
+    },
     enabled: !isCheckingAuth,
   });
 

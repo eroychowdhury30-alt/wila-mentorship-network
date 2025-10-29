@@ -1,9 +1,11 @@
+
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
-import { Users, Calendar, LayoutDashboard, LogOut, Menu } from "lucide-react";
+import { Badge } from "@/components/ui/badge"; // Added Badge import
+import { Users, Calendar, LayoutDashboard, LogOut, Menu, Shield } from "lucide-react"; // Added Shield import
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -52,6 +54,15 @@ export default function Layout({ children }) {
             </Link>
 
             <div className="flex items-center gap-4">
+              {user?.role === 'admin' && ( // Added Admin Panel link to nav bar
+                <Link to={createPageUrl('AdminDashboard')}>
+                  <Button variant="ghost" className="gap-2">
+                    <Shield className="w-4 h-4" />
+                    <span className="hidden md:inline">Admin Panel</span>
+                  </Button>
+                </Link>
+              )}
+
               {user?.user_type === 'mentee' && (
                 <>
                   <Link to={createPageUrl('Home')}>
@@ -96,8 +107,19 @@ export default function Layout({ children }) {
                       <p className="text-sm font-medium">{user.full_name}</p>
                       <p className="text-xs text-gray-500">{user.email}</p>
                       <p className="text-xs text-purple-600 capitalize mt-1">{user.user_type} Account</p>
+                      {user.role === 'admin' && ( // Added Admin badge
+                        <Badge className="mt-1 bg-orange-500">Admin</Badge>
+                      )}
                     </div>
                     <DropdownMenuSeparator />
+                    {user.role === 'admin' && ( // Added Admin Panel link to dropdown
+                      <DropdownMenuItem asChild>
+                        <Link to={createPageUrl('AdminDashboard')} className="cursor-pointer">
+                          <Shield className="w-4 h-4 mr-2" />
+                          Admin Panel
+                        </Link>
+                      </DropdownMenuItem>
+                    )}
                     {user.user_type === 'mentee' && (
                       <>
                         <DropdownMenuItem asChild>

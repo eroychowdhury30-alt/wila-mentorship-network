@@ -3,6 +3,7 @@ import Schedule from './pages/Schedule';
 import Sessions from './pages/Sessions';
 import Onboarding from './pages/Onboarding';
 import MentorDashboard from './pages/MentorDashboard';
+import AdminDashboard from './pages/AdminDashboard';
 import Layout from './Layout.jsx';
 
 
@@ -12,6 +13,7 @@ export const PAGES = {
     "Sessions": Sessions,
     "Onboarding": Onboarding,
     "MentorDashboard": MentorDashboard,
+    "AdminDashboard": AdminDashboard,
 }
 
 export const pagesConfig = {

@@ -51,6 +51,16 @@
     "avatar_color": {
       "type": "string",
       "description": "Color for avatar background"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "approved",
+        "rejected"
+      ],
+      "default": "pending",
+      "description": "Approval status"
     }
   },
   "required": [

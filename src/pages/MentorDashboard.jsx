@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -8,7 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Calendar, Briefcase, Users, Clock, ExternalLink, Plus, X, Trash2 } from 'lucide-react';
+import { Calendar, Briefcase, Users, Clock, ExternalLink, Plus, X, Trash2, XCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import {
   Select,
@@ -51,7 +52,8 @@ export default function MentorDashboard() {
     experience_years: 'Over 20 years',
     expertise: [],
     mentors_to: [],
-    bio: ''
+    bio: '',
+    status: 'pending'
   });
   const [availableSlots, setAvailableSlots] = useState([]);
   const queryClient = useQueryClient();
@@ -90,7 +92,8 @@ export default function MentorDashboard() {
           experience_years: profile.experience_years || 'Over 20 years',
           expertise: profile.expertise || [],
           mentors_to: profile.mentors_to || [],
-          bio: profile.bio || ''
+          bio: profile.bio || '',
+          status: profile.status || 'pending'
         });
         setIsEditing(false);
       } else {
@@ -106,11 +109,11 @@ export default function MentorDashboard() {
       if (mentorProfile) {
         return base44.entities.Mentor.update(mentorProfile.id, data);
       } else {
-        return base44.entities.Mentor.create(data);
+        return base44.entities.Mentor.create({ ...data, status: 'pending' });
       }
     },
     onSuccess: () => {
-      toast.success('Profile saved successfully!');
+      toast.success(mentorProfile ? 'Profile updated successfully!' : 'Profile submitted for approval!');
       loadUser();
     },
   });
@@ -188,6 +191,61 @@ export default function MentorDashboard() {
       prev.includes(slot) ? prev.filter(s => s !== slot) : [...prev, slot]
     );
   };
+
+  // Show pending approval message
+  if (mentorProfile && mentorProfile.status === 'pending') {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
+        <Card className="max-w-md w-full">
+          <CardHeader className="text-center">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-orange-100 rounded-full mb-4 mx-auto">
+              <Clock className="w-8 h-8 text-orange-600" />
+            </div>
+            <CardTitle className="text-2xl">Approval Pending</CardTitle>
+          </CardHeader>
+          <CardContent className="text-center space-y-4">
+            <p className="text-gray-600">
+              Your mentor application has been submitted and is awaiting admin approval. 
+              You'll receive access to the dashboard once your profile is reviewed.
+            </p>
+            <div className="bg-purple-50 p-4 rounded-lg">
+              <p className="text-sm font-medium text-purple-900 mb-2">Your Profile:</p>
+              <p className="text-sm text-purple-700">{profileData.full_name}</p>
+              <p className="text-xs text-purple-600">{profileData.title} at {profileData.company}</p>
+            </div>
+            <Button onClick={() => setIsEditing(true)} variant="outline" className="w-full">
+              Edit Application
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // Show rejected message
+  if (mentorProfile && mentorProfile.status === 'rejected') {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
+        <Card className="max-w-md w-full">
+          <CardHeader className="text-center">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-red-100 rounded-full mb-4 mx-auto">
+              <XCircle className="w-8 h-8 text-red-600" />
+            </div>
+            <CardTitle className="text-2xl">Application Not Approved</CardTitle>
+          </CardHeader>
+          <CardContent className="text-center space-y-4">
+            <p className="text-gray-600">
+              Unfortunately, your mentor application was not approved at this time. 
+              Please contact the admin for more information.
+            </p>
+            <Button onClick={() => setIsEditing(true)} variant="outline" className="w-full">
+              Update & Resubmit
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
