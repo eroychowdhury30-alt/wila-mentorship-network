@@ -1,7 +1,8 @@
+
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { Button } from '@/components/ui/button';
 import { Users, LogIn } from 'lucide-react';
@@ -17,6 +18,7 @@ export default function Home() {
     expertise: 'all',
     mentees: 'all'
   });
+  const navigate = useNavigate();
 
   useEffect(() => {
     checkUser();
@@ -140,12 +142,12 @@ export default function Home() {
               </>
             ) : (
               <Button
-                onClick={() => base44.auth.redirectToLogin()}
+                onClick={() => navigate(createPageUrl('Welcome'))}
                 size="lg"
                 className="bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-semibold px-8"
               >
                 <LogIn className="w-5 h-5 mr-2" />
-                Sign In to Browse Mentors
+                Get Started
               </Button>
             )}
           </div>
