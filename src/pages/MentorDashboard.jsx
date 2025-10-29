@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -9,7 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Calendar, Briefcase, Users, Clock, ExternalLink, Plus, X, Trash2, XCircle, Pause } from 'lucide-react';
+import { Calendar, Briefcase, Users, Clock, ExternalLink, Plus, Trash2, XCircle, Pause } from 'lucide-react';
 import { toast } from 'sonner';
 import {
   Select,
@@ -18,8 +17,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Calendar as CalendarComponent } from '@/components/ui/calendar'; // Renamed to avoid conflict
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 
 const EXPERTISE_OPTIONS = [
   'Executive Leadership',
@@ -58,7 +61,7 @@ export default function MentorDashboard() {
     status: 'pending'
   });
   const [availableSlots, setAvailableSlots] = useState([]);
-  const [selectedDate, setSelectedDate] = useState(new Date('2025-10-28')); // Initialize with the specified date
+  const [selectedDate, setSelectedDate] = useState(new Date('2025-10-28'));
   const queryClient = useQueryClient();
 
   useEffect(() => {
@@ -77,7 +80,7 @@ export default function MentorDashboard() {
 
   const { data: existingSessions = [], isLoading: sessionsLoading } = useQuery({
     queryKey: ['mentor-sessions', mentorProfile?.full_name, selectedDate.toISOString().split('T')[0]],
-    queryFn: () => base44.entities.Session.filter({
+    queryFn: () => base44.entities.Session.filter({ 
       mentor_name: mentorProfile?.full_name,
       date: selectedDate.toISOString().split('T')[0]
     }),
@@ -132,7 +135,7 @@ export default function MentorDashboard() {
         date: selectedDate.toISOString().split('T')[0],
         is_booked: false
       }));
-
+      
       return base44.entities.Session.bulkCreate(sessionData);
     },
     onSuccess: () => {
@@ -199,11 +202,11 @@ export default function MentorDashboard() {
   };
 
   const formatDate = (date) => {
-    return date.toLocaleDateString('en-US', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
+    return date.toLocaleDateString('en-US', { 
+      weekday: 'long', 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
     });
   };
 
@@ -220,7 +223,7 @@ export default function MentorDashboard() {
           </CardHeader>
           <CardContent className="text-center space-y-4">
             <p className="text-gray-600">
-              Your mentor application has been submitted and is awaiting admin approval.
+              Your mentor application has been submitted and is awaiting admin approval. 
               You'll receive access to the dashboard once your profile is reviewed.
             </p>
             <div className="bg-purple-50 p-4 rounded-lg">
@@ -250,7 +253,7 @@ export default function MentorDashboard() {
           </CardHeader>
           <CardContent className="text-center space-y-4">
             <p className="text-gray-600">
-              Your mentor account has been temporarily paused by the administrator.
+              Your mentor account has been temporarily paused by the administrator. 
               Your profile is not visible to mentees during this time. Please contact the admin for more information.
             </p>
             <div className="bg-yellow-50 p-4 rounded-lg">
@@ -277,7 +280,7 @@ export default function MentorDashboard() {
           </CardHeader>
           <CardContent className="text-center space-y-4">
             <p className="text-gray-600">
-              Unfortunately, your mentor application was not approved at this time.
+              Unfortunately, your mentor application was not approved at this time. 
               Please contact the admin for more information.
             </p>
             <Button onClick={() => setIsEditing(true)} variant="outline" className="w-full">
@@ -352,7 +355,7 @@ export default function MentorDashboard() {
                     {TIME_SLOTS.map(timeSlot => {
                       const session = bookedSessions.find(s => s.time_slot === timeSlot);
                       if (!session) return null;
-
+                      
                       return (
                         <div key={session.id} className="flex items-center gap-3 p-4 bg-purple-50 border border-purple-200 rounded-lg">
                           <div className="flex-shrink-0">
