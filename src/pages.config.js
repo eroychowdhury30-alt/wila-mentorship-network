@@ -4,6 +4,7 @@ import Sessions from './pages/Sessions';
 import Onboarding from './pages/Onboarding';
 import MentorDashboard from './pages/MentorDashboard';
 import AdminDashboard from './pages/AdminDashboard';
+import Welcome from './pages/Welcome';
 import Layout from './Layout.jsx';
 
 
@@ -14,6 +15,7 @@ export const PAGES = {
     "Onboarding": Onboarding,
     "MentorDashboard": MentorDashboard,
     "AdminDashboard": AdminDashboard,
+    "Welcome": Welcome,
 }
 
 export const pagesConfig = {
