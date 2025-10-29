@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
@@ -12,7 +11,6 @@ import FilterBar from '../components/FilterBar';
 export default function Home() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
-  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [filters, setFilters] = useState({
     sortBy: 'firstName',
     experience: 'all',
@@ -21,29 +19,21 @@ export default function Home() {
   });
 
   useEffect(() => {
-    checkUserOnboarding();
+    checkUser();
   }, []);
 
-  const checkUserOnboarding = async () => {
+  const checkUser = async () => {
     try {
       const currentUser = await base44.auth.me();
       setUser(currentUser);
       
-      // Check if user has completed onboarding
-      if (!currentUser.user_type || !currentUser.onboarding_completed) {
-        navigate(createPageUrl('Onboarding'));
-        return;
-      }
-      
-      // If user is a mentor, redirect to mentor dashboard
+      // Only redirect if user is logged in AND is a mentor
       if (currentUser.user_type === 'mentor') {
         navigate(createPageUrl('MentorDashboard'));
-        return;
       }
     } catch (error) {
-      console.error('Error checking user:', error);
-    } finally {
-      setIsCheckingAuth(false);
+      // User is not logged in - that's fine, they can still browse mentors
+      console.log('User not logged in - showing public mentor directory');
     }
   };
 
@@ -53,7 +43,6 @@ export default function Home() {
       const allMentors = await base44.entities.Mentor.list();
       return allMentors.filter(m => m.status === 'approved');
     },
-    enabled: !isCheckingAuth,
   });
 
   const handleFilterChange = (key, value) => {
@@ -88,14 +77,6 @@ export default function Home() {
     }
     return 0;
   });
-
-  if (isCheckingAuth) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen">
