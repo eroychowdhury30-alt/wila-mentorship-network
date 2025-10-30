@@ -97,7 +97,7 @@ export default function MentorCard({ mentor, isMentee = false }) {
           </Button>
         )}
         {isMentee && (
-          <Link to={createPageUrl('Sessions')} className="flex-1">
+          <Link to={`${createPageUrl('Sessions')}?mentor=${encodeURIComponent(mentor.full_name)}`} className="flex-1">
             <Button 
               variant="outline"
               className="w-full border-gray-300 hover:bg-gray-50"
