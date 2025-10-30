@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
-import { Calendar, Search, AlertCircle } from 'lucide-react';
+import { Calendar, Search, AlertCircle, ArrowLeft } from 'lucide-react';
 import TimeSlotCard from '../components/TimeSlotCard';
 import { toast } from 'sonner';
+import { useNavigate } from 'react-router-dom';
+import { createPageUrl } from '@/utils';
 import {
   Dialog,
   DialogContent,
@@ -24,7 +26,18 @@ export default function Sessions() {
   const [showModal, setShowModal] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date('2025-10-28'));
   const [currentUser, setCurrentUser] = useState(null);
+  const [selectedMentor, setSelectedMentor] = useState(null);
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Get mentor name from URL parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    const mentorName = urlParams.get('mentor');
+    if (mentorName) {
+      setSelectedMentor(decodeURIComponent(mentorName));
+    }
+  }, []);
 
   // Get current user
   const { data: user } = useQuery({
@@ -37,10 +50,14 @@ export default function Sessions() {
   });
 
   const { data: sessions = [], isLoading: sessionsLoading } = useQuery({
-    queryKey: ['sessions', selectedDate.toISOString().split('T')[0]],
-    queryFn: () => base44.entities.Session.filter({ 
-      date: selectedDate.toISOString().split('T')[0]
-    }),
+    queryKey: ['sessions', selectedDate.toISOString().split('T')[0], selectedMentor],
+    queryFn: async () => {
+      const filterQuery = { date: selectedDate.toISOString().split('T')[0] };
+      if (selectedMentor) {
+        filterQuery.mentor_name = selectedMentor;
+      }
+      return base44.entities.Session.filter(filterQuery);
+    },
   });
 
   // Check if user has already booked a session for the selected date
@@ -97,6 +114,11 @@ export default function Sessions() {
     }
   };
 
+  const handleClearFilter = () => {
+    setSelectedMentor(null);
+    navigate(createPageUrl('Sessions'));
+  };
+
   const timeSlots = ['9am', '10am', '11am', '12pm', '1pm', '2pm', '3pm'];
   
   const getSessionsForTimeSlot = (time) => {
@@ -132,17 +154,36 @@ export default function Sessions() {
             <h1 className="text-4xl font-bold text-purple-600 mb-6">
               Mentorship Day Session Sign Up
             </h1>
-            <p className="text-lg text-gray-700 max-w-3xl mx-auto leading-relaxed">
-              On Mentorship Day, mentors offer (free) 1-on-1 sessions (30min) in select hours. A{' '}
-              <span className="inline-flex items-center">
-                <Calendar className="w-4 h-4 mx-1" />
-              </span>{' '}
-              icon indicates that the slot is available. You can click on the name to sign up. If there is no{' '}
-              <span className="inline-flex items-center">
-                <Calendar className="w-4 h-4 mx-1" />
-              </span>{' '}
-              icon, it means the mentor for that session is already booked. You will receive a confirmation email from Teamup after the booking.
-            </p>
+            {selectedMentor ? (
+              <div className="mb-4">
+                <div className="inline-flex items-center gap-2 bg-purple-100 px-4 py-2 rounded-lg">
+                  <span className="text-lg font-semibold text-purple-900">
+                    Viewing schedule for: {selectedMentor}
+                  </span>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleClearFilter}
+                    className="text-purple-700 hover:text-purple-900"
+                  >
+                    <ArrowLeft className="w-4 h-4 mr-1" />
+                    View All Mentors
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <p className="text-lg text-gray-700 max-w-3xl mx-auto leading-relaxed">
+                On Mentorship Day, mentors offer (free) 1-on-1 sessions (30min) in select hours. A{' '}
+                <span className="inline-flex items-center">
+                  <Calendar className="w-4 h-4 mx-1" />
+                </span>{' '}
+                icon indicates that the slot is available. You can click on the name to sign up. If there is no{' '}
+                <span className="inline-flex items-center">
+                  <Calendar className="w-4 h-4 mx-1" />
+                </span>{' '}
+                icon, it means the mentor for that session is already booked. You will receive a confirmation email from Teamup after the booking.
+              </p>
+            )}
             <p className="text-md text-purple-600 font-semibold mt-4">
               Note: You can only book one 30-minute session per day.
             </p>
@@ -165,7 +206,7 @@ export default function Sessions() {
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-semibold text-gray-900">
-                Mentorship Day - {formatDate(selectedDate)}
+                {selectedMentor ? `${selectedMentor}'s Schedule - ${formatDate(selectedDate)}` : `Mentorship Day - ${formatDate(selectedDate)}`}
               </h2>
               <div className="flex items-center gap-2">
                 <Popover>
@@ -210,8 +251,22 @@ export default function Sessions() {
             ) : sessions.length === 0 ? (
               <div className="text-center py-12">
                 <Calendar className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-                <p className="text-gray-500">No sessions available for this date</p>
+                <p className="text-gray-500">
+                  {selectedMentor 
+                    ? `No sessions available for ${selectedMentor} on this date` 
+                    : 'No sessions available for this date'}
+                </p>
                 <p className="text-sm text-gray-400 mt-1">Please select a different date</p>
+                {selectedMentor && (
+                  <Button
+                    variant="outline"
+                    className="mt-4"
+                    onClick={handleClearFilter}
+                  >
+                    <ArrowLeft className="w-4 h-4 mr-2" />
+                    View All Mentors
+                  </Button>
+                )}
               </div>
             ) : (
               <div className="overflow-x-auto">
