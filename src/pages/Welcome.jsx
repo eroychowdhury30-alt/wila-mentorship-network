@@ -1,5 +1,6 @@
 import React from 'react';
 import { base44 } from '@/api/base44Client';
+import { createPageUrl } from '@/utils';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Users, UserCheck } from 'lucide-react';
@@ -8,8 +9,13 @@ export default function Welcome() {
   const handleSelectUserType = (userType) => {
     // Store the intended user type in localStorage
     localStorage.setItem('intended_user_type', userType);
-    // Redirect to login
-    base44.auth.redirectToLogin();
+    
+    // Redirect to login with the appropriate next URL
+    const nextUrl = userType === 'mentor' 
+      ? createPageUrl('MentorDashboard')
+      : createPageUrl('Home');
+    
+    base44.auth.redirectToLogin(nextUrl);
   };
 
   return (
