@@ -210,7 +210,7 @@ export default function Layout({ children }) {
                         </DropdownMenuItem>
                         <DropdownMenuItem asChild>
                           <Link to={createPageUrl('Home')} className="cursor-pointer">
-                            <Users className="w-4 h-4" mr-2" />
+                            <Users className="w-4 h-4 mr-2" />
                             Browse Mentors
                           </Link>
                         </DropdownMenuItem>
