@@ -30,33 +30,57 @@ export default function Layout({ children }) {
     try {
       const currentUser = await base44.auth.me();
       setUser(currentUser);
-      setIsLoading(false);
       
-      // If logged in and on Welcome, redirect based on user type
-      if (currentPage === 'Welcome' && currentUser.onboarding_completed) {
+      // Check for intended user type from localStorage (from Welcome page selection)
+      const intendedUserType = localStorage.getItem('intended_user_type');
+      
+      // If user doesn't have user_type yet, set it from intended type
+      if (intendedUserType && !currentUser.user_type) {
+        await base44.auth.updateMe({ user_type: intendedUserType, onboarding_completed: true });
+        localStorage.removeItem('intended_user_type');
+        
+        // Redirect based on intended type
+        if (intendedUserType === 'mentor') {
+          navigate(createPageUrl('MentorDashboard'), { replace: true });
+        } else {
+          navigate(createPageUrl('Home'), { replace: true });
+        }
+        setIsLoading(false);
+        return;
+      }
+      
+      // If user has intended type in localStorage but already has user_type, just redirect and clean up
+      if (intendedUserType && currentUser.user_type) {
+        localStorage.removeItem('intended_user_type');
+        
         if (currentUser.user_type === 'mentor') {
           navigate(createPageUrl('MentorDashboard'), { replace: true });
         } else {
           navigate(createPageUrl('Home'), { replace: true });
         }
+        setIsLoading(false);
         return;
       }
       
-      // Handle onboarding
-      if (!currentUser.onboarding_completed || !currentUser.user_type) {
-        const intendedUserType = localStorage.getItem('intended_user_type');
-        
-        if (intendedUserType && currentPage !== 'MenteeQuestionnaire') {
-          await base44.auth.updateMe({ user_type: intendedUserType });
-          localStorage.removeItem('intended_user_type');
-          
-          if (intendedUserType === 'mentee') {
-            navigate(createPageUrl('MenteeQuestionnaire'), { replace: true });
-          } else {
-            navigate(createPageUrl('MentorDashboard'), { replace: true });
-          }
+      // If logged in and on Welcome page, redirect based on existing user type
+      if (currentPage === 'Welcome' && currentUser.user_type) {
+        if (currentUser.user_type === 'mentor') {
+          navigate(createPageUrl('MentorDashboard'), { replace: true });
+        } else {
+          navigate(createPageUrl('Home'), { replace: true });
         }
+        setIsLoading(false);
+        return;
       }
+      
+      // If user is logged in but has no user_type and no intended type, send to onboarding
+      if (!currentUser.user_type && currentPage !== 'Onboarding' && currentPage !== 'MenteeQuestionnaire') {
+        navigate(createPageUrl('Onboarding'), { replace: true });
+        setIsLoading(false);
+        return;
+      }
+      
+      setIsLoading(false);
     } catch (error) {
       // Not logged in
       setUser(null);
