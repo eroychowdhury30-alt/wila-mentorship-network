@@ -96,7 +96,6 @@ export default function MentorDashboard() {
     enabled: !!mentorProfile?.full_name,
   });
 
-  // Get mentee profile data
   const { data: menteeProfile } = useQuery({
     queryKey: ['mentee-profile', selectedMenteeSession?.booked_by],
     queryFn: async () => {
@@ -149,10 +148,11 @@ export default function MentorDashboard() {
 
   const saveProfileMutation = useMutation({
     mutationFn: async (data) => {
+      console.log('Saving profile with data:', data);
       if (mentorProfile) {
-        return base44.entities.Mentor.update(mentorProfile.id, data);
+        return await base44.entities.Mentor.update(mentorProfile.id, data);
       } else {
-        return base44.entities.Mentor.create({ ...data, status: 'pending' });
+        return await base44.entities.Mentor.create({ ...data, status: 'pending' });
       }
     },
     onSuccess: async () => {
@@ -175,7 +175,7 @@ export default function MentorDashboard() {
         is_booked: false
       }));
       
-      return base44.entities.Session.bulkCreate(sessionData);
+      return await base44.entities.Session.bulkCreate(sessionData);
     },
     onSuccess: () => {
       toast.success('Availability saved successfully!');
@@ -186,7 +186,7 @@ export default function MentorDashboard() {
 
   const deleteSessionMutation = useMutation({
     mutationFn: async (sessionId) => {
-      return base44.entities.Session.delete(sessionId);
+      return await base44.entities.Session.delete(sessionId);
     },
     onSuccess: () => {
       toast.success('Session deleted successfully!');
@@ -194,12 +194,20 @@ export default function MentorDashboard() {
     },
   });
 
-  const handleSaveProfile = () => {
+  const handleSaveProfile = async () => {
+    console.log('handleSaveProfile called');
+    console.log('profileData:', profileData);
+    
     if (!profileData.full_name || !profileData.title || !profileData.company) {
       toast.error('Please fill in all required fields');
       return;
     }
-    saveProfileMutation.mutate(profileData);
+    
+    try {
+      await saveProfileMutation.mutateAsync(profileData);
+    } catch (error) {
+      console.error('Save profile error:', error);
+    }
   };
 
   const handleSaveAvailability = () => {
@@ -254,7 +262,6 @@ export default function MentorDashboard() {
     });
   };
 
-  // Show pending approval message
   if (mentorProfile && mentorProfile.status === 'pending') {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
@@ -284,7 +291,6 @@ export default function MentorDashboard() {
     );
   }
 
-  // Show paused message
   if (mentorProfile && mentorProfile.status === 'paused') {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
@@ -311,7 +317,6 @@ export default function MentorDashboard() {
     );
   }
 
-  // Show rejected message
   if (mentorProfile && mentorProfile.status === 'rejected') {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
@@ -354,17 +359,16 @@ export default function MentorDashboard() {
 
         <Tabs defaultValue="profile" className="space-y-6">
           <TabsList className="grid w-full grid-cols-2 max-w-md">
-            <TabsTrigger value="profile" className="gap-2">
-              <User className="w-4 h-4" />
+            <TabsTrigger value="profile">
+              <User className="w-4 h-4 mr-2" />
               Profile
             </TabsTrigger>
-            <TabsTrigger value="sessions" className="gap-2">
-              <Calendar className="w-4 h-4" />
+            <TabsTrigger value="sessions">
+              <Calendar className="w-4 h-4 mr-2" />
               Sessions
             </TabsTrigger>
           </TabsList>
 
-          {/* Profile Tab */}
           <TabsContent value="profile">
             <div className="grid lg:grid-cols-3 gap-6">
               <div className="lg:col-span-2">
@@ -522,9 +526,7 @@ export default function MentorDashboard() {
                 </Card>
               </div>
 
-              {/* Sidebar */}
               <div className="space-y-6">
-                {/* Profile Preview */}
                 {mentorProfile && (
                   <Card>
                     <CardHeader>
@@ -570,7 +572,6 @@ export default function MentorDashboard() {
             </div>
           </TabsContent>
 
-          {/* Sessions Tab */}
           <TabsContent value="sessions">
             {!mentorProfile ? (
               <Card>
@@ -581,9 +582,7 @@ export default function MentorDashboard() {
               </Card>
             ) : (
               <div className="grid lg:grid-cols-3 gap-6">
-                {/* Main Content */}
                 <div className="lg:col-span-2 space-y-6">
-                  {/* Set Availability */}
                   <Card>
                     <CardHeader>
                       <div className="flex items-center justify-between">
@@ -649,7 +648,6 @@ export default function MentorDashboard() {
                     </CardContent>
                   </Card>
 
-                  {/* Booked Sessions */}
                   <Card>
                     <CardHeader>
                       <CardTitle>Booked Sessions</CardTitle>
@@ -707,9 +705,7 @@ export default function MentorDashboard() {
                   </Card>
                 </div>
 
-                {/* Sidebar */}
                 <div className="space-y-6">
-                  {/* Sessions Summary */}
                   <Card>
                     <CardHeader>
                       <CardTitle>Summary</CardTitle>
@@ -732,7 +728,6 @@ export default function MentorDashboard() {
                     </CardContent>
                   </Card>
 
-                  {/* Available Sessions to Delete */}
                   {availableSessions.length > 0 && (
                     <Card>
                       <CardHeader>
@@ -765,7 +760,6 @@ export default function MentorDashboard() {
         </Tabs>
       </div>
 
-      {/* Mentee Profile Modal */}
       <Dialog open={showMenteeModal} onOpenChange={setShowMenteeModal}>
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
@@ -773,7 +767,6 @@ export default function MentorDashboard() {
           </DialogHeader>
           
           <div className="space-y-6 py-4">
-            {/* Basic Info */}
             <div className="text-center">
               <div className="w-20 h-20 mx-auto bg-purple-100 rounded-full flex items-center justify-center text-purple-600 text-2xl font-bold mb-3">
                 {selectedMenteeSession?.mentee_name?.split(' ').map(n => n[0]).join('') || 'M'}
@@ -785,7 +778,6 @@ export default function MentorDashboard() {
               </div>
             </div>
 
-            {/* Session Info */}
             <div className="bg-purple-50 p-4 rounded-lg">
               <div className="flex items-center gap-2 mb-2">
                 <Clock className="w-5 h-5 text-purple-600" />
@@ -797,7 +789,6 @@ export default function MentorDashboard() {
               <p className="text-sm text-gray-700">Time: {selectedMenteeSession?.time_slot}</p>
             </div>
 
-            {/* Mentee Profile Data */}
             {menteeProfile?.mentee_profile ? (
               <div className="space-y-4">
                 <div>
