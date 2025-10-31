@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Calendar, Briefcase, Users, Clock, ExternalLink, Plus, Trash2, XCircle, Pause, Mail, User } from 'lucide-react';
 import { toast } from 'sonner';
 import {
@@ -351,390 +352,417 @@ export default function MentorDashboard() {
           </div>
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-6">
-          {/* Main Content */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Today's Schedule Calendar */}
-            {mentorProfile && (
-              <Card>
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <div className="flex-1">
-                      <CardTitle>Your Schedule</CardTitle>
-                      <p className="text-sm text-gray-600 mt-1">{formatDate(selectedDate)}</p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <Button variant="outline" className="w-[240px] justify-start text-left font-normal">
-                            <Calendar className="mr-2 h-4 w-4" />
-                            {formatDate(selectedDate)}
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="end">
-                          <CalendarComponent
-                            mode="single"
-                            selected={selectedDate}
-                            onSelect={(date) => date && setSelectedDate(date)}
-                            initialFocus
-                          />
-                        </PopoverContent>
-                      </Popover>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  {sessionsLoading ? (
-                    <div className="text-center py-8">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto"></div>
-                    </div>
-                  ) : bookedSessions.length === 0 ? (
-                    <div className="text-center py-8">
-                      <Calendar className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-                      <p className="text-gray-500">No sessions booked for this date</p>
-                      <p className="text-sm text-gray-400 mt-1">Your available slots will appear as they're booked</p>
-                    </div>
-                  ) : (
-                    <div className="space-y-3">
-                      {TIME_SLOTS.map(timeSlot => {
-                        const session = bookedSessions.find(s => s.time_slot === timeSlot);
-                        if (!session) return null;
-                        
-                        return (
-                          <div 
-                            key={session.id} 
-                            className="flex items-center gap-3 p-4 bg-purple-50 border border-purple-200 rounded-lg hover:shadow-md transition-shadow cursor-pointer"
-                            onClick={() => handleViewMentee(session)}
-                          >
-                            <div className="flex-shrink-0">
-                              <div className="w-12 h-12 bg-purple-600 rounded-full flex items-center justify-center text-white font-semibold">
-                                {session.mentee_name?.split(' ').map(n => n[0]).join('') || 'M'}
-                              </div>
-                            </div>
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2 mb-1">
-                                <Clock className="w-4 h-4 text-purple-600" />
-                                <span className="font-semibold text-gray-900">{timeSlot}</span>
-                                <Badge className="bg-purple-600 text-white text-xs">Booked</Badge>
-                              </div>
-                              <p className="text-sm text-gray-700 font-medium">{session.mentee_name || 'Mentee Name'}</p>
-                              <p className="text-xs text-gray-500">{session.booked_by}</p>
-                            </div>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleViewMentee(session);
-                              }}
-                            >
-                              <User className="w-4 h-4 mr-2" />
-                              View Profile
-                            </Button>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            )}
+        <Tabs defaultValue="profile" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-2 max-w-md">
+            <TabsTrigger value="profile" className="gap-2">
+              <User className="w-4 h-4" />
+              Profile
+            </TabsTrigger>
+            <TabsTrigger value="sessions" className="gap-2">
+              <Calendar className="w-4 h-4" />
+              Sessions
+            </TabsTrigger>
+          </TabsList>
 
-            {/* Profile Section */}
-            <Card>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle>Your Profile Information</CardTitle>
-                  {mentorProfile && !isEditing && (
-                    <Button onClick={() => setIsEditing(true)} variant="outline" size="sm">
-                      Edit Profile
-                    </Button>
-                  )}
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="full_name">Full Name *</Label>
-                    <Input
-                      id="full_name"
-                      value={profileData.full_name}
-                      onChange={(e) => setProfileData({ ...profileData, full_name: e.target.value })}
-                      disabled={!isEditing}
-                      placeholder="Enter your full name"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="title">Title *</Label>
-                    <Input
-                      id="title"
-                      value={profileData.title}
-                      onChange={(e) => setProfileData({ ...profileData, title: e.target.value })}
-                      disabled={!isEditing}
-                      placeholder="e.g., Senior Director"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="company">Company *</Label>
-                    <Input
-                      id="company"
-                      value={profileData.company}
-                      onChange={(e) => setProfileData({ ...profileData, company: e.target.value })}
-                      disabled={!isEditing}
-                      placeholder="e.g., Google"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="experience">Experience Level</Label>
-                    <Select
-                      value={profileData.experience_years}
-                      onValueChange={(value) => setProfileData({ ...profileData, experience_years: value })}
-                      disabled={!isEditing}
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="< 5 years">Less than 5 years</SelectItem>
-                        <SelectItem value="5-10 years">5-10 years</SelectItem>
-                        <SelectItem value="11-20 years">11-20 years</SelectItem>
-                        <SelectItem value="Over 20 years">Over 20 years</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-
-                <div>
-                  <Label htmlFor="linkedin_url">LinkedIn URL</Label>
-                  <Input
-                    id="linkedin_url"
-                    type="url"
-                    placeholder="https://linkedin.com/in/yourprofile"
-                    value={profileData.linkedin_url}
-                    onChange={(e) => setProfileData({ ...profileData, linkedin_url: e.target.value })}
-                    disabled={!isEditing}
-                  />
-                </div>
-
-                <div>
-                  <Label htmlFor="bio">Bio</Label>
-                  <Textarea
-                    id="bio"
-                    placeholder="Tell mentees about your experience..."
-                    value={profileData.bio}
-                    onChange={(e) => setProfileData({ ...profileData, bio: e.target.value })}
-                    disabled={!isEditing}
-                    rows={4}
-                  />
-                </div>
-
-                <div>
-                  <Label>Areas of Expertise</Label>
-                  <div className="grid grid-cols-2 gap-2 mt-2">
-                    {EXPERTISE_OPTIONS.map(option => (
-                      <div key={option} className="flex items-center space-x-2">
-                        <Checkbox
-                          id={option}
-                          checked={profileData.expertise.includes(option)}
-                          onCheckedChange={() => toggleExpertise(option)}
-                          disabled={!isEditing}
-                        />
-                        <label htmlFor={option} className="text-sm cursor-pointer">
-                          {option}
-                        </label>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <Label>I Want to Mentor</Label>
-                  <div className="grid grid-cols-2 gap-2 mt-2">
-                    {MENTEE_OPTIONS.map(option => (
-                      <div key={option} className="flex items-center space-x-2">
-                        <Checkbox
-                          id={option}
-                          checked={profileData.mentors_to.includes(option)}
-                          onCheckedChange={() => toggleMentee(option)}
-                          disabled={!isEditing}
-                        />
-                        <label htmlFor={option} className="text-sm cursor-pointer">
-                          {option}
-                        </label>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {isEditing && (
-                  <div className="flex gap-3 pt-4">
-                    <Button
-                      onClick={handleSaveProfile}
-                      disabled={saveProfileMutation.isPending}
-                      className="bg-purple-600 hover:bg-purple-700"
-                    >
-                      {saveProfileMutation.isPending ? 'Saving...' : 'Save Profile'}
-                    </Button>
-                    {mentorProfile && (
-                      <Button
-                        onClick={() => {
-                          setIsEditing(false);
-                          loadUser();
-                        }}
-                        variant="outline"
-                      >
-                        Cancel
-                      </Button>
-                    )}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Availability Section */}
-            {mentorProfile && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Set Your Availability for Mentorship Day</CardTitle>
-                  <p className="text-sm text-gray-600">{formatDate(selectedDate)}</p>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div>
-                    <Label>Select Available Time Slots</Label>
-                    <div className="grid grid-cols-3 gap-2 mt-2">
-                      {TIME_SLOTS.map(slot => {
-                        const isAlreadyBooked = existingSessions.some(s => s.time_slot === slot);
-                        return (
-                          <Button
-                            key={slot}
-                            variant={availableSlots.includes(slot) ? 'default' : 'outline'}
-                            onClick={() => toggleTimeSlot(slot)}
-                            className={availableSlots.includes(slot) ? 'bg-purple-600' : ''}
-                            disabled={isAlreadyBooked}
-                          >
-                            {slot}
-                            {isAlreadyBooked && ' ✓'}
-                          </Button>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                  {availableSlots.length > 0 && (
-                    <Button
-                      onClick={handleSaveAvailability}
-                      disabled={saveAvailabilityMutation.isPending}
-                      className="w-full bg-green-600 hover:bg-green-700"
-                    >
-                      <Plus className="w-4 h-4 mr-2" />
-                      {saveAvailabilityMutation.isPending ? 'Saving...' : 'Add Availability'}
-                    </Button>
-                  )}
-                </CardContent>
-              </Card>
-            )}
-          </div>
-
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Profile Preview */}
-            {mentorProfile && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Your Profile Preview</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="text-center">
-                    <div className="w-20 h-20 mx-auto bg-purple-100 rounded-full flex items-center justify-center text-purple-600 text-2xl font-bold mb-3">
-                      {profileData.full_name.split(' ').map(n => n[0]).join('')}
-                    </div>
-                    <h3 className="font-semibold text-lg">{profileData.full_name}</h3>
-                    <p className="text-sm text-gray-600">{profileData.title}</p>
-                    <p className="text-sm text-gray-500">{profileData.company}</p>
-                  </div>
-
-                  <div className="space-y-2 text-sm">
-                    <div className="flex items-center gap-2">
-                      <Clock className="w-4 h-4 text-gray-400" />
-                      <Badge variant="outline">{profileData.experience_years}</Badge>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Briefcase className="w-4 h-4 text-gray-400" />
-                      <span>{profileData.expertise.length} expertise areas</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Users className="w-4 h-4 text-gray-400" />
-                      <span>{profileData.mentors_to.length} mentee groups</span>
-                    </div>
-                  </div>
-
-                  {profileData.linkedin_url && (
-                    <Button variant="outline" className="w-full" asChild>
-                      <a href={profileData.linkedin_url} target="_blank" rel="noopener noreferrer">
-                        <ExternalLink className="w-4 h-4 mr-2" />
-                        View LinkedIn
-                      </a>
-                    </Button>
-                  )}
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Sessions Summary */}
-            {mentorProfile && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Your Sessions Summary</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
-                    <div>
-                      <p className="text-sm text-gray-600">Booked</p>
-                      <p className="text-2xl font-bold text-green-600">{bookedSessions.length}</p>
-                    </div>
-                    <Users className="w-8 h-8 text-green-600" />
-                  </div>
-                  <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
-                    <div>
-                      <p className="text-sm text-gray-600">Available</p>
-                      <p className="text-2xl font-bold text-blue-600">{availableSessions.length}</p>
-                    </div>
-                    <Calendar className="w-8 h-8 text-blue-600" />
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Available Sessions to Delete */}
-            {availableSessions.length > 0 && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Your Available Slots</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2">
-                    {availableSessions.map(session => (
-                      <div key={session.id} className="flex items-center justify-between p-2 bg-gray-50 rounded">
-                        <span className="text-sm font-medium">{session.time_slot}</span>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleDeleteSession(session.id)}
-                          className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50"
-                        >
-                          <Trash2 className="w-4 h-4" />
+          {/* Profile Tab */}
+          <TabsContent value="profile">
+            <div className="grid lg:grid-cols-3 gap-6">
+              <div className="lg:col-span-2">
+                <Card>
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <CardTitle>Your Profile Information</CardTitle>
+                      {mentorProfile && !isEditing && (
+                        <Button onClick={() => setIsEditing(true)} variant="outline" size="sm">
+                          Edit Profile
                         </Button>
+                      )}
+                    </div>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="full_name">Full Name *</Label>
+                        <Input
+                          id="full_name"
+                          value={profileData.full_name}
+                          onChange={(e) => setProfileData({ ...profileData, full_name: e.target.value })}
+                          disabled={!isEditing}
+                          placeholder="Enter your full name"
+                        />
                       </div>
-                    ))}
-                  </div>
+                      <div>
+                        <Label htmlFor="title">Title *</Label>
+                        <Input
+                          id="title"
+                          value={profileData.title}
+                          onChange={(e) => setProfileData({ ...profileData, title: e.target.value })}
+                          disabled={!isEditing}
+                          placeholder="e.g., Senior Director"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="company">Company *</Label>
+                        <Input
+                          id="company"
+                          value={profileData.company}
+                          onChange={(e) => setProfileData({ ...profileData, company: e.target.value })}
+                          disabled={!isEditing}
+                          placeholder="e.g., Google"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="experience">Experience Level</Label>
+                        <Select
+                          value={profileData.experience_years}
+                          onValueChange={(value) => setProfileData({ ...profileData, experience_years: value })}
+                          disabled={!isEditing}
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="< 5 years">Less than 5 years</SelectItem>
+                            <SelectItem value="5-10 years">5-10 years</SelectItem>
+                            <SelectItem value="11-20 years">11-20 years</SelectItem>
+                            <SelectItem value="Over 20 years">Over 20 years</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+
+                    <div>
+                      <Label htmlFor="linkedin_url">LinkedIn URL</Label>
+                      <Input
+                        id="linkedin_url"
+                        type="url"
+                        placeholder="https://linkedin.com/in/yourprofile"
+                        value={profileData.linkedin_url}
+                        onChange={(e) => setProfileData({ ...profileData, linkedin_url: e.target.value })}
+                        disabled={!isEditing}
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="bio">Bio</Label>
+                      <Textarea
+                        id="bio"
+                        placeholder="Tell mentees about your experience..."
+                        value={profileData.bio}
+                        onChange={(e) => setProfileData({ ...profileData, bio: e.target.value })}
+                        disabled={!isEditing}
+                        rows={4}
+                      />
+                    </div>
+
+                    <div>
+                      <Label>Areas of Expertise</Label>
+                      <div className="grid grid-cols-2 gap-2 mt-2">
+                        {EXPERTISE_OPTIONS.map(option => (
+                          <div key={option} className="flex items-center space-x-2">
+                            <Checkbox
+                              id={option}
+                              checked={profileData.expertise.includes(option)}
+                              onCheckedChange={() => toggleExpertise(option)}
+                              disabled={!isEditing}
+                            />
+                            <label htmlFor={option} className="text-sm cursor-pointer">
+                              {option}
+                            </label>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <Label>I Want to Mentor</Label>
+                      <div className="grid grid-cols-2 gap-2 mt-2">
+                        {MENTEE_OPTIONS.map(option => (
+                          <div key={option} className="flex items-center space-x-2">
+                            <Checkbox
+                              id={option}
+                              checked={profileData.mentors_to.includes(option)}
+                              onCheckedChange={() => toggleMentee(option)}
+                              disabled={!isEditing}
+                            />
+                            <label htmlFor={option} className="text-sm cursor-pointer">
+                              {option}
+                            </label>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {isEditing && (
+                      <div className="flex gap-3 pt-4">
+                        <Button
+                          onClick={handleSaveProfile}
+                          disabled={saveProfileMutation.isPending}
+                          className="bg-purple-600 hover:bg-purple-700"
+                        >
+                          {saveProfileMutation.isPending ? 'Saving...' : 'Save Profile'}
+                        </Button>
+                        {mentorProfile && (
+                          <Button
+                            onClick={() => {
+                              setIsEditing(false);
+                              loadUser();
+                            }}
+                            variant="outline"
+                          >
+                            Cancel
+                          </Button>
+                        )}
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Sidebar */}
+              <div className="space-y-6">
+                {/* Profile Preview */}
+                {mentorProfile && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Profile Preview</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="text-center">
+                        <div className="w-20 h-20 mx-auto bg-purple-100 rounded-full flex items-center justify-center text-purple-600 text-2xl font-bold mb-3">
+                          {profileData.full_name.split(' ').map(n => n[0]).join('')}
+                        </div>
+                        <h3 className="font-semibold text-lg">{profileData.full_name}</h3>
+                        <p className="text-sm text-gray-600">{profileData.title}</p>
+                        <p className="text-sm text-gray-500">{profileData.company}</p>
+                      </div>
+
+                      <div className="space-y-2 text-sm">
+                        <div className="flex items-center gap-2">
+                          <Clock className="w-4 h-4 text-gray-400" />
+                          <Badge variant="outline">{profileData.experience_years}</Badge>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Briefcase className="w-4 h-4 text-gray-400" />
+                          <span>{profileData.expertise.length} expertise areas</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Users className="w-4 h-4 text-gray-400" />
+                          <span>{profileData.mentors_to.length} mentee groups</span>
+                        </div>
+                      </div>
+
+                      {profileData.linkedin_url && (
+                        <Button variant="outline" className="w-full" asChild>
+                          <a href={profileData.linkedin_url} target="_blank" rel="noopener noreferrer">
+                            <ExternalLink className="w-4 h-4 mr-2" />
+                            View LinkedIn
+                          </a>
+                        </Button>
+                      )}
+                    </CardContent>
+                  </Card>
+                )}
+              </div>
+            </div>
+          </TabsContent>
+
+          {/* Sessions Tab */}
+          <TabsContent value="sessions">
+            {!mentorProfile ? (
+              <Card>
+                <CardContent className="text-center py-12">
+                  <Calendar className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                  <p className="text-gray-600">Please complete your profile first to manage sessions</p>
                 </CardContent>
               </Card>
+            ) : (
+              <div className="grid lg:grid-cols-3 gap-6">
+                {/* Main Content */}
+                <div className="lg:col-span-2 space-y-6">
+                  {/* Set Availability */}
+                  <Card>
+                    <CardHeader>
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <CardTitle>Set Your Availability</CardTitle>
+                          <p className="text-sm text-gray-600 mt-1">Choose a date and select time slots</p>
+                        </div>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button variant="outline" className="gap-2">
+                              <Calendar className="h-4 w-4" />
+                              {formatDate(selectedDate)}
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0" align="end">
+                            <CalendarComponent
+                              mode="single"
+                              selected={selectedDate}
+                              onSelect={(date) => date && setSelectedDate(date)}
+                              initialFocus
+                            />
+                          </PopoverContent>
+                        </Popover>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div>
+                        <Label>Select Time Slots to Add</Label>
+                        <div className="grid grid-cols-3 gap-2 mt-3">
+                          {TIME_SLOTS.map(slot => {
+                            const isAlreadyBooked = existingSessions.some(s => s.time_slot === slot);
+                            const isSelected = availableSlots.includes(slot);
+                            return (
+                              <Button
+                                key={slot}
+                                variant={isSelected ? 'default' : 'outline'}
+                                onClick={() => !isAlreadyBooked && toggleTimeSlot(slot)}
+                                className={isSelected ? 'bg-purple-600 hover:bg-purple-700' : ''}
+                                disabled={isAlreadyBooked}
+                              >
+                                {slot}
+                                {isAlreadyBooked && ' ✓'}
+                              </Button>
+                            );
+                          })}
+                        </div>
+                        <p className="text-xs text-gray-500 mt-2">
+                          Slots with ✓ are already in your schedule
+                        </p>
+                      </div>
+
+                      {availableSlots.length > 0 && (
+                        <Button
+                          onClick={handleSaveAvailability}
+                          disabled={saveAvailabilityMutation.isPending}
+                          className="w-full bg-green-600 hover:bg-green-700"
+                          size="lg"
+                        >
+                          <Plus className="w-4 h-4 mr-2" />
+                          {saveAvailabilityMutation.isPending ? 'Saving...' : `Add ${availableSlots.length} Time Slot${availableSlots.length > 1 ? 's' : ''}`}
+                        </Button>
+                      )}
+                    </CardContent>
+                  </Card>
+
+                  {/* Booked Sessions */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Booked Sessions</CardTitle>
+                      <p className="text-sm text-gray-600">View mentees who signed up</p>
+                    </CardHeader>
+                    <CardContent>
+                      {sessionsLoading ? (
+                        <div className="text-center py-8">
+                          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto"></div>
+                        </div>
+                      ) : bookedSessions.length === 0 ? (
+                        <div className="text-center py-8">
+                          <Users className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+                          <p className="text-gray-500">No sessions booked yet</p>
+                          <p className="text-sm text-gray-400 mt-1">Mentees will appear here when they sign up</p>
+                        </div>
+                      ) : (
+                        <div className="space-y-3">
+                          {bookedSessions.map(session => (
+                            <div 
+                              key={session.id} 
+                              className="flex items-center gap-3 p-4 bg-purple-50 border border-purple-200 rounded-lg hover:shadow-md transition-shadow cursor-pointer"
+                              onClick={() => handleViewMentee(session)}
+                            >
+                              <div className="flex-shrink-0">
+                                <div className="w-12 h-12 bg-purple-600 rounded-full flex items-center justify-center text-white font-semibold">
+                                  {session.mentee_name?.split(' ').map(n => n[0]).join('') || 'M'}
+                                </div>
+                              </div>
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2 mb-1">
+                                  <Clock className="w-4 h-4 text-purple-600" />
+                                  <span className="font-semibold text-gray-900">{session.time_slot}</span>
+                                  <Badge className="bg-purple-600 text-white text-xs">Booked</Badge>
+                                </div>
+                                <p className="text-sm text-gray-700 font-medium">{session.mentee_name || 'Mentee Name'}</p>
+                                <p className="text-xs text-gray-500">{session.booked_by}</p>
+                              </div>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleViewMentee(session);
+                                }}
+                              >
+                                <User className="w-4 h-4 mr-2" />
+                                View Profile
+                              </Button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Sidebar */}
+                <div className="space-y-6">
+                  {/* Sessions Summary */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Summary</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                        <div>
+                          <p className="text-sm text-gray-600">Booked</p>
+                          <p className="text-2xl font-bold text-green-600">{bookedSessions.length}</p>
+                        </div>
+                        <Users className="w-8 h-8 text-green-600" />
+                      </div>
+                      <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+                        <div>
+                          <p className="text-sm text-gray-600">Available</p>
+                          <p className="text-2xl font-bold text-blue-600">{availableSessions.length}</p>
+                        </div>
+                        <Calendar className="w-8 h-8 text-blue-600" />
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Available Sessions to Delete */}
+                  {availableSessions.length > 0 && (
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Your Available Slots</CardTitle>
+                        <p className="text-xs text-gray-500">Click trash to remove</p>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-2">
+                          {availableSessions.map(session => (
+                            <div key={session.id} className="flex items-center justify-between p-2 bg-gray-50 rounded hover:bg-gray-100 transition">
+                              <span className="text-sm font-medium">{session.time_slot}</span>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => handleDeleteSession(session.id)}
+                                className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            </div>
+                          ))}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )}
+                </div>
+              </div>
             )}
-          </div>
-        </div>
+          </TabsContent>
+        </Tabs>
       </div>
 
       {/* Mentee Profile Modal */}
@@ -770,7 +798,7 @@ export default function MentorDashboard() {
             </div>
 
             {/* Mentee Profile Data */}
-            {menteeProfile?.mentee_profile && (
+            {menteeProfile?.mentee_profile ? (
               <div className="space-y-4">
                 <div>
                   <h4 className="font-semibold text-gray-900 mb-2">Professional Background</h4>
@@ -823,9 +851,7 @@ export default function MentorDashboard() {
                   </div>
                 )}
               </div>
-            )}
-
-            {!menteeProfile?.mentee_profile && (
+            ) : (
               <div className="text-center py-4">
                 <p className="text-gray-500 text-sm">Mentee hasn't completed their profile yet</p>
               </div>
