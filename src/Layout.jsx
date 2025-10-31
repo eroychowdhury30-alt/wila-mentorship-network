@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -99,7 +100,7 @@ export default function Layout({ children }) {
               <div className="w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center">
                 <div className="text-white font-bold text-sm">WILA</div>
               </div>
-              <span className="text-xl font-bold text-gray-900">Mentorship Network</span>
+              <span className="text-xl font-bold text-gray-900">WILA Connect</span>
             </Link>
 
             <div className="flex items-center gap-4">
