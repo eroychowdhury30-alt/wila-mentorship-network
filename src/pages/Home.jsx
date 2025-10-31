@@ -99,10 +99,10 @@ export default function Home() {
               </div>
             </div>
           </div>
-          <h1 className="text-5xl font-bold mb-6">Mentorship Network</h1>
+          <h1 className="text-5xl font-bold mb-6">WILA Connect</h1>
           <p className="text-xl mb-8 max-w-2xl mx-auto leading-relaxed">
-            Connect with accomplished women leaders from the Berkeley Haas alumni
-            community who are ready to guide your professional journey
+            Connect with accomplished women leaders from the WILA community
+            who are ready to guide your professional journey
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
             <Button
