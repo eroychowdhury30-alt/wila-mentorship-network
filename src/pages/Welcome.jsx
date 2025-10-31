@@ -56,7 +56,7 @@ export default function Welcome() {
                 className="w-full bg-purple-600 hover:bg-purple-700"
                 size="lg"
               >
-                Sign in to continue as a WILA mentee
+                Sign up / Sign in
               </Button>
             </CardContent>
           </Card>
@@ -83,7 +83,7 @@ export default function Welcome() {
                 className="w-full bg-yellow-400 hover:bg-yellow-500 text-gray-900"
                 size="lg"
               >
-                Sign in to continue as a WILA mentor
+                Sign up / Sign in
               </Button>
             </CardContent>
           </Card>
