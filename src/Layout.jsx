@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -33,9 +32,13 @@ export default function Layout({ children }) {
       setUser(currentUser);
       setIsLoading(false);
       
-      // If logged in and on Welcome, redirect to Home
+      // If logged in and on Welcome, redirect based on user type
       if (currentPage === 'Welcome' && currentUser.onboarding_completed) {
-        navigate(createPageUrl('Home'), { replace: true });
+        if (currentUser.user_type === 'mentor') {
+          navigate(createPageUrl('MentorDashboard'), { replace: true });
+        } else {
+          navigate(createPageUrl('Home'), { replace: true });
+        }
         return;
       }
       
@@ -96,7 +99,10 @@ export default function Layout({ children }) {
       <nav className="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
-            <Link to={createPageUrl('Home')} className="flex items-center gap-3">
+            <Link 
+              to={user?.user_type === 'mentor' ? createPageUrl('MentorDashboard') : createPageUrl('Home')} 
+              className="flex items-center gap-3"
+            >
               <div className="w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center">
                 <div className="text-white font-bold text-sm">WILA</div>
               </div>
@@ -132,16 +138,16 @@ export default function Layout({ children }) {
 
               {user?.user_type === 'mentor' && (
                 <>
-                  <Link to={createPageUrl('Home')}>
-                    <Button variant="ghost" className="gap-2">
-                      <Users className="w-4 h-4" />
-                      <span className="hidden md:inline">Browse Mentors</span>
-                    </Button>
-                  </Link>
                   <Link to={createPageUrl('MentorDashboard')}>
                     <Button variant="ghost" className="gap-2">
                       <LayoutDashboard className="w-4 h-4" />
                       <span className="hidden md:inline">Dashboard</span>
+                    </Button>
+                  </Link>
+                  <Link to={createPageUrl('Home')}>
+                    <Button variant="ghost" className="gap-2">
+                      <Users className="w-4 h-4" />
+                      <span className="hidden md:inline">Browse Mentors</span>
                     </Button>
                   </Link>
                 </>
@@ -197,15 +203,15 @@ export default function Layout({ children }) {
                     {user.user_type === 'mentor' && (
                       <>
                         <DropdownMenuItem asChild>
-                          <Link to={createPageUrl('Home')} className="cursor-pointer">
-                            <Users className="w-4 h-4 mr-2" />
-                            Browse Mentors
-                          </Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem asChild>
                           <Link to={createPageUrl('MentorDashboard')} className="cursor-pointer">
                             <LayoutDashboard className="w-4 h-4 mr-2" />
                             My Dashboard
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link to={createPageUrl('Home')} className="cursor-pointer">
+                            <Users className="w-4 h-4" mr-2" />
+                            Browse Mentors
                           </Link>
                         </DropdownMenuItem>
                       </>
