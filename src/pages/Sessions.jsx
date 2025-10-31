@@ -7,6 +7,8 @@ import TimeSlotCard from '../components/TimeSlotCard';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 import {
   Dialog,
   DialogContent,
@@ -27,6 +29,7 @@ export default function Sessions() {
   const [selectedDate, setSelectedDate] = useState(new Date('2025-10-28'));
   const [currentUser, setCurrentUser] = useState(null);
   const [selectedMentor, setSelectedMentor] = useState(null);
+  const [sessionGoal, setSessionGoal] = useState('');
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
@@ -74,12 +77,14 @@ export default function Sessions() {
   const bookedSession = userBookedSessions[0];
 
   const bookSessionMutation = useMutation({
-    mutationFn: async (sessionId) => {
+    mutationFn: async ({ sessionId, goal }) => {
       const user = await base44.auth.me();
       return base44.entities.Session.update(sessionId, {
         is_booked: true,
         booked_by: user.email,
-        mentee_name: user.full_name
+        mentee_name: user.full_name,
+        mentee_linkedin: user.linkedin_profile || '',
+        session_goal: goal
       });
     },
     onSuccess: () => {
@@ -88,6 +93,7 @@ export default function Sessions() {
       toast.success('Session booked successfully!');
       setShowModal(false);
       setSelectedSession(null);
+      setSessionGoal('');
     },
   });
 
@@ -109,8 +115,16 @@ export default function Sessions() {
       return;
     }
     
+    if (!sessionGoal || sessionGoal.trim().length === 0) {
+      toast.error('Please tell us what you\'re looking for from this session');
+      return;
+    }
+    
     if (selectedSession) {
-      bookSessionMutation.mutate(selectedSession.id);
+      bookSessionMutation.mutate({ 
+        sessionId: selectedSession.id, 
+        goal: sessionGoal 
+      });
     }
   };
 
@@ -340,6 +354,21 @@ export default function Sessions() {
               30-minute mentorship session
             </div>
 
+            <div>
+              <Label htmlFor="session_goal">What are you looking for from this session? *</Label>
+              <Textarea
+                id="session_goal"
+                value={sessionGoal}
+                onChange={(e) => setSessionGoal(e.target.value)}
+                placeholder="e.g., Career advice, interview preparation, industry insights, networking guidance..."
+                rows={4}
+                className="mt-2"
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                This helps your mentor prepare for your session
+              </p>
+            </div>
+
             {hasBookedSession && (
               <Alert className="border-red-200 bg-red-50">
                 <AlertCircle className="h-4 w-4 text-red-600" />
@@ -352,7 +381,7 @@ export default function Sessions() {
             <div className="space-y-3 pt-4">
               <Button
                 onClick={handleSignup}
-                disabled={bookSessionMutation.isPending || hasBookedSession}
+                disabled={bookSessionMutation.isPending || hasBookedSession || !sessionGoal}
                 className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Calendar className="w-4 h-4 mr-2" />
