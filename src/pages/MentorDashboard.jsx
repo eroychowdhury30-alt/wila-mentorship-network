@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -9,7 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Calendar, Briefcase, Users, Clock, ExternalLink, Plus, Trash2, XCircle, Pause } from 'lucide-react';
+import { Calendar, Briefcase, Users, Clock, ExternalLink, Plus, Trash2, XCircle, Pause, Mail, User } from 'lucide-react';
 import { toast } from 'sonner';
 import {
   Select,
@@ -24,6 +23,12 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { Calendar as CalendarComponent } from '@/components/ui/calendar';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 
 const EXPERTISE_OPTIONS = [
   'Executive Leadership',
@@ -50,6 +55,8 @@ export default function MentorDashboard() {
   const [user, setUser] = useState(null);
   const [mentorProfile, setMentorProfile] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [selectedMenteeSession, setSelectedMenteeSession] = useState(null);
+  const [showMenteeModal, setShowMenteeModal] = useState(false);
   const [profileData, setProfileData] = useState({
     full_name: '',
     title: '',
@@ -88,11 +95,20 @@ export default function MentorDashboard() {
     enabled: !!mentorProfile?.full_name,
   });
 
+  // Get mentee profile data
+  const { data: menteeProfile } = useQuery({
+    queryKey: ['mentee-profile', selectedMenteeSession?.booked_by],
+    queryFn: async () => {
+      const users = await base44.entities.User.filter({ email: selectedMenteeSession?.booked_by });
+      return users[0];
+    },
+    enabled: !!selectedMenteeSession?.booked_by,
+  });
+
   const loadMentorProfile = async (currentUser) => {
     try {
       const allMentors = await base44.entities.Mentor.filter({ created_by: currentUser.email });
       
-      // Filter out the sample mentors by checking if full_name matches user's name
       const userMentor = allMentors.find(m => 
         m.full_name.toLowerCase() === currentUser.full_name.toLowerCase()
       );
@@ -112,7 +128,6 @@ export default function MentorDashboard() {
         });
         setIsEditing(false);
       } else {
-        // No profile matching user's name, show create form
         setProfileData({
           full_name: currentUser.full_name || '',
           title: '',
@@ -200,6 +215,11 @@ export default function MentorDashboard() {
     }
   };
 
+  const handleViewMentee = (session) => {
+    setSelectedMenteeSession(session);
+    setShowMenteeModal(true);
+  };
+
   const toggleExpertise = (item) => {
     setProfileData(prev => ({
       ...prev,
@@ -270,7 +290,7 @@ export default function MentorDashboard() {
         <Card className="max-w-md w-full">
           <CardHeader className="text-center">
             <div className="inline-flex items-center justify-center w-16 h-16 bg-yellow-100 rounded-full mb-4 mx-auto">
-              <Pause className="w-8 h-8 text-yellow-600" />
+              <Pause className="w-4 h-4 text-yellow-600" />
             </div>
             <CardTitle className="text-2xl">Account Paused</CardTitle>
           </CardHeader>
@@ -381,7 +401,11 @@ export default function MentorDashboard() {
                         if (!session) return null;
                         
                         return (
-                          <div key={session.id} className="flex items-center gap-3 p-4 bg-purple-50 border border-purple-200 rounded-lg">
+                          <div 
+                            key={session.id} 
+                            className="flex items-center gap-3 p-4 bg-purple-50 border border-purple-200 rounded-lg hover:shadow-md transition-shadow cursor-pointer"
+                            onClick={() => handleViewMentee(session)}
+                          >
                             <div className="flex-shrink-0">
                               <div className="w-12 h-12 bg-purple-600 rounded-full flex items-center justify-center text-white font-semibold">
                                 {session.mentee_name?.split(' ').map(n => n[0]).join('') || 'M'}
@@ -396,6 +420,17 @@ export default function MentorDashboard() {
                               <p className="text-sm text-gray-700 font-medium">{session.mentee_name || 'Mentee Name'}</p>
                               <p className="text-xs text-gray-500">{session.booked_by}</p>
                             </div>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleViewMentee(session);
+                              }}
+                            >
+                              <User className="w-4 h-4 mr-2" />
+                              View Profile
+                            </Button>
                           </div>
                         );
                       })}
@@ -701,6 +736,103 @@ export default function MentorDashboard() {
           </div>
         </div>
       </div>
+
+      {/* Mentee Profile Modal */}
+      <Dialog open={showMenteeModal} onOpenChange={setShowMenteeModal}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Mentee Profile</DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-6 py-4">
+            {/* Basic Info */}
+            <div className="text-center">
+              <div className="w-20 h-20 mx-auto bg-purple-100 rounded-full flex items-center justify-center text-purple-600 text-2xl font-bold mb-3">
+                {selectedMenteeSession?.mentee_name?.split(' ').map(n => n[0]).join('') || 'M'}
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900">{selectedMenteeSession?.mentee_name}</h3>
+              <div className="flex items-center justify-center gap-2 mt-2 text-sm text-gray-600">
+                <Mail className="w-4 h-4" />
+                <span>{selectedMenteeSession?.booked_by}</span>
+              </div>
+            </div>
+
+            {/* Session Info */}
+            <div className="bg-purple-50 p-4 rounded-lg">
+              <div className="flex items-center gap-2 mb-2">
+                <Clock className="w-5 h-5 text-purple-600" />
+                <span className="font-semibold text-gray-900">Session Details</span>
+              </div>
+              <p className="text-sm text-gray-700">
+                {selectedMenteeSession && formatDate(new Date(selectedMenteeSession.date))}
+              </p>
+              <p className="text-sm text-gray-700">Time: {selectedMenteeSession?.time_slot}</p>
+            </div>
+
+            {/* Mentee Profile Data */}
+            {menteeProfile?.mentee_profile && (
+              <div className="space-y-4">
+                <div>
+                  <h4 className="font-semibold text-gray-900 mb-2">Professional Background</h4>
+                  <div className="space-y-2 text-sm">
+                    {menteeProfile.mentee_profile.current_role && (
+                      <div>
+                        <span className="text-gray-600">Current Role:</span>
+                        <p className="text-gray-900">{menteeProfile.mentee_profile.current_role}</p>
+                      </div>
+                    )}
+                    {menteeProfile.mentee_profile.current_company && (
+                      <div>
+                        <span className="text-gray-600">Company:</span>
+                        <p className="text-gray-900">{menteeProfile.mentee_profile.current_company}</p>
+                      </div>
+                    )}
+                    {menteeProfile.mentee_profile.years_of_experience && (
+                      <div>
+                        <span className="text-gray-600">Experience:</span>
+                        <p className="text-gray-900 capitalize">{menteeProfile.mentee_profile.years_of_experience}</p>
+                      </div>
+                    )}
+                    {menteeProfile.mentee_profile.education_level && (
+                      <div>
+                        <span className="text-gray-600">Education:</span>
+                        <p className="text-gray-900 capitalize">{menteeProfile.mentee_profile.education_level.replace('_', ' ')}</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {menteeProfile.mentee_profile.areas_of_interest && (
+                  <div>
+                    <h4 className="font-semibold text-gray-900 mb-2">Areas of Interest</h4>
+                    <p className="text-sm text-gray-700">{menteeProfile.mentee_profile.areas_of_interest}</p>
+                  </div>
+                )}
+
+                {menteeProfile.mentee_profile.career_goals && (
+                  <div>
+                    <h4 className="font-semibold text-gray-900 mb-2">Career Goals</h4>
+                    <p className="text-sm text-gray-700">{menteeProfile.mentee_profile.career_goals}</p>
+                  </div>
+                )}
+
+                {menteeProfile.mentee_profile.what_seeking && (
+                  <div>
+                    <h4 className="font-semibold text-gray-900 mb-2">What They're Seeking</h4>
+                    <p className="text-sm text-gray-700">{menteeProfile.mentee_profile.what_seeking}</p>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {!menteeProfile?.mentee_profile && (
+              <div className="text-center py-4">
+                <p className="text-gray-500 text-sm">Mentee hasn't completed their profile yet</p>
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
