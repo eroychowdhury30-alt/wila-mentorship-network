@@ -146,7 +146,7 @@ export default function Layout({ children }) {
                 </>
               )}
 
-              {user ? (
+              {user && (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="outline" className="gap-2">
@@ -216,10 +216,6 @@ export default function Layout({ children }) {
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
-              ) : (
-                <Button onClick={() => navigate(createPageUrl('Welcome'))} className="bg-purple-600 hover:bg-purple-700">
-                  Sign In
-                </Button>
               )}
             </div>
           </div>
