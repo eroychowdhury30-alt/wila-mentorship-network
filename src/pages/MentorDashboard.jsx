@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -72,7 +73,7 @@ export default function MentorDashboard() {
     try {
       const currentUser = await base44.auth.me();
       setUser(currentUser);
-      loadMentorProfile(currentUser);
+      await loadMentorProfile(currentUser);
     } catch (error) {
       console.error('Error loading user:', error);
     }
@@ -109,7 +110,6 @@ export default function MentorDashboard() {
           bio: userMentor.bio || '',
           status: userMentor.status || 'pending'
         });
-        // Don't automatically set editing to true if profile exists
         setIsEditing(false);
       } else {
         // No profile matching user's name, show create form
@@ -139,10 +139,15 @@ export default function MentorDashboard() {
         return base44.entities.Mentor.create({ ...data, status: 'pending' });
       }
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       toast.success(mentorProfile ? 'Profile updated successfully!' : 'Profile submitted for approval!');
-      loadUser();
+      setIsEditing(false);
+      await loadUser();
     },
+    onError: (error) => {
+      console.error('Error saving profile:', error);
+      toast.error('Failed to save profile. Please try again.');
+    }
   });
 
   const saveAvailabilityMutation = useMutation({
