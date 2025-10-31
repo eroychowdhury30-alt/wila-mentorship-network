@@ -91,8 +91,7 @@ export default function MentorDashboard() {
     try {
       const allMentors = await base44.entities.Mentor.filter({ created_by: currentUser.email });
       
-      // Filter out the 27 sample mentors by checking if full_name matches user's name
-      // Admins who created sample data should only see their own profile if they created one
+      // Filter out the sample mentors by checking if full_name matches user's name
       const userMentor = allMentors.find(m => 
         m.full_name.toLowerCase() === currentUser.full_name.toLowerCase()
       );
@@ -110,6 +109,7 @@ export default function MentorDashboard() {
           bio: userMentor.bio || '',
           status: userMentor.status || 'pending'
         });
+        // Don't automatically set editing to true if profile exists
         setIsEditing(false);
       } else {
         // No profile matching user's name, show create form
