@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -58,6 +59,7 @@ export default function MentorDashboard() {
   const [isEditing, setIsEditing] = useState(false);
   const [selectedMenteeSession, setSelectedMenteeSession] = useState(null);
   const [showMenteeModal, setShowMenteeModal] = useState(false);
+  const [activeTab, setActiveTab] = useState('profile');
   const [profileData, setProfileData] = useState({
     full_name: '',
     title: '',
@@ -159,6 +161,8 @@ export default function MentorDashboard() {
       toast.success(mentorProfile ? 'Profile updated successfully!' : 'Profile submitted for approval!');
       setIsEditing(false);
       await loadUser();
+      // Switch to sessions tab after successful save
+      setActiveTab('sessions');
     },
     onError: (error) => {
       console.error('Error saving profile:', error);
@@ -357,7 +361,7 @@ export default function MentorDashboard() {
           </div>
         </div>
 
-        <Tabs defaultValue="profile" className="space-y-6">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="grid w-full grid-cols-2 max-w-md">
             <TabsTrigger value="profile">
               <User className="w-4 h-4 mr-2" />
