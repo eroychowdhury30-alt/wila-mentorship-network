@@ -20,7 +20,7 @@ export default function Welcome() {
             <div className="text-purple-600 font-bold text-2xl">WILA</div>
           </div>
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            Welcome to the Mentorship Network
+            Welcome to WILA Connect
           </h1>
           <p className="text-xl text-gray-600">
             How would you like to participate?
@@ -50,7 +50,7 @@ export default function Welcome() {
                 className="w-full bg-purple-600 hover:bg-purple-700"
                 size="lg"
               >
-                Continue as Mentee
+                Sign in to continue as a WILA mentee
               </Button>
             </CardContent>
           </Card>
@@ -77,7 +77,7 @@ export default function Welcome() {
                 className="w-full bg-yellow-400 hover:bg-yellow-500 text-gray-900"
                 size="lg"
               >
-                Continue as Mentor
+                Sign in to continue as a WILA mentor
               </Button>
             </CardContent>
           </Card>
