@@ -266,6 +266,7 @@ export default function MentorDashboard() {
     });
   };
 
+  // Show pending approval message
   if (mentorProfile && mentorProfile.status === 'pending') {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
@@ -780,6 +781,17 @@ export default function MentorDashboard() {
                 <Mail className="w-4 h-4" />
                 <span>{selectedMenteeSession?.booked_by}</span>
               </div>
+              {selectedMenteeSession?.mentee_linkedin && (
+                <a 
+                  href={selectedMenteeSession.mentee_linkedin} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline mt-2"
+                >
+                  <ExternalLink className="w-3 h-3" />
+                  LinkedIn Profile
+                </a>
+              )}
             </div>
 
             <div className="bg-purple-50 p-4 rounded-lg">
@@ -793,10 +805,17 @@ export default function MentorDashboard() {
               <p className="text-sm text-gray-700">Time: {selectedMenteeSession?.time_slot}</p>
             </div>
 
+            {selectedMenteeSession?.session_goal && (
+              <div className="bg-blue-50 p-4 rounded-lg">
+                <h4 className="font-semibold text-gray-900 mb-2">What They're Looking For</h4>
+                <p className="text-sm text-gray-700">{selectedMenteeSession.session_goal}</p>
+              </div>
+            )}
+
             {menteeProfile?.mentee_profile ? (
-              <div className="space-y-4">
+              <div className="space-y-4 border-t pt-4">
                 <div>
-                  <h4 className="font-semibold text-gray-900 mb-2">Professional Background</h4>
+                  <h4 className="font-semibold text-gray-900 mb-2">Additional Profile Information</h4>
                   <div className="space-y-2 text-sm">
                     {menteeProfile.mentee_profile.current_role && (
                       <div>
@@ -841,14 +860,14 @@ export default function MentorDashboard() {
 
                 {menteeProfile.mentee_profile.what_seeking && (
                   <div>
-                    <h4 className="font-semibold text-gray-900 mb-2">What They're Seeking</h4>
+                    <h4 className="font-semibold text-gray-900 mb-2">General Mentorship Goals</h4>
                     <p className="text-sm text-gray-700">{menteeProfile.mentee_profile.what_seeking}</p>
                   </div>
                 )}
               </div>
             ) : (
               <div className="text-center py-4">
-                <p className="text-gray-500 text-sm">Mentee hasn't completed their profile yet</p>
+                <p className="text-gray-500 text-sm">No additional profile information available</p>
               </div>
             )}
           </div>
