@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -111,7 +112,7 @@ export default function Layout({ children }) {
   // Show minimal loading for protected pages
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
       </div>
     );
@@ -121,24 +122,24 @@ export default function Layout({ children }) {
     <div className="min-h-screen bg-gray-50">
       {/* Navigation Bar */}
       <nav className="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
-        <div className="max-w-7xl mx-auto px-6 py-4">
+        <div className="max-w-7xl mx-auto px-6 py-3">
           <div className="flex items-center justify-between">
             <Link 
               to={user?.user_type === 'mentor' ? createPageUrl('MentorDashboard') : createPageUrl('Home')} 
-              className="flex items-center gap-3"
+              className="flex items-center gap-3 group"
             >
-              <div className="w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center">
+              <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-purple-700 rounded-xl flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow">
                 <div className="text-white font-bold text-sm">WILA</div>
               </div>
-              <span className="text-xl font-bold text-gray-900">WILA Connect</span>
+              <span className="text-xl font-bold text-gray-900 group-hover:text-purple-600 transition-colors">WILA Connect</span>
             </Link>
 
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
               {user?.role === 'admin' && (
                 <Link to={createPageUrl('AdminDashboard')}>
-                  <Button variant="ghost" className="gap-2">
+                  <Button variant="ghost" className="gap-2 hover:bg-purple-50 hover:text-purple-600">
                     <Shield className="w-4 h-4" />
-                    <span className="hidden md:inline">Admin Panel</span>
+                    <span className="hidden md:inline">Admin</span>
                   </Button>
                 </Link>
               )}
@@ -146,15 +147,15 @@ export default function Layout({ children }) {
               {user?.user_type === 'mentee' && (
                 <>
                   <Link to={createPageUrl('Home')}>
-                    <Button variant="ghost" className="gap-2">
+                    <Button variant="ghost" className="gap-2 hover:bg-purple-50 hover:text-purple-600">
                       <Users className="w-4 h-4" />
-                      <span className="hidden md:inline">Browse Mentors</span>
+                      <span className="hidden md:inline">Mentors</span>
                     </Button>
                   </Link>
                   <Link to={createPageUrl('Sessions')}>
-                    <Button variant="ghost" className="gap-2">
+                    <Button variant="ghost" className="gap-2 hover:bg-purple-50 hover:text-purple-600">
                       <Calendar className="w-4 h-4" />
-                      <span className="hidden md:inline">Book Sessions</span>
+                      <span className="hidden md:inline">Sessions</span>
                     </Button>
                   </Link>
                 </>
@@ -163,15 +164,15 @@ export default function Layout({ children }) {
               {user?.user_type === 'mentor' && (
                 <>
                   <Link to={createPageUrl('MentorDashboard')}>
-                    <Button variant="ghost" className="gap-2">
+                    <Button variant="ghost" className="gap-2 hover:bg-purple-50 hover:text-purple-600">
                       <LayoutDashboard className="w-4 h-4" />
                       <span className="hidden md:inline">Dashboard</span>
                     </Button>
                   </Link>
                   <Link to={createPageUrl('Home')}>
-                    <Button variant="ghost" className="gap-2">
+                    <Button variant="ghost" className="gap-2 hover:bg-purple-50 hover:text-purple-600">
                       <Users className="w-4 h-4" />
-                      <span className="hidden md:inline">Browse Mentors</span>
+                      <span className="hidden md:inline">Mentors</span>
                     </Button>
                   </Link>
                 </>
@@ -180,13 +181,13 @@ export default function Layout({ children }) {
               {user && (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="outline" className="gap-2">
-                      <div className="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center text-white text-sm font-semibold">
+                    <Button variant="outline" className="gap-2 hover:bg-gray-50 ml-2">
+                      <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-purple-600 rounded-full flex items-center justify-center text-white text-sm font-semibold shadow-sm">
                         {user.full_name?.split(' ').map(n => n[0]).join('') || 'U'}
                       </div>
-                      <div className="text-left hidden md:block">
-                        <p className="text-sm font-medium text-gray-900">{user.full_name}</p>
-                        <p className="text-xs text-gray-500 capitalize">{user.user_type || 'User'}</p>
+                      <div className="text-left hidden lg:block">
+                        <p className="text-sm font-medium text-gray-900 leading-none">{user.full_name}</p>
+                        <p className="text-xs text-gray-500 capitalize mt-0.5">{user.user_type || 'User'}</p>
                       </div>
                     </Button>
                   </DropdownMenuTrigger>
@@ -194,10 +195,12 @@ export default function Layout({ children }) {
                     <div className="px-2 py-2">
                       <p className="text-sm font-medium">{user.full_name}</p>
                       <p className="text-xs text-gray-500">{user.email}</p>
-                      <p className="text-xs text-purple-600 capitalize mt-1">{user.user_type} Account</p>
-                      {user.role === 'admin' && (
-                        <Badge className="mt-1 bg-orange-500">Admin</Badge>
-                      )}
+                      <div className="flex items-center gap-2 mt-2">
+                        <Badge className="bg-purple-100 text-purple-700 text-xs capitalize">{user.user_type}</Badge>
+                        {user.role === 'admin' && (
+                          <Badge className="bg-orange-100 text-orange-700 text-xs">Admin</Badge>
+                        )}
+                      </div>
                     </div>
                     <DropdownMenuSeparator />
                     {user.role === 'admin' && (
