@@ -11,33 +11,33 @@ import {
 
 export default function FilterBar({ filters, onFilterChange, onClearAll }) {
   return (
-    <div className="bg-white border border-gray-200 rounded-lg p-6 mb-6">
-      <div className="flex items-center justify-between mb-4">
+    <div className="bg-white border border-gray-200 rounded-xl p-6 mb-8 shadow-sm">
+      <div className="flex items-center justify-between mb-5">
         <div className="flex items-center gap-2">
-          <Filter className="w-5 h-5 text-gray-600" />
+          <Filter className="w-5 h-5 text-purple-600" />
           <h3 className="font-semibold text-gray-900">Filter Mentors</h3>
         </div>
         <Button
           variant="ghost"
           size="sm"
           onClick={onClearAll}
-          className="text-gray-600 hover:text-gray-900"
+          className="text-gray-600 hover:text-gray-900 hover:bg-gray-100"
         >
           <X className="w-4 h-4 mr-1" />
           Clear All
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <div>
-          <label className="text-sm font-medium text-gray-700 mb-2 block">
+          <label className="text-xs font-semibold text-gray-700 mb-2 block uppercase tracking-wide">
             Sort By
           </label>
           <Select
             value={filters.sortBy}
             onValueChange={(value) => onFilterChange('sortBy', value)}
           >
-            <SelectTrigger>
+            <SelectTrigger className="h-10">
               <SelectValue placeholder="First Name" />
             </SelectTrigger>
             <SelectContent>
@@ -49,14 +49,14 @@ export default function FilterBar({ filters, onFilterChange, onClearAll }) {
         </div>
 
         <div>
-          <label className="text-sm font-medium text-gray-700 mb-2 block">
+          <label className="text-xs font-semibold text-gray-700 mb-2 block uppercase tracking-wide">
             Experience Level
           </label>
           <Select
             value={filters.experience}
             onValueChange={(value) => onFilterChange('experience', value)}
           >
-            <SelectTrigger>
+            <SelectTrigger className="h-10">
               <SelectValue placeholder="Any experience" />
             </SelectTrigger>
             <SelectContent>
@@ -70,14 +70,14 @@ export default function FilterBar({ filters, onFilterChange, onClearAll }) {
         </div>
 
         <div>
-          <label className="text-sm font-medium text-gray-700 mb-2 block">
+          <label className="text-xs font-semibold text-gray-700 mb-2 block uppercase tracking-wide">
             Area of Expertise
           </label>
           <Select
             value={filters.expertise}
             onValueChange={(value) => onFilterChange('expertise', value)}
           >
-            <SelectTrigger>
+            <SelectTrigger className="h-10">
               <SelectValue placeholder="Any expertise" />
             </SelectTrigger>
             <SelectContent>
@@ -92,14 +92,14 @@ export default function FilterBar({ filters, onFilterChange, onClearAll }) {
         </div>
 
         <div>
-          <label className="text-sm font-medium text-gray-700 mb-2 block">
+          <label className="text-xs font-semibold text-gray-700 mb-2 block uppercase tracking-wide">
             Target Mentees
           </label>
           <Select
             value={filters.mentees}
             onValueChange={(value) => onFilterChange('mentees', value)}
           >
-            <SelectTrigger>
+            <SelectTrigger className="h-10">
               <SelectValue placeholder="Any mentee" />
             </SelectTrigger>
             <SelectContent>
