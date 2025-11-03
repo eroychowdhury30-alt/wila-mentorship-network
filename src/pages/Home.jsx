@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
@@ -80,35 +81,22 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-white">
       {/* Hero Section */}
-      <div className="relative bg-purple-600 text-white py-24 px-6 overflow-hidden">
-        <div 
-          className="absolute inset-0 opacity-10"
-          style={{
-            backgroundImage: 'url(https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1200)',
-            backgroundSize: 'cover',
-            backgroundPosition: 'center'
-          }}
-        />
-        <div className="relative max-w-4xl mx-auto text-center">
-          <div className="mb-8">
-            <div className="inline-flex items-center justify-center w-32 h-32 mb-4">
-              <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center">
-                <div className="text-purple-600 font-bold text-2xl">WILA</div>
-              </div>
-            </div>
+      <div className="relative bg-gradient-to-r from-purple-600 to-purple-700 text-white py-20 px-6">
+        <div className="max-w-5xl mx-auto text-center">
+          <div className="inline-flex items-center justify-center w-20 h-20 mb-6 bg-white rounded-2xl shadow-lg">
+            <div className="text-purple-600 font-bold text-2xl">WILA</div>
           </div>
-          <h1 className="text-5xl font-bold mb-6">WILA Connect</h1>
-          <p className="text-xl mb-8 max-w-2xl mx-auto leading-relaxed">
-            Connect with accomplished women leaders from the WILA community
-            who are ready to guide your professional journey
+          <h1 className="text-5xl md:text-6xl font-bold mb-4">WILA Connect</h1>
+          <p className="text-xl text-purple-100 mb-10 max-w-2xl mx-auto">
+            Connect with accomplished women leaders who are ready to guide your professional journey
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
             <Button
               size="lg"
               onClick={scrollToMentors}
-              className="bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-semibold px-8"
+              className="bg-white text-purple-600 hover:bg-purple-50 font-semibold px-8 h-12 text-base shadow-lg"
             >
               Browse Mentors
             </Button>
@@ -117,9 +105,9 @@ export default function Home() {
                 <Button
                   size="lg"
                   variant="outline"
-                  className="bg-white hover:bg-gray-100 text-purple-600 font-semibold px-8 border-0"
+                  className="bg-purple-500 hover:bg-purple-400 text-white border-0 font-semibold px-8 h-12 text-base shadow-lg"
                 >
-                  Mentor Session Sign Up
+                  Book a Session
                 </Button>
               </Link>
             )}
@@ -130,13 +118,13 @@ export default function Home() {
       {/* Mentor Directory Section */}
       <div id="mentor-directory" className="py-16 px-6 bg-gray-50">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-12">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-purple-600 rounded-full mb-4">
-              <Users className="w-8 h-8 text-white" />
-            </div>
-            <h2 className="text-4xl font-bold text-purple-600 mb-4">
+          <div className="mb-10">
+            <h2 className="text-3xl font-bold text-gray-900 mb-2">
               Mentor Directory
             </h2>
+            <p className="text-gray-600">
+              Browse profiles and connect with mentors who can help you grow
+            </p>
           </div>
 
           <FilterBar
@@ -145,18 +133,23 @@ export default function Home() {
             onClearAll={handleClearAll}
           />
 
-          <div className="mb-6">
-            <h3 className="text-lg font-semibold text-gray-900">
-              {sortedMentors.length} Mentors Found
-            </h3>
-            <p className="text-gray-600 text-sm">
-              Browse profiles or use the controls above to refine your search
+          <div className="mb-8">
+            <p className="text-sm text-gray-600">
+              <span className="font-semibold text-gray-900">{sortedMentors.length}</span> {sortedMentors.length === 1 ? 'mentor' : 'mentors'} found
             </p>
           </div>
 
           {isLoading ? (
-            <div className="text-center py-12">
+            <div className="text-center py-20">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
+            </div>
+          ) : sortedMentors.length === 0 ? (
+            <div className="text-center py-20 bg-white rounded-xl border border-gray-200">
+              <Users className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+              <p className="text-gray-600 text-lg">No mentors found matching your filters</p>
+              <Button onClick={handleClearAll} variant="outline" className="mt-4">
+                Clear Filters
+              </Button>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
