@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -79,13 +80,81 @@ export default function Sessions() {
   const bookSessionMutation = useMutation({
     mutationFn: async ({ sessionId, goal }) => {
       const user = await base44.auth.me();
-      return base44.entities.Session.update(sessionId, {
+      
+      // Update the session
+      const updatedSession = await base44.entities.Session.update(sessionId, {
         is_booked: true,
         booked_by: user.email,
         mentee_name: user.full_name,
         mentee_linkedin: user.linkedin_profile || '',
         session_goal: goal
       });
+      
+      // Get the mentor's details to find their email
+      const mentors = await base44.entities.Mentor.filter({ 
+        full_name: updatedSession.mentor_name 
+      });
+      
+      if (mentors.length > 0) {
+        const mentor = mentors[0];
+        const mentorEmail = mentor.created_by;
+        
+        // Format the session date
+        const sessionDate = new Date(updatedSession.date).toLocaleDateString('en-US', { 
+          weekday: 'long', 
+          year: 'numeric', 
+          month: 'long', 
+          day: 'numeric' 
+        });
+        
+        // Send email to mentor
+        try {
+          await base44.integrations.Core.SendEmail({
+            from_name: 'WILA Connect',
+            to: mentorEmail,
+            subject: `New Session Booking: ${user.full_name}`,
+            body: `
+              <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                <h2 style="color: #7c3aed;">New Session Booking</h2>
+                
+                <p>Hi ${mentor.full_name},</p>
+                
+                <p>Great news! A mentee has booked a session with you.</p>
+                
+                <div style="background-color: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                  <h3 style="margin-top: 0; color: #374151;">Session Details</h3>
+                  <p><strong>Date:</strong> ${sessionDate}</p>
+                  <p><strong>Time:</strong> ${updatedSession.time_slot}</p>
+                </div>
+                
+                <div style="background-color: #ede9fe; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                  <h3 style="margin-top: 0; color: #7c3aed;">Mentee Information</h3>
+                  <p><strong>Name:</strong> ${user.full_name}</p>
+                  <p><strong>Email:</strong> ${user.email}</p>
+                  ${user.linkedin_profile ? `<p><strong>LinkedIn:</strong> <a href="${user.linkedin_profile}" style="color: #7c3aed;">${user.linkedin_profile}</a></p>` : ''}
+                </div>
+                
+                <div style="background-color: #dbeafe; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                  <h3 style="margin-top: 0; color: #1e40af;">What They're Looking For</h3>
+                  <p style="white-space: pre-wrap;">${goal}</p>
+                </div>
+                
+                <p style="margin-top: 30px;">You can view more details and manage your sessions in your <a href="${window.location.origin}" style="color: #7c3aed;">WILA Connect dashboard</a>.</p>
+                
+                <p style="color: #6b7280; font-size: 14px; margin-top: 30px;">
+                  Best regards,<br>
+                  The WILA Connect Team
+                </p>
+              </div>
+            `
+          });
+        } catch (emailError) {
+          console.error('Failed to send email to mentor:', emailError);
+          // Don't fail the booking if email fails
+        }
+      }
+      
+      return updatedSession;
     },
     onSuccess: () => {
       queryClient.invalidateQueries(['sessions']);
