@@ -126,9 +126,9 @@ export default function Layout({ children }) {
         <div className="max-w-7xl mx-auto px-6 py-3">
           <div className="flex items-center justify-between">
             <Link 
-              to={user?.user_type === 'mentor' ? createPageUrl('MentorDashboard') : createPageUrl('Home')} 
-              className="flex items-center gap-3 group"
-            >
+                            to={createPageUrl('Welcome')} 
+                            className="flex items-center gap-3 group"
+                          >
               <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-purple-700 rounded-xl flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow">
                 <div className="text-white font-bold text-sm">WILA</div>
               </div>
