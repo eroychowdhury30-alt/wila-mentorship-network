@@ -112,12 +112,12 @@ export default function Sessions() {
       });
       
       // Get the mentor's details to find their email
-      const mentors = await base44.entities.Mentor.filter({ 
-        full_name: updatedSession.mentor_name 
-      });
+      console.log('Looking for mentor with name:', updatedSession.mentor_name);
+      const allMentors = await base44.entities.Mentor.list();
+      const mentor = allMentors.find(m => m.full_name === updatedSession.mentor_name);
+      console.log('Found mentor:', mentor);
       
-      if (mentors.length > 0) {
-        const mentor = mentors[0];
+      if (mentor) {
         const mentorEmail = mentor.created_by;
         
         // Format the session date
