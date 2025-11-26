@@ -26,7 +26,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 export default function Sessions() {
   const [selectedSession, setSelectedSession] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(new Date('2025-12-12'));
+  const [selectedDate, setSelectedDate] = useState(new Date('2025-12-13'));
   const [currentUser, setCurrentUser] = useState(null);
   const [selectedMentor, setSelectedMentor] = useState(null);
   const [sessionGoal, setSessionGoal] = useState('');
@@ -439,22 +439,10 @@ export default function Sessions() {
                 {selectedMentor ? `${selectedMentor}'s Schedule - ${formatDate(selectedDate)}` : `Mentorship Day - ${formatDate(selectedDate)}`}
               </h2>
               <div className="flex items-center gap-2">
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button variant="outline" className="w-[240px] justify-start text-left font-normal">
-                      <Calendar className="mr-2 h-4 w-4" />
-                      {formatDate(selectedDate)}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="end">
-                    <CalendarComponent
-                      mode="single"
-                      selected={selectedDate}
-                      onSelect={(date) => date && setSelectedDate(date)}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
+                <div className="flex items-center gap-2 px-4 py-2 bg-purple-100 rounded-lg">
+                  <Calendar className="h-4 w-4 text-purple-600" />
+                  <span className="font-medium text-purple-900">{formatDate(selectedDate)}</span>
+                </div>
                 <Button variant="ghost" size="icon">
                   <Search className="w-5 h-5 text-gray-500" />
                 </Button>
