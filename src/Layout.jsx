@@ -25,9 +25,18 @@ export default function Layout({ children }) {
 
   const loadUser = async () => {
     const currentPage = location.pathname.split('/').pop();
-    const publicPages = ['Welcome', 'Home']; // Home is now public for mentees to browse
+    const publicPages = ['Welcome', 'Home', 'Sessions']; // Public pages that don't require login
     
     try {
+      const isAuthenticated = await base44.auth.isAuthenticated();
+      
+      if (!isAuthenticated) {
+        // Not logged in - allow public pages
+        setUser(null);
+        setIsLoading(false);
+        return;
+      }
+      
       const currentUser = await base44.auth.me();
       setUser(currentUser);
       
@@ -75,14 +84,9 @@ export default function Layout({ children }) {
       
       setIsLoading(false);
     } catch (error) {
-      // Not logged in
+      // Error checking auth
       setUser(null);
       setIsLoading(false);
-      
-      // Allow public pages without login
-      if (!publicPages.includes(currentPage)) {
-        navigate(createPageUrl('Welcome'), { replace: true });
-      }
     }
   };
 
