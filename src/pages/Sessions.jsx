@@ -194,7 +194,7 @@ Berkeley Haas Women in Leadership Alliance`
     onSuccess: () => {
       queryClient.invalidateQueries(['sessions']);
       queryClient.invalidateQueries(['user-booked-sessions']);
-      toast.success('Session booked successfully! Confirmation emails sent.');
+      toast.success('Session booked! A confirmation email has been sent to you.');
       setShowModal(false);
       setSelectedSession(null);
       setSessionGoal('');
