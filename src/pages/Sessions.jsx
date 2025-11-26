@@ -129,11 +129,13 @@ export default function Sessions() {
         });
         
         // Send email to mentor
-        await base44.integrations.Core.SendEmail({
-          from_name: 'WILA Connect',
-          to: mentorEmail,
-          subject: `WILA Connect: Session Booked with ${user.full_name}`,
-          body: `Hi ${mentor.full_name},
+        console.log('Sending email to mentor:', mentorEmail);
+        try {
+          await base44.integrations.Core.SendEmail({
+            from_name: 'WILA Connect',
+            to: mentorEmail,
+            subject: `WILA Connect: Session Booked with ${user.full_name}`,
+            body: `Hi ${mentor.full_name},
 
 You have a session booked with ${user.full_name} on ${sessionDate} at ${updatedSession.time_slot}.
 
@@ -149,14 +151,20 @@ You can view more details and manage your sessions at ${window.location.origin}
 
 Best regards,
 Berkeley Haas Women in Leadership Alliance`
-        });
+          });
+          console.log('Email sent to mentor successfully');
+        } catch (emailError) {
+          console.error('Failed to send email to mentor:', emailError);
+        }
         
         // Send email to mentee
-        await base44.integrations.Core.SendEmail({
-          from_name: 'WILA Connect',
-          to: user.email,
-          subject: `WILA Connect: Session Booked with ${mentor.full_name}`,
-          body: `Hi ${user.full_name},
+        console.log('Sending email to mentee:', user.email);
+        try {
+          await base44.integrations.Core.SendEmail({
+            from_name: 'WILA Connect',
+            to: user.email,
+            subject: `WILA Connect: Session Booked with ${mentor.full_name}`,
+            body: `Hi ${user.full_name},
 
 Your session is confirmed!
 
@@ -171,7 +179,11 @@ If you need to reschedule or cancel, please visit ${window.location.origin}
 
 Best regards,
 Berkeley Haas Women in Leadership Alliance`
-        });
+          });
+          console.log('Email sent to mentee successfully');
+        } catch (emailError) {
+          console.error('Failed to send email to mentee:', emailError);
+        }
       }
       
       return updatedSession;
