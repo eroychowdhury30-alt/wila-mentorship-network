@@ -118,7 +118,7 @@ export default function Sessions() {
       console.log('Found mentor:', mentor);
       
       if (mentor) {
-        const mentorEmail = mentor.created_by;
+        const mentorEmail = mentor.email || mentor.created_by;
         
         // Format the session date
         const sessionDate = new Date(updatedSession.date).toLocaleDateString('en-US', { 

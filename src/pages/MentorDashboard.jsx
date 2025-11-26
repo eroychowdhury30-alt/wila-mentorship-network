@@ -61,6 +61,7 @@ export default function MentorDashboard() {
   const [activeTab, setActiveTab] = useState('profile');
   const [profileData, setProfileData] = useState({
     full_name: '',
+    email: '',
     title: '',
     company: '',
     linkedin_url: '',
@@ -115,33 +116,35 @@ export default function MentorDashboard() {
       );
       
       if (userMentor) {
-        setMentorProfile(userMentor);
-        setProfileData({
-          full_name: userMentor.full_name || '',
-          title: userMentor.title || '',
-          company: userMentor.company || '',
-          linkedin_url: userMentor.linkedin_url || '',
-          experience_years: userMentor.experience_years || 'Over 20 years',
-          expertise: userMentor.expertise || [],
-          mentors_to: userMentor.mentors_to || [],
-          bio: userMentor.bio || '',
-          status: userMentor.status || 'pending'
-        });
-        setIsEditing(false);
-      } else {
-        setProfileData({
-          full_name: currentUser.full_name || '',
-          title: '',
-          company: '',
-          linkedin_url: '',
-          experience_years: 'Over 20 years',
-          expertise: [],
-          mentors_to: [],
-          bio: '',
-          status: 'pending'
-        });
-        setIsEditing(true);
-      }
+                setMentorProfile(userMentor);
+                setProfileData({
+                  full_name: userMentor.full_name || '',
+                  email: userMentor.email || currentUser.email || '',
+                  title: userMentor.title || '',
+                  company: userMentor.company || '',
+                  linkedin_url: userMentor.linkedin_url || '',
+                  experience_years: userMentor.experience_years || 'Over 20 years',
+                  expertise: userMentor.expertise || [],
+                  mentors_to: userMentor.mentors_to || [],
+                  bio: userMentor.bio || '',
+                  status: userMentor.status || 'pending'
+                });
+                setIsEditing(false);
+              } else {
+                setProfileData({
+                  full_name: currentUser.full_name || '',
+                  email: currentUser.email || '',
+                  title: '',
+                  company: '',
+                  linkedin_url: '',
+                  experience_years: 'Over 20 years',
+                  expertise: [],
+                  mentors_to: [],
+                  bio: '',
+                  status: 'pending'
+                });
+                setIsEditing(true);
+              }
     } catch (error) {
       console.error('Error loading mentor profile:', error);
     }
@@ -443,41 +446,55 @@ export default function MentorDashboard() {
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="grid md:grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="full_name">Full Name *</Label>
-                        <Input
-                          id="full_name"
-                          value={profileData.full_name}
-                          onChange={(e) => setProfileData({ ...profileData, full_name: e.target.value })}
-                          disabled={!isEditing}
-                          placeholder="Enter your full name"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="title">Title *</Label>
-                        <Input
-                          id="title"
-                          value={profileData.title}
-                          onChange={(e) => setProfileData({ ...profileData, title: e.target.value })}
-                          disabled={!isEditing}
-                          placeholder="e.g., Senior Director"
-                        />
-                      </div>
-                    </div>
+                                            <div>
+                                              <Label htmlFor="full_name">Full Name *</Label>
+                                              <Input
+                                                id="full_name"
+                                                value={profileData.full_name}
+                                                onChange={(e) => setProfileData({ ...profileData, full_name: e.target.value })}
+                                                disabled={!isEditing}
+                                                placeholder="Enter your full name"
+                                              />
+                                            </div>
+                                            <div>
+                                              <Label htmlFor="email">Email *</Label>
+                                              <Input
+                                                id="email"
+                                                type="email"
+                                                value={profileData.email}
+                                                onChange={(e) => setProfileData({ ...profileData, email: e.target.value })}
+                                                disabled={!isEditing}
+                                                placeholder="your@email.com"
+                                              />
+                                            </div>
+                                          </div>
+
+                                          <div className="grid md:grid-cols-2 gap-4">
+                                            <div>
+                                              <Label htmlFor="title">Title *</Label>
+                                              <Input
+                                                id="title"
+                                                value={profileData.title}
+                                                onChange={(e) => setProfileData({ ...profileData, title: e.target.value })}
+                                                disabled={!isEditing}
+                                                placeholder="e.g., Senior Director"
+                                              />
+                                            </div>
+                                            <div>
+                                              <Label htmlFor="company">Company *</Label>
+                                              <Input
+                                                id="company"
+                                                value={profileData.company}
+                                                onChange={(e) => setProfileData({ ...profileData, company: e.target.value })}
+                                                disabled={!isEditing}
+                                                placeholder="e.g., Google"
+                                              />
+                                            </div>
+                                          </div>
 
                     <div className="grid md:grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="company">Company *</Label>
-                        <Input
-                          id="company"
-                          value={profileData.company}
-                          onChange={(e) => setProfileData({ ...profileData, company: e.target.value })}
-                          disabled={!isEditing}
-                          placeholder="e.g., Google"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="experience">Experience Level</Label>
+                                            <div>
+                                              <Label htmlFor="experience">Experience Level</Label>
                         <Select
                           value={profileData.experience_years}
                           onValueChange={(value) => setProfileData({ ...profileData, experience_years: value })}
