@@ -24,8 +24,14 @@ export default function Layout({ children }) {
   }, [location.pathname]);
 
   const loadUser = async () => {
-    const currentPage = location.pathname.split('/').pop();
+    const currentPage = location.pathname.split('/').pop() || 'Welcome';
     const publicPages = ['Welcome', 'Home', 'Sessions']; // Public pages that don't require login
+    
+    // If on root path with no page, redirect to Welcome
+    if (!currentPage || currentPage === '' || location.pathname === '/') {
+      navigate(createPageUrl('Welcome'), { replace: true });
+      return;
+    }
     
     try {
       const isAuthenticated = await base44.auth.isAuthenticated();
