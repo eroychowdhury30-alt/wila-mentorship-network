@@ -137,53 +137,53 @@ export default function Sessions() {
       
       // Send email to mentor (only if we have their email)
       if (mentorEmailAddress) {
-        await base44.integrations.Core.SendEmail({
+        await base44.functions.invoke('sendEmail', {
           from_name: 'WILA Connect',
           to: mentorEmailAddress,
           subject: `WILA Connect: Session Booked with ${user.full_name}`,
           body: `Hi ${mentor?.full_name || updatedSession.mentor_name},
 
-You have a session booked with ${user.full_name} on ${sessionDate} at ${updatedSession.time_slot}.
+      You have a session booked with ${user.full_name} on ${sessionDate} at ${updatedSession.time_slot}.
 
-Mentee Information:
-- Name: ${user.full_name}
-- Email: ${user.email}
-${user.linkedin_profile ? `- LinkedIn: ${user.linkedin_profile}` : ''}
+      Mentee Information:
+      - Name: ${user.full_name}
+      - Email: ${user.email}
+      ${user.linkedin_profile ? `- LinkedIn: ${user.linkedin_profile}` : ''}
 
-What They're Looking For:
-${goal}
+      What They're Looking For:
+      ${goal}
 
-You can view more details and manage your sessions at ${window.location.origin}
+      You can view more details and manage your sessions at ${window.location.origin}
 
-Best regards,
-Berkeley Haas Women in Leadership Alliance`
+      Best regards,
+      Berkeley Haas Women in Leadership Alliance`
         });
         console.log('Email sent to mentor at:', mentorEmailAddress);
       } else {
         console.log('No mentor email found - skipping mentor notification');
       }
-      
+
       // Send email to mentee
       if (menteeEmailAddress) {
-        await base44.integrations.Core.SendEmail({
+        await base44.functions.invoke('sendEmail', {
           from_name: 'WILA Connect',
           to: menteeEmailAddress,
           subject: `WILA Connect: Session Booked with ${updatedSession.mentor_name}`,
           body: `Hi ${user.full_name},
 
-Your session is confirmed!
+      Your session is confirmed!
 
-You have a session booked with ${updatedSession.mentor_name} on ${sessionDate} at ${updatedSession.time_slot}.
+      You have a session booked with ${updatedSession.mentor_name} on ${sessionDate} at ${updatedSession.time_slot}.
 
-${mentor ? `Mentor Information:
-- Name: ${mentor.full_name}
-- Title: ${mentor.title} at ${mentor.company}
-${mentor.linkedin_url ? `- LinkedIn: ${mentor.linkedin_url}` : ''}` : ''}
+      ${mentor ? `Mentor Information:
+      - Name: ${mentor.full_name}
+      - Title: ${mentor.title} at ${mentor.company}
+      ${mentor.linkedin_url ? `- LinkedIn: ${mentor.linkedin_url}` : ''}` : ''}
 
-If you need to reschedule or cancel, please visit ${window.location.origin}
+      If you need to reschedule or cancel, please visit ${window.location.origin}
 
-Best regards,
-Berkeley Haas Women in Leadership Alliance`
+      Best regards,
+      Berkeley Haas Women in Leadership Alliance`
         });
         console.log('Email sent to mentee at:', menteeEmailAddress);
       }
@@ -232,9 +232,9 @@ Berkeley Haas Women in Leadership Alliance`
         const mentor = mentors[0];
         
         // Email mentor about cancellation
-        await base44.integrations.Core.SendEmail({
+        await base44.functions.invoke('sendEmail', {
           from_name: 'WILA Connect',
-          to: mentor.created_by,
+          to: mentor.email || mentor.created_by,
           subject: `WILA Connect: Session Cancelled`,
           body: `Hi ${mentor.full_name},
 
@@ -249,7 +249,7 @@ Berkeley Haas Women in Leadership Alliance`
 
       // Email mentee about cancellation
       const user = await base44.auth.me();
-      await base44.integrations.Core.SendEmail({
+      await base44.functions.invoke('sendEmail', {
         from_name: 'WILA Connect',
         to: user.email,
         subject: `WILA Connect: Session Cancelled`,
