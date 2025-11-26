@@ -222,22 +222,18 @@ export default function MentorDashboard() {
         month: 'long', 
         day: 'numeric' 
       });
+      const cancelDatetime = `${sessionDate} at ${session.time_slot}`;
 
       // Email mentee about cancellation
       if (menteeEmail) {
         try {
           await base44.functions.invoke('sendEmail', {
-            from_name: 'WILA Connect',
             to: menteeEmail,
-            subject: `WILA Connect: Session Cancelled by Mentor`,
-            body: `Hi ${menteeName},
-
-      Unfortunately, your session with ${profileData.full_name} on ${sessionDate} at ${session.time_slot} has been cancelled by the mentor.
-
-      Please visit ${window.location.origin} to book a new session with another mentor.
-
-      Best regards,
-      Berkeley Haas Women in Leadership Alliance`
+            recipient_name: menteeName,
+            mentor_name: profileData.full_name,
+            mentee_name: menteeName,
+            booking_datetime: cancelDatetime,
+            email_type: 'cancellation'
           });
         } catch (e) {
           console.error('Failed to send cancellation email:', e);
