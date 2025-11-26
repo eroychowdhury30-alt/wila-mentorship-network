@@ -7,8 +7,9 @@ import { Users, UserCheck } from 'lucide-react';
 
 export default function Welcome() {
   const handleMenteeClick = () => {
-    // Mentees go directly to mentor directory without login
-    window.location.href = createPageUrl('Home');
+    // Mentees need to sign in first
+    localStorage.setItem('intended_user_type', 'mentee');
+    base44.auth.redirectToLogin(createPageUrl('Home'));
   };
 
   const handleMentorClick = () => {
@@ -55,7 +56,7 @@ export default function Welcome() {
                 className="w-full bg-purple-600 hover:bg-purple-700"
                 size="lg"
               >
-                Browse Mentors
+                Sign up / Sign in
               </Button>
             </CardContent>
           </Card>
