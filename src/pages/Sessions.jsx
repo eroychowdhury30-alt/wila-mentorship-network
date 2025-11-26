@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -27,7 +26,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 export default function Sessions() {
   const [selectedSession, setSelectedSession] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(new Date('2025-10-28'));
+  const [selectedDate, setSelectedDate] = useState(new Date('2025-12-12'));
   const [currentUser, setCurrentUser] = useState(null);
   const [selectedMentor, setSelectedMentor] = useState(null);
   const [sessionGoal, setSessionGoal] = useState('');
@@ -110,22 +109,16 @@ export default function Sessions() {
         // Send email to mentor
         try {
           await base44.integrations.Core.SendEmail({
-            from_name: 'WILA Connect',
+            from_name: 'Berkeley Haas Women',
             to: mentorEmail,
-            subject: `New Session Booking: ${user.full_name}`,
+            subject: `WILA Connect: Session Booked with ${user.full_name}`,
             body: `
               <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-                <h2 style="color: #7c3aed;">New Session Booking</h2>
+                <h2 style="color: #7c3aed;">You have a session booked!</h2>
                 
                 <p>Hi ${mentor.full_name},</p>
                 
-                <p>Great news! A mentee has booked a session with you.</p>
-                
-                <div style="background-color: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
-                  <h3 style="margin-top: 0; color: #374151;">Session Details</h3>
-                  <p><strong>Date:</strong> ${sessionDate}</p>
-                  <p><strong>Time:</strong> ${updatedSession.time_slot}</p>
-                </div>
+                <p>You have a session booked with <strong>${user.full_name}</strong> on <strong>${sessionDate}</strong> at <strong>${updatedSession.time_slot}</strong>.</p>
                 
                 <div style="background-color: #ede9fe; padding: 20px; border-radius: 8px; margin: 20px 0;">
                   <h3 style="margin-top: 0; color: #7c3aed;">Mentee Information</h3>
@@ -143,14 +136,47 @@ export default function Sessions() {
                 
                 <p style="color: #6b7280; font-size: 14px; margin-top: 30px;">
                   Best regards,<br>
-                  The WILA Connect Team
+                  Berkeley Haas Women in Leadership Alliance
                 </p>
               </div>
             `
           });
         } catch (emailError) {
           console.error('Failed to send email to mentor:', emailError);
-          // Don't fail the booking if email fails
+        }
+        
+        // Send email to mentee
+        try {
+          await base44.integrations.Core.SendEmail({
+            from_name: 'Berkeley Haas Women',
+            to: user.email,
+            subject: `WILA Connect: Session Booked with ${mentor.full_name}`,
+            body: `
+              <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                <h2 style="color: #7c3aed;">Your session is confirmed!</h2>
+                
+                <p>Hi ${user.full_name},</p>
+                
+                <p>You have a session booked with <strong>${mentor.full_name}</strong> on <strong>${sessionDate}</strong> at <strong>${updatedSession.time_slot}</strong>.</p>
+                
+                <div style="background-color: #ede9fe; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                  <h3 style="margin-top: 0; color: #7c3aed;">Mentor Information</h3>
+                  <p><strong>Name:</strong> ${mentor.full_name}</p>
+                  <p><strong>Title:</strong> ${mentor.title} at ${mentor.company}</p>
+                  ${mentor.linkedin_url ? `<p><strong>LinkedIn:</strong> <a href="${mentor.linkedin_url}" style="color: #7c3aed;">${mentor.linkedin_url}</a></p>` : ''}
+                </div>
+                
+                <p style="margin-top: 30px;">If you need to reschedule or cancel, please visit <a href="${window.location.origin}" style="color: #7c3aed;">WILA Connect</a>.</p>
+                
+                <p style="color: #6b7280; font-size: 14px; margin-top: 30px;">
+                  Best regards,<br>
+                  Berkeley Haas Women in Leadership Alliance
+                </p>
+              </div>
+            `
+          });
+        } catch (emailError) {
+          console.error('Failed to send email to mentee:', emailError);
         }
       }
       

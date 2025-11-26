@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -26,7 +25,7 @@ export default function Layout({ children }) {
 
   const loadUser = async () => {
     const currentPage = location.pathname.split('/').pop();
-    const publicPages = ['Welcome'];
+    const publicPages = ['Welcome', 'Home']; // Home is now public for mentees to browse
     
     try {
       const currentUser = await base44.auth.me();
@@ -74,20 +73,13 @@ export default function Layout({ children }) {
         return;
       }
       
-      // If user is logged in but has no user_type and no intended type, send to onboarding
-      if (!currentUser.user_type && currentPage !== 'Onboarding' && currentPage !== 'MenteeQuestionnaire') {
-        navigate(createPageUrl('Onboarding'), { replace: true });
-        setIsLoading(false);
-        return;
-      }
-      
       setIsLoading(false);
     } catch (error) {
       // Not logged in
       setUser(null);
       setIsLoading(false);
       
-      // Redirect to Welcome if not on a public page
+      // Allow public pages without login
       if (!publicPages.includes(currentPage)) {
         navigate(createPageUrl('Welcome'), { replace: true });
       }

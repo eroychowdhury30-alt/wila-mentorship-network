@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -72,7 +71,7 @@ export default function MentorDashboard() {
     status: 'pending'
   });
   const [availableSlots, setAvailableSlots] = useState([]);
-  const [selectedDate, setSelectedDate] = useState(new Date('2025-10-28'));
+  const [selectedDate, setSelectedDate] = useState(new Date('2025-12-12'));
   const queryClient = useQueryClient();
 
   useEffect(() => {

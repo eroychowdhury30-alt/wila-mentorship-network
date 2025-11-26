@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Shield, Users, UserCheck, UserX, Clock, CheckCircle, XCircle, Trash2, Pause, Play } from 'lucide-react';
+import { Shield, Users, UserCheck, UserX, Clock, CheckCircle, XCircle, Trash2, Pause, Play, Calendar, ExternalLink } from 'lucide-react';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
@@ -203,6 +203,10 @@ export default function AdminDashboard() {
             <TabsTrigger value="paused" className="gap-2">
               <Pause className="w-4 h-4" />
               Paused ({pausedMentors.length})
+            </TabsTrigger>
+            <TabsTrigger value="sessions" className="gap-2">
+              <Calendar className="w-4 h-4" />
+              Sessions ({bookedSessions.length})
             </TabsTrigger>
             <TabsTrigger value="users" className="gap-2">
               <Users className="w-4 h-4" />
@@ -408,6 +412,57 @@ export default function AdminDashboard() {
                             <Trash2 className="w-4 h-4 mr-2" />
                             Remove
                           </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Booked Sessions */}
+          <TabsContent value="sessions">
+            <Card>
+              <CardHeader>
+                <CardTitle>All Booked Sessions</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {bookedSessions.length === 0 ? (
+                  <p className="text-center text-gray-500 py-8">No booked sessions yet</p>
+                ) : (
+                  <div className="space-y-3">
+                    {bookedSessions.map((session) => (
+                      <div key={session.id} className="border rounded-lg p-4 hover:bg-gray-50">
+                        <div className="flex items-start justify-between">
+                          <div className="space-y-2">
+                            <div className="flex items-center gap-3">
+                              <Badge className="bg-purple-600 text-white">
+                                {new Date(session.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                              </Badge>
+                              <Badge variant="outline">{session.time_slot}</Badge>
+                              <Badge className={session.status === 'cancelled' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}>
+                                {session.status || 'scheduled'}
+                              </Badge>
+                            </div>
+                            <div className="grid md:grid-cols-2 gap-4 mt-3">
+                              <div>
+                                <p className="text-xs font-semibold text-gray-500 uppercase">Mentor</p>
+                                <p className="font-medium">{session.mentor_name}</p>
+                              </div>
+                              <div>
+                                <p className="text-xs font-semibold text-gray-500 uppercase">Mentee</p>
+                                <p className="font-medium">{session.mentee_name}</p>
+                                <p className="text-sm text-gray-600">{session.booked_by}</p>
+                              </div>
+                            </div>
+                            {session.session_goal && (
+                              <div className="mt-2">
+                                <p className="text-xs font-semibold text-gray-500 uppercase">Session Goal</p>
+                                <p className="text-sm text-gray-700">{session.session_goal}</p>
+                              </div>
+                            )}
+                          </div>
                         </div>
                       </div>
                     ))}

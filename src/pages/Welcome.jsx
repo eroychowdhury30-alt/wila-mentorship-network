@@ -6,16 +6,15 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Users, UserCheck } from 'lucide-react';
 
 export default function Welcome() {
-  const handleSelectUserType = (userType) => {
-    // Store the intended user type in localStorage
-    localStorage.setItem('intended_user_type', userType);
-    
-    // Redirect to login with the appropriate next URL
-    const nextUrl = userType === 'mentor' 
-      ? createPageUrl('MentorDashboard')
-      : createPageUrl('Home');
-    
-    base44.auth.redirectToLogin(nextUrl);
+  const handleMenteeClick = () => {
+    // Mentees go directly to mentor directory without login
+    window.location.href = createPageUrl('Home');
+  };
+
+  const handleMentorClick = () => {
+    // Mentors need to sign in
+    localStorage.setItem('intended_user_type', 'mentor');
+    base44.auth.redirectToLogin(createPageUrl('MentorDashboard'));
   };
 
   return (
@@ -52,11 +51,11 @@ export default function Welcome() {
                 <li>• Access to mentorship resources</li>
               </ul>
               <Button
-                onClick={() => handleSelectUserType('mentee')}
+                onClick={handleMenteeClick}
                 className="w-full bg-purple-600 hover:bg-purple-700"
                 size="lg"
               >
-                Sign up / Sign in
+                Browse Mentors
               </Button>
             </CardContent>
           </Card>
@@ -79,7 +78,7 @@ export default function Welcome() {
                 <li>• Make a difference</li>
               </ul>
               <Button
-                onClick={() => handleSelectUserType('mentor')}
+                onClick={handleMentorClick}
                 className="w-full bg-yellow-400 hover:bg-yellow-500 text-gray-900"
                 size="lg"
               >
