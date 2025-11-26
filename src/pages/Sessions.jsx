@@ -129,11 +129,15 @@ export default function Sessions() {
         });
         
         // Send email to mentor
-        console.log('Sending email to mentor:', mentorEmail);
+        const mentorEmailAddress = mentorEmail;
+        const menteeEmailAddress = user.email;
+        console.log('Mentor email address:', mentorEmailAddress);
+        console.log('Mentee email address:', menteeEmailAddress);
+        
         try {
           await base44.integrations.Core.SendEmail({
             from_name: 'WILA Connect',
-            to: mentorEmail,
+            to: mentorEmailAddress,
             subject: `WILA Connect: Session Booked with ${user.full_name}`,
             body: `Hi ${mentor.full_name},
 
@@ -158,11 +162,10 @@ Berkeley Haas Women in Leadership Alliance`
         }
         
         // Send email to mentee
-        console.log('Sending email to mentee:', user.email);
         try {
           await base44.integrations.Core.SendEmail({
             from_name: 'WILA Connect',
-            to: user.email,
+            to: menteeEmailAddress,
             subject: `WILA Connect: Session Booked with ${mentor.full_name}`,
             body: `Hi ${user.full_name},
 
