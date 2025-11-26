@@ -226,22 +226,18 @@ export default function MentorDashboard() {
       // Email mentee about cancellation
       if (menteeEmail) {
         try {
-          await base44.integrations.Core.SendEmail({
-            from_name: 'Berkeley Haas Women',
+          await base44.functions.invoke('sendEmail', {
+            from_name: 'WILA Connect',
             to: menteeEmail,
             subject: `WILA Connect: Session Cancelled by Mentor`,
-            body: `
-              <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-                <h2 style="color: #dc2626;">Session Cancelled</h2>
-                <p>Hi ${menteeName},</p>
-                <p>Unfortunately, your session with <strong>${profileData.full_name}</strong> on <strong>${sessionDate}</strong> at <strong>${session.time_slot}</strong> has been cancelled by the mentor.</p>
-                <p>Please visit <a href="${window.location.origin}" style="color: #7c3aed;">WILA Connect</a> to book a new session with another mentor.</p>
-                <p style="color: #6b7280; font-size: 14px; margin-top: 30px;">
-                  Best regards,<br>
-                  Berkeley Haas Women in Leadership Alliance
-                </p>
-              </div>
-            `
+            body: `Hi ${menteeName},
+
+      Unfortunately, your session with ${profileData.full_name} on ${sessionDate} at ${session.time_slot} has been cancelled by the mentor.
+
+      Please visit ${window.location.origin} to book a new session with another mentor.
+
+      Best regards,
+      Berkeley Haas Women in Leadership Alliance`
           });
         } catch (e) {
           console.error('Failed to send cancellation email:', e);
