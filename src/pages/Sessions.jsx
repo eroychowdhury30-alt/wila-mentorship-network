@@ -287,10 +287,17 @@ export default function Sessions() {
   };
 
   const handleSessionClick = (session) => {
-    // If not logged in, redirect to login
+    // If session is already booked, don't do anything
+    if (session.is_booked) {
+      return;
+    }
+    
+    // If not logged in, redirect to login first
     if (!currentUser) {
       localStorage.setItem('intended_user_type', 'mentee');
-      base44.auth.redirectToLogin(window.location.href);
+      // Store the current URL to return to after login
+      const returnUrl = window.location.pathname + window.location.search;
+      base44.auth.redirectToLogin(returnUrl);
       return;
     }
     
@@ -299,10 +306,9 @@ export default function Sessions() {
       return;
     }
     
-    if (!session.is_booked) {
-      setSelectedSession(session);
-      setShowModal(true);
-    }
+    // Show the session details modal
+    setSelectedSession(session);
+    setShowModal(true);
   };
 
   const handleSignup = () => {
