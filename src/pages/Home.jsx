@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
@@ -37,7 +36,6 @@ export default function Home() {
       const allMentors = await base44.entities.Mentor.list();
       return allMentors.filter(m => m.status === 'approved');
     },
-    enabled: !!user,
   });
 
   const handleFilterChange = (key, value) => {
@@ -100,17 +98,15 @@ export default function Home() {
             >
               Browse Mentors
             </Button>
-            {user?.user_type === 'mentee' && (
-              <Link to={createPageUrl('Sessions')}>
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="bg-purple-500 hover:bg-purple-400 text-white border-0 font-semibold px-8 h-12 text-base shadow-lg"
-                >
-                  Book a Session
-                </Button>
-              </Link>
-            )}
+            <Link to={createPageUrl('Sessions')}>
+              <Button
+                size="lg"
+                variant="outline"
+                className="bg-purple-500 hover:bg-purple-400 text-white border-0 font-semibold px-8 h-12 text-base shadow-lg"
+              >
+                Book a Session
+              </Button>
+            </Link>
           </div>
         </div>
       </div>

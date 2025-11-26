@@ -197,6 +197,60 @@ export default function MentorDashboard() {
     },
   });
 
+  const cancelBookedSessionMutation = useMutation({
+    mutationFn: async (session) => {
+      // Get mentee email before clearing
+      const menteeEmail = session.booked_by;
+      const menteeName = session.mentee_name;
+      
+      // Update session to cancelled and clear booking
+      await base44.entities.Session.update(session.id, {
+        is_booked: false,
+        booked_by: null,
+        mentee_name: null,
+        mentee_linkedin: null,
+        session_goal: null,
+        status: 'cancelled'
+      });
+
+      const sessionDate = new Date(session.date).toLocaleDateString('en-US', { 
+        weekday: 'long', 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+      });
+
+      // Email mentee about cancellation
+      if (menteeEmail) {
+        try {
+          await base44.integrations.Core.SendEmail({
+            from_name: 'Berkeley Haas Women',
+            to: menteeEmail,
+            subject: `WILA Connect: Session Cancelled by Mentor`,
+            body: `
+              <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                <h2 style="color: #dc2626;">Session Cancelled</h2>
+                <p>Hi ${menteeName},</p>
+                <p>Unfortunately, your session with <strong>${profileData.full_name}</strong> on <strong>${sessionDate}</strong> at <strong>${session.time_slot}</strong> has been cancelled by the mentor.</p>
+                <p>Please visit <a href="${window.location.origin}" style="color: #7c3aed;">WILA Connect</a> to book a new session with another mentor.</p>
+                <p style="color: #6b7280; font-size: 14px; margin-top: 30px;">
+                  Best regards,<br>
+                  Berkeley Haas Women in Leadership Alliance
+                </p>
+              </div>
+            `
+          });
+        } catch (e) {
+          console.error('Failed to send cancellation email:', e);
+        }
+      }
+    },
+    onSuccess: () => {
+      toast.success('Session cancelled and mentee notified');
+      queryClient.invalidateQueries(['mentor-sessions']);
+    },
+  });
+
   const handleSaveProfile = async () => {
     console.log('handleSaveProfile called');
     console.log('profileData:', profileData);
@@ -690,17 +744,34 @@ export default function MentorDashboard() {
                                 <p className="text-sm text-gray-700 font-medium">{session.mentee_name || 'Mentee Name'}</p>
                                 <p className="text-xs text-gray-500">{session.booked_by}</p>
                               </div>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleViewMentee(session);
-                                }}
-                              >
-                                <User className="w-4 h-4 mr-2" />
-                                View Profile
-                              </Button>
+                              <div className="flex gap-2">
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleViewMentee(session);
+                                  }}
+                                >
+                                  <User className="w-4 h-4 mr-2" />
+                                  View
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    if (confirm('Cancel this session? The mentee will be notified.')) {
+                                      cancelBookedSessionMutation.mutate(session);
+                                    }
+                                  }}
+                                  disabled={cancelBookedSessionMutation.isPending}
+                                >
+                                  <Trash2 className="w-4 h-4 mr-2" />
+                                  Cancel
+                                </Button>
+                              </div>
                             </div>
                           ))}
                         </div>
