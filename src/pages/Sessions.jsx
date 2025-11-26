@@ -42,13 +42,19 @@ export default function Sessions() {
     }
   }, []);
 
-  // Get current user
+  // Get current user (optional - may not be logged in)
   const { data: user } = useQuery({
     queryKey: ['current-user'],
     queryFn: async () => {
-      const userData = await base44.auth.me();
-      setCurrentUser(userData);
-      return userData;
+      try {
+        const isAuth = await base44.auth.isAuthenticated();
+        if (!isAuth) return null;
+        const userData = await base44.auth.me();
+        setCurrentUser(userData);
+        return userData;
+      } catch {
+        return null;
+      }
     },
   });
 
@@ -281,6 +287,13 @@ export default function Sessions() {
   };
 
   const handleSessionClick = (session) => {
+    // If not logged in, redirect to login
+    if (!currentUser) {
+      localStorage.setItem('intended_user_type', 'mentee');
+      base44.auth.redirectToLogin(window.location.href);
+      return;
+    }
+    
     if (hasBookedSession) {
       toast.error('You have already booked a session for this date. You can only book one 30-minute session per day.');
       return;
