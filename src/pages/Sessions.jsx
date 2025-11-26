@@ -135,13 +135,14 @@ export default function Sessions() {
       console.log('Mentee email to use:', menteeEmailAddress);
       console.log('Current user email:', user.email);
       
-      // Send email to mentor (only if we have their email)
-      if (mentorEmailAddress) {
-        await base44.functions.invoke('sendEmail', {
-          from_name: 'WILA Connect',
-          to: mentorEmailAddress,
-          subject: `WILA Connect: Session Booked with ${user.full_name}`,
-          body: `Hi ${mentor?.full_name || updatedSession.mentor_name},
+      // Send emails (don't block booking if emails fail)
+      try {
+        if (mentorEmailAddress) {
+          await base44.functions.invoke('sendEmail', {
+            from_name: 'WILA Connect',
+            to: mentorEmailAddress,
+            subject: `WILA Connect: Session Booked with ${user.full_name}`,
+            body: `Hi ${mentor?.full_name || updatedSession.mentor_name},
 
       You have a session booked with ${user.full_name} on ${sessionDate} at ${updatedSession.time_slot}.
 
@@ -157,19 +158,20 @@ export default function Sessions() {
 
       Best regards,
       Berkeley Haas Women in Leadership Alliance`
-        });
-        console.log('Email sent to mentor at:', mentorEmailAddress);
-      } else {
-        console.log('No mentor email found - skipping mentor notification');
+          });
+          console.log('Email sent to mentor at:', mentorEmailAddress);
+        }
+      } catch (e) {
+        console.error('Failed to send mentor email:', e);
       }
 
-      // Send email to mentee
-      if (menteeEmailAddress) {
-        await base44.functions.invoke('sendEmail', {
-          from_name: 'WILA Connect',
-          to: menteeEmailAddress,
-          subject: `WILA Connect: Session Booked with ${updatedSession.mentor_name}`,
-          body: `Hi ${user.full_name},
+      try {
+        if (menteeEmailAddress) {
+          await base44.functions.invoke('sendEmail', {
+            from_name: 'WILA Connect',
+            to: menteeEmailAddress,
+            subject: `WILA Connect: Session Booked with ${updatedSession.mentor_name}`,
+            body: `Hi ${user.full_name},
 
       Your session is confirmed!
 
@@ -184,8 +186,11 @@ export default function Sessions() {
 
       Best regards,
       Berkeley Haas Women in Leadership Alliance`
-        });
-        console.log('Email sent to mentee at:', menteeEmailAddress);
+          });
+          console.log('Email sent to mentee at:', menteeEmailAddress);
+        }
+      } catch (e) {
+        console.error('Failed to send mentee email:', e);
       }
       
       return updatedSession;
