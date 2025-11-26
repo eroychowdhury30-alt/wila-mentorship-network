@@ -24,21 +24,21 @@ export default function Layout({ children }) {
   }, [location.pathname]);
 
   const loadUser = async () => {
-        const currentPage = location.pathname.split('/').pop();
-        const publicPages = ['Welcome']; // Only Welcome page is public
-
-        try {
-          const isAuthenticated = await base44.auth.isAuthenticated();
-
-          if (!isAuthenticated) {
-            // Not logged in - redirect to Welcome page unless already there
-            setUser(null);
-            setIsLoading(false);
-            if (!publicPages.includes(currentPage)) {
-              navigate(createPageUrl('Welcome'), { replace: true });
-            }
-            return;
-          }
+    const currentPage = location.pathname.split('/').pop();
+    const publicPages = ['Welcome', 'Home', 'Sessions']; // Public pages that don't require login
+    
+    try {
+      const isAuthenticated = await base44.auth.isAuthenticated();
+      
+      if (!isAuthenticated) {
+        // Not logged in - redirect to Welcome if not on a public page
+        setUser(null);
+        setIsLoading(false);
+        if (!publicPages.includes(currentPage)) {
+          navigate(createPageUrl('Welcome'), { replace: true });
+        }
+        return;
+      }
       
       const currentUser = await base44.auth.me();
       setUser(currentUser);
