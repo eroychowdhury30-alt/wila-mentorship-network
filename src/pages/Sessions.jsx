@@ -191,10 +191,14 @@ Berkeley Haas Women in Leadership Alliance`
     onSuccess: () => {
       queryClient.invalidateQueries(['sessions']);
       queryClient.invalidateQueries(['user-booked-sessions']);
-      toast.success('Session booked successfully!');
+      toast.success('Session booked successfully! Confirmation emails sent.');
       setShowModal(false);
       setSelectedSession(null);
       setSessionGoal('');
+    },
+    onError: (error) => {
+      console.error('Booking error:', error);
+      toast.error('Failed to book session: ' + error.message);
     },
   });
 
