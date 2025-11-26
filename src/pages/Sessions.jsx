@@ -117,29 +117,31 @@ export default function Sessions() {
       const mentor = allMentors.find(m => m.full_name === updatedSession.mentor_name);
       console.log('Found mentor:', mentor);
       
-      if (mentor) {
-        const mentorEmail = mentor.email || mentor.created_by;
-        
-        // Format the session date
-        const sessionDate = new Date(updatedSession.date).toLocaleDateString('en-US', { 
-          weekday: 'long', 
-          year: 'numeric', 
-          month: 'long', 
-          day: 'numeric' 
-        });
-        
-        // Send email to mentor
-        const mentorEmailAddress = mentorEmail;
-        const menteeEmailAddress = user.email;
-        console.log('Mentor email address:', mentorEmailAddress);
-        console.log('Mentee email address:', menteeEmailAddress);
-        
-        try {
-          await base44.integrations.Core.SendEmail({
-            from_name: 'WILA Connect',
-            to: mentorEmailAddress,
-            subject: `WILA Connect: Session Booked with ${user.full_name}`,
-            body: `Hi ${mentor.full_name},
+      // Format the session date
+      const sessionDate = new Date(updatedSession.date).toLocaleDateString('en-US', { 
+        weekday: 'long', 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+      });
+      
+      // Get email addresses - mentor email from their profile, mentee from session booking
+      const mentorEmailAddress = mentor?.email || updatedSession.mentor_email || null;
+      const menteeEmailAddress = updatedSession.booked_by; // This is the email of who booked
+      
+      console.log('=== EMAIL DEBUG ===');
+      console.log('Mentor found:', mentor);
+      console.log('Mentor email to use:', mentorEmailAddress);
+      console.log('Mentee email to use:', menteeEmailAddress);
+      console.log('Current user email:', user.email);
+      
+      // Send email to mentor (only if we have their email)
+      if (mentorEmailAddress) {
+        await base44.integrations.Core.SendEmail({
+          from_name: 'WILA Connect',
+          to: mentorEmailAddress,
+          subject: `WILA Connect: Session Booked with ${user.full_name}`,
+          body: `Hi ${mentor?.full_name || updatedSession.mentor_name},
 
 You have a session booked with ${user.full_name} on ${sessionDate} at ${updatedSession.time_slot}.
 
@@ -155,38 +157,35 @@ You can view more details and manage your sessions at ${window.location.origin}
 
 Best regards,
 Berkeley Haas Women in Leadership Alliance`
-          });
-          console.log('Email sent to mentor successfully');
-        } catch (emailError) {
-          console.error('Failed to send email to mentor:', emailError);
-        }
-        
-        // Send email to mentee
-        try {
-          await base44.integrations.Core.SendEmail({
-            from_name: 'WILA Connect',
-            to: menteeEmailAddress,
-            subject: `WILA Connect: Session Booked with ${mentor.full_name}`,
-            body: `Hi ${user.full_name},
+        });
+        console.log('Email sent to mentor at:', mentorEmailAddress);
+      } else {
+        console.log('No mentor email found - skipping mentor notification');
+      }
+      
+      // Send email to mentee
+      if (menteeEmailAddress) {
+        await base44.integrations.Core.SendEmail({
+          from_name: 'WILA Connect',
+          to: menteeEmailAddress,
+          subject: `WILA Connect: Session Booked with ${updatedSession.mentor_name}`,
+          body: `Hi ${user.full_name},
 
 Your session is confirmed!
 
-You have a session booked with ${mentor.full_name} on ${sessionDate} at ${updatedSession.time_slot}.
+You have a session booked with ${updatedSession.mentor_name} on ${sessionDate} at ${updatedSession.time_slot}.
 
-Mentor Information:
+${mentor ? `Mentor Information:
 - Name: ${mentor.full_name}
 - Title: ${mentor.title} at ${mentor.company}
-${mentor.linkedin_url ? `- LinkedIn: ${mentor.linkedin_url}` : ''}
+${mentor.linkedin_url ? `- LinkedIn: ${mentor.linkedin_url}` : ''}` : ''}
 
 If you need to reschedule or cancel, please visit ${window.location.origin}
 
 Best regards,
 Berkeley Haas Women in Leadership Alliance`
-          });
-          console.log('Email sent to mentee successfully');
-        } catch (emailError) {
-          console.error('Failed to send email to mentee:', emailError);
-        }
+        });
+        console.log('Email sent to mentee at:', menteeEmailAddress);
       }
       
       return updatedSession;
