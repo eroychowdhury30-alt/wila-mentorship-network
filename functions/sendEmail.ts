@@ -18,22 +18,22 @@ Deno.serve(async (req) => {
         const serviceId = Deno.env.get("EMAILJS_SERVICE_ID");
         const templateId = Deno.env.get("EMAILJS_TEMPLATE_ID");
         const publicKey = Deno.env.get("EMAILJS_PUBLIC_KEY");
-        const privateKey = Deno.env.get("EMAILJS_PRIVATE_KEY");
 
-        if (!serviceId || !templateId || !publicKey || !privateKey) {
+        if (!serviceId || !templateId || !publicKey) {
             return Response.json({ error: 'EmailJS not configured' }, { status: 500 });
         }
 
+        // Use EmailJS REST API directly
         const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'origin': 'https://base44.com'
             },
             body: JSON.stringify({
                 service_id: serviceId,
                 template_id: templateId,
                 user_id: publicKey,
-                accessToken: privateKey,
                 template_params: {
                     to_email: to,
                     recipient_name: recipient_name,
@@ -45,12 +45,14 @@ Deno.serve(async (req) => {
             })
         });
 
+        const responseText = await response.text();
+        
         if (!response.ok) {
-            const errorText = await response.text();
-            console.error('EmailJS error:', errorText);
-            return Response.json({ error: 'Failed to send email', details: errorText }, { status: response.status });
+            console.error('EmailJS error:', responseText);
+            return Response.json({ error: 'Failed to send email', details: responseText }, { status: response.status });
         }
 
+        console.log('EmailJS response:', responseText);
         return Response.json({ success: true, message: 'Email sent successfully' });
     } catch (error) {
         console.error('Error sending email:', error);
