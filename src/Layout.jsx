@@ -31,10 +31,11 @@ export default function Layout({ children }) {
       const isAuthenticated = await base44.auth.isAuthenticated();
       
       if (!isAuthenticated) {
-        // Not logged in - redirect to Welcome if not on a public page
+        // Not logged in - only redirect to Welcome from protected pages
         setUser(null);
         setIsLoading(false);
-        if (!publicPages.includes(currentPage)) {
+        const protectedPages = ['MentorDashboard', 'AdminDashboard', 'Onboarding', 'MenteeQuestionnaire'];
+        if (protectedPages.includes(currentPage)) {
           navigate(createPageUrl('Welcome'), { replace: true });
         }
         return;
