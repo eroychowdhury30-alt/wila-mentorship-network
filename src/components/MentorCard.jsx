@@ -94,16 +94,14 @@ export default function MentorCard({ mentor, isMentee = false }) {
               LinkedIn
             </Button>
           )}
-          {isMentee && (
-            <Link to={`${createPageUrl('Sessions')}?mentor=${encodeURIComponent(mentor.full_name)}`} className="flex-1">
-              <Button 
-                className="w-full bg-purple-600 hover:bg-purple-700 text-white h-10"
-              >
-                <Calendar className="w-4 h-4 mr-2" />
-                Book Session
-              </Button>
-            </Link>
-          )}
+          <Link to={`${createPageUrl('Sessions')}?mentor=${encodeURIComponent(mentor.full_name)}`} className="flex-1">
+            <Button 
+              className="w-full bg-purple-600 hover:bg-purple-700 text-white h-10"
+            >
+              <Calendar className="w-4 h-4 mr-2" />
+              Book Session
+            </Button>
+          </Link>
         </div>
       </div>
     </Card>
