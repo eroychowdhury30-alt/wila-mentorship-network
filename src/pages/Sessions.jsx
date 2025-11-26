@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
-import { Calendar, Search, AlertCircle, ArrowLeft } from 'lucide-react';
+import { Calendar, Search, AlertCircle, ArrowLeft, XCircle } from 'lucide-react';
 import TimeSlotCard from '../components/TimeSlotCard';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
@@ -73,8 +73,8 @@ export default function Sessions() {
     enabled: !!currentUser?.email,
   });
 
-  const hasBookedSession = userBookedSessions.length > 0;
-  const bookedSession = userBookedSessions[0];
+  const hasBookedSession = userBookedSessions.filter(s => s.status !== 'cancelled').length > 0;
+  const bookedSession = userBookedSessions.find(s => s.status !== 'cancelled');
 
   const bookSessionMutation = useMutation({
     mutationFn: async ({ sessionId, goal }) => {
@@ -192,6 +192,94 @@ export default function Sessions() {
     },
   });
 
+  const cancelSessionMutation = useMutation({
+    mutationFn: async (session) => {
+      // Update session to cancelled and clear booking
+      await base44.entities.Session.update(session.id, {
+        is_booked: false,
+        booked_by: null,
+        mentee_name: null,
+        mentee_linkedin: null,
+        session_goal: null,
+        status: 'cancelled'
+      });
+
+      // Get mentor info for email
+      const mentors = await base44.entities.Mentor.filter({ 
+        full_name: session.mentor_name 
+      });
+      
+      const sessionDate = new Date(session.date).toLocaleDateString('en-US', { 
+        weekday: 'long', 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+      });
+
+      if (mentors.length > 0) {
+        const mentor = mentors[0];
+        
+        // Email mentor about cancellation
+        try {
+          await base44.integrations.Core.SendEmail({
+            from_name: 'Berkeley Haas Women',
+            to: mentor.created_by,
+            subject: `WILA Connect: Session Cancelled`,
+            body: `
+              <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                <h2 style="color: #dc2626;">Session Cancelled</h2>
+                <p>Hi ${mentor.full_name},</p>
+                <p>The session scheduled with <strong>${session.mentee_name}</strong> on <strong>${sessionDate}</strong> at <strong>${session.time_slot}</strong> has been cancelled.</p>
+                <p>This time slot is now available for other mentees to book.</p>
+                <p style="color: #6b7280; font-size: 14px; margin-top: 30px;">
+                  Best regards,<br>
+                  Berkeley Haas Women in Leadership Alliance
+                </p>
+              </div>
+            `
+          });
+        } catch (e) {
+          console.error('Failed to send cancellation email to mentor:', e);
+        }
+      }
+
+      // Email mentee about cancellation
+      const user = await base44.auth.me();
+      try {
+        await base44.integrations.Core.SendEmail({
+          from_name: 'Berkeley Haas Women',
+          to: user.email,
+          subject: `WILA Connect: Session Cancelled`,
+          body: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+              <h2 style="color: #dc2626;">Session Cancelled</h2>
+              <p>Hi ${user.full_name},</p>
+              <p>Your session with <strong>${session.mentor_name}</strong> on <strong>${sessionDate}</strong> at <strong>${session.time_slot}</strong> has been cancelled.</p>
+              <p>You can book a new session at <a href="${window.location.origin}" style="color: #7c3aed;">WILA Connect</a>.</p>
+              <p style="color: #6b7280; font-size: 14px; margin-top: 30px;">
+                Best regards,<br>
+                Berkeley Haas Women in Leadership Alliance
+              </p>
+            </div>
+          `
+        });
+      } catch (e) {
+        console.error('Failed to send cancellation email to mentee:', e);
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(['sessions']);
+      queryClient.invalidateQueries(['user-booked-sessions']);
+      toast.success('Session cancelled successfully');
+    },
+  });
+
+  const handleCancelSession = (session) => {
+    if (confirm('Are you sure you want to cancel this session?')) {
+      cancelSessionMutation.mutate(session);
+    }
+  };
+
   const handleSessionClick = (session) => {
     if (hasBookedSession) {
       toast.error('You have already booked a session for this date. You can only book one 30-minute session per day.');
@@ -298,15 +386,28 @@ export default function Sessions() {
             </p>
           </div>
 
-          {/* Already Booked Alert */}
-          {hasBookedSession && (
+          {/* Already Booked Alert with Cancel Option */}
+          {hasBookedSession && bookedSession && (
             <Alert className="mb-6 border-green-200 bg-green-50">
               <AlertCircle className="h-4 w-4 text-green-600" />
               <AlertTitle className="text-green-900">Session Already Booked!</AlertTitle>
               <AlertDescription className="text-green-800">
-                You have already booked a session with <strong>{bookedSession.mentor_name}</strong> at{' '}
-                <strong>{bookedSession.time_slot}</strong> on {formatDate(selectedDate)}. 
-                You can only book one session per day.
+                <div className="flex items-center justify-between">
+                  <span>
+                    You have booked a session with <strong>{bookedSession.mentor_name}</strong> at{' '}
+                    <strong>{bookedSession.time_slot}</strong> on {formatDate(selectedDate)}.
+                  </span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleCancelSession(bookedSession)}
+                    disabled={cancelSessionMutation.isPending}
+                    className="ml-4 text-red-600 border-red-300 hover:bg-red-50"
+                  >
+                    <XCircle className="w-4 h-4 mr-1" />
+                    {cancelSessionMutation.isPending ? 'Cancelling...' : 'Cancel Session'}
+                  </Button>
+                </div>
               </AlertDescription>
             </Alert>
           )}
