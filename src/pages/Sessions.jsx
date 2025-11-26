@@ -295,9 +295,10 @@ export default function Sessions() {
     // If not logged in, redirect to login first
     if (!currentUser) {
       localStorage.setItem('intended_user_type', 'mentee');
-      // Store the current URL to return to after login
-      const returnUrl = window.location.pathname + window.location.search;
-      base44.auth.redirectToLogin(returnUrl);
+      // Store session ID to book after login
+      localStorage.setItem('pending_session_id', session.id);
+      // Use full URL for redirect
+      base44.auth.redirectToLogin(window.location.href);
       return;
     }
     
