@@ -61,15 +61,10 @@ export default function Layout({ children }) {
         return;
       }
       
-      // If user has intended type in localStorage but already has user_type, just redirect and clean up
+      // If user has intended type in localStorage but already has user_type, just clean up
+      // Don't redirect - let them stay on current page (important for session booking flow)
       if (intendedUserType && currentUser.user_type) {
         localStorage.removeItem('intended_user_type');
-        
-        if (currentUser.user_type === 'mentor') {
-          navigate(createPageUrl('MentorDashboard'), { replace: true });
-        } else {
-          navigate(createPageUrl('Home'), { replace: true });
-        }
         setIsLoading(false);
         return;
       }

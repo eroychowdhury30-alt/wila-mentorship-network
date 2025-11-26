@@ -40,6 +40,22 @@ export default function Sessions() {
     if (mentorName) {
       setSelectedMentor(decodeURIComponent(mentorName));
     }
+    
+    // Check for pending session after login redirect
+    const checkPendingSession = async () => {
+      const pendingSessionId = localStorage.getItem('pending_session_id');
+      if (pendingSessionId) {
+        localStorage.removeItem('pending_session_id');
+        // Fetch the session and open modal
+        const allSessions = await base44.entities.Session.filter({ date: '2025-12-13' });
+        const pendingSession = allSessions.find(s => s.id === pendingSessionId);
+        if (pendingSession && !pendingSession.is_booked) {
+          setSelectedSession(pendingSession);
+          setShowModal(true);
+        }
+      }
+    };
+    checkPendingSession();
   }, []);
 
   // Get current user (optional - may not be logged in)
