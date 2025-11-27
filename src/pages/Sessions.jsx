@@ -135,18 +135,15 @@ export default function Sessions() {
       console.log('Mentee email to use:', menteeEmailAddress);
       console.log('Current user email:', user.email);
       
-      const bookingDatetime = `${sessionDate} at ${updatedSession.time_slot}`;
-      
       // Send emails (don't block booking if emails fail)
       try {
         if (mentorEmailAddress) {
           await base44.functions.invoke('sendEmail', {
             to: mentorEmailAddress,
-            recipient_name: mentor?.full_name || updatedSession.mentor_name,
             mentor_name: mentor?.full_name || updatedSession.mentor_name,
             mentee_name: user.full_name,
-            booking_datetime: bookingDatetime,
-            email_type: 'booking'
+            session_date: sessionDate,
+            session_time: updatedSession.time_slot
           });
           console.log('Email sent to mentor at:', mentorEmailAddress);
         }
@@ -158,11 +155,10 @@ export default function Sessions() {
         if (menteeEmailAddress) {
           await base44.functions.invoke('sendEmail', {
             to: menteeEmailAddress,
-            recipient_name: user.full_name,
             mentor_name: mentor?.full_name || updatedSession.mentor_name,
             mentee_name: user.full_name,
-            booking_datetime: bookingDatetime,
-            email_type: 'booking'
+            session_date: sessionDate,
+            session_time: updatedSession.time_slot
           });
           console.log('Email sent to mentee at:', menteeEmailAddress);
         }
@@ -212,8 +208,6 @@ export default function Sessions() {
         month: 'long', 
         day: 'numeric' 
       });
-      const cancelDatetime = `${sessionDate} at ${session.time_slot}`;
-
       if (mentors.length > 0) {
         const mentor = mentors[0];
         
@@ -221,11 +215,10 @@ export default function Sessions() {
         try {
           await base44.functions.invoke('sendEmail', {
             to: mentor.email || mentor.created_by,
-            recipient_name: mentor.full_name,
             mentor_name: mentor.full_name,
             mentee_name: session.mentee_name,
-            booking_datetime: cancelDatetime,
-            email_type: 'cancellation'
+            session_date: sessionDate,
+            session_time: session.time_slot
           });
         } catch (e) {
           console.error('Failed to send mentor cancellation email:', e);
@@ -237,11 +230,10 @@ export default function Sessions() {
       try {
         await base44.functions.invoke('sendEmail', {
           to: user.email,
-          recipient_name: user.full_name,
           mentor_name: session.mentor_name,
           mentee_name: user.full_name,
-          booking_datetime: cancelDatetime,
-          email_type: 'cancellation'
+          session_date: sessionDate,
+          session_time: session.time_slot
         });
       } catch (e) {
         console.error('Failed to send mentee cancellation email:', e);

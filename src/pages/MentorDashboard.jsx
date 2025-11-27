@@ -229,11 +229,10 @@ export default function MentorDashboard() {
         try {
           await base44.functions.invoke('sendEmail', {
             to: menteeEmail,
-            recipient_name: menteeName,
             mentor_name: profileData.full_name,
             mentee_name: menteeName,
-            booking_datetime: cancelDatetime,
-            email_type: 'cancellation'
+            session_date: sessionDate,
+            session_time: session.time_slot
           });
         } catch (e) {
           console.error('Failed to send cancellation email:', e);
