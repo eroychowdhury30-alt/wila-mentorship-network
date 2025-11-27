@@ -67,12 +67,21 @@ Deno.serve(async (req) => {
         const mentorEmail = mentor?.email || session.mentor_email || null;
         const menteeEmail = user.email;
 
-        // Send email notifications if we have both emails
+        // Send email notifications via EmailJS
+        let emailSentSuccess = false;
         if (mentorEmail && menteeEmail) {
             const serviceId = Deno.env.get("EMAILJS_SERVICE_ID");
             const publicKey = Deno.env.get("EMAILJS_PUBLIC_KEY");
             const mentorTemplateId = 'template_dcek09u';
             const menteeTemplateId = 'template_bsxqzqm';
+
+            console.log('=== EmailJS Config ===');
+            console.log('Service ID:', serviceId);
+            console.log('Public Key:', publicKey ? 'SET' : 'NOT SET');
+            console.log('Mentor Template:', mentorTemplateId);
+            console.log('Mentee Template:', menteeTemplateId);
+            console.log('Mentor Email:', mentorEmail);
+            console.log('Mentee Email:', menteeEmail);
 
             if (serviceId && publicKey) {
                 const templateParams = {
@@ -87,8 +96,10 @@ Deno.serve(async (req) => {
                     mentor_meeting_link: ''
                 };
 
+                console.log('Template Params:', JSON.stringify(templateParams));
+
                 // Send to mentor
-                await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+                const mentorRes = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -101,9 +112,11 @@ Deno.serve(async (req) => {
                         template_params: templateParams
                     })
                 });
+                const mentorResText = await mentorRes.text();
+                console.log('Mentor email response:', mentorRes.status, mentorResText);
 
                 // Send to mentee
-                await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+                const menteeRes = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -116,13 +129,19 @@ Deno.serve(async (req) => {
                         template_params: { ...templateParams, to_email: menteeEmail }
                     })
                 });
+                const menteeResText = await menteeRes.text();
+                console.log('Mentee email response:', menteeRes.status, menteeResText);
+
+                emailSentSuccess = mentorRes.ok && menteeRes.ok;
             }
         }
 
         return Response.json({ 
             success: true, 
             session: updatedSession,
-            emailSent: !!(mentorEmail && menteeEmail)
+            emailSent: emailSentSuccess,
+            mentorEmail,
+            menteeEmail
         });
     } catch (error) {
         console.error('Error booking session:', error);
