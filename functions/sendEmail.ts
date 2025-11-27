@@ -16,7 +16,7 @@ Deno.serve(async (req) => {
         }
 
         const serviceId = Deno.env.get("EMAILJS_SERVICE_ID");
-        const templateId = Deno.env.get("EMAILJS_TEMPLATE_ID");
+        const templateId = "template_myelvma";
         const publicKey = Deno.env.get("EMAILJS_PUBLIC_KEY");
 
         if (!serviceId || !templateId || !publicKey) {
