@@ -173,13 +173,16 @@ export default function Sessions() {
       return updatedSession;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries(['sessions']);
-      queryClient.invalidateQueries(['user-booked-sessions']);
-      toast.success('Session booked! A confirmation email has been sent to you.');
-      setShowModal(false);
-      setSelectedSession(null);
-      setSessionGoal('');
-    },
+            queryClient.invalidateQueries(['sessions']);
+            queryClient.invalidateQueries(['user-booked-sessions']);
+            toast.success('Session booked! A confirmation email has been sent to your inbox.', {
+              duration: 5000,
+              description: 'Please check your email for session details.'
+            });
+            setShowModal(false);
+            setSelectedSession(null);
+            setSessionGoal('');
+          },
     onError: (error) => {
       console.error('Booking error:', error);
       toast.error('Failed to book session: ' + error.message);
