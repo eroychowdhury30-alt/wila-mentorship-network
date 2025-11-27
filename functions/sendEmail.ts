@@ -9,9 +9,9 @@ Deno.serve(async (req) => {
             return Response.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const { to, recipient_name, mentor_name, mentee_name, booking_datetime, email_type } = await req.json();
+        const { to, mentor_name, mentee_name, session_date, session_time } = await req.json();
 
-        if (!to || !recipient_name || !mentor_name || !mentee_name || !booking_datetime) {
+        if (!to || !mentor_name || !mentee_name || !session_date || !session_time) {
             return Response.json({ error: 'Missing required fields' }, { status: 400 });
         }
 
@@ -36,10 +36,10 @@ Deno.serve(async (req) => {
                 user_id: publicKey,
                 template_params: {
                     email: to,
-                    recipient_name: recipient_name,
                     mentor_name: mentor_name,
                     mentee_name: mentee_name,
-                    booking_datetime: booking_datetime
+                    session_date: session_date,
+                    session_time: session_time
                 }
             })
         });
