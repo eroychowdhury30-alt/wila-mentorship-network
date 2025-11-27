@@ -26,8 +26,7 @@ Deno.serve(async (req) => {
 
         const serviceId = Deno.env.get("EMAILJS_SERVICE_ID");
         const publicKey = Deno.env.get("EMAILJS_PUBLIC_KEY");
-        const mentorTemplateId = 'template_dcek09u';
-        const menteeTemplateId = 'template_bsxqzqm';
+        const templateId = Deno.env.get("EMAILJS_TEMPLATE_ID");
 
         if (!serviceId || !publicKey) {
             return Response.json({ error: 'EmailJS not configured' }, { status: 500 });
