@@ -126,7 +126,7 @@ export default function Sessions() {
       });
       
       // Get email addresses - mentor email from their profile, mentee from session booking
-      const mentorEmailAddress = mentor?.email || updatedSession.mentor_email || null;
+      const mentorEmailAddress = mentor?.email || updatedSession.mentor_email || mentor?.created_by || null;
       const menteeEmailAddress = updatedSession.booked_by; // This is the email of who booked
       
       console.log('=== EMAIL DEBUG ===');
@@ -138,7 +138,7 @@ export default function Sessions() {
       // Send email notifications
       try {
         if (mentorEmailAddress && menteeEmailAddress) {
-          await base44.functions.invoke('sendEmail', {
+          const emailResult = await base44.functions.invoke('sendEmail', {
             mentor_email: mentorEmailAddress,
             mentee_email: menteeEmailAddress,
             mentor_name: mentor?.full_name || updatedSession.mentor_name,
@@ -148,7 +148,9 @@ export default function Sessions() {
             mentee_response: goal,
             mentor_meeting_link: ''
           });
-          console.log('Emails sent to mentor and mentee');
+          console.log('Email result:', emailResult);
+        } else {
+          console.log('Missing email addresses - mentor:', mentorEmailAddress, 'mentee:', menteeEmailAddress);
         }
       } catch (e) {
         console.error('Failed to send emails:', e);
