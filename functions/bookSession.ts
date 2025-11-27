@@ -95,7 +95,7 @@ Deno.serve(async (req) => {
                     },
                     body: JSON.stringify({
                         service_id: serviceId,
-                        template_id: mentorTemplateId,
+                        template_id: templateId,
                         user_id: publicKey,
                         template_params: templateParams
                     })
@@ -110,7 +110,7 @@ Deno.serve(async (req) => {
                     },
                     body: JSON.stringify({
                         service_id: serviceId,
-                        template_id: menteeTemplateId,
+                        template_id: templateId,
                         user_id: publicKey,
                         template_params: { ...templateParams, to_email: menteeEmail }
                     })
