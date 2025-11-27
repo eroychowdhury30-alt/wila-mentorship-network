@@ -95,8 +95,10 @@ export default function Sessions() {
     enabled: !!currentUser?.email,
   });
 
-  const hasBookedSession = userBookedSessions.filter(s => s.status !== 'cancelled').length > 0;
-  const bookedSession = userBookedSessions.find(s => s.status !== 'cancelled');
+  // Check for active (non-cancelled) booked sessions
+  const activeBookedSessions = userBookedSessions.filter(s => s.is_booked && s.status !== 'cancelled');
+  const hasBookedSession = activeBookedSessions.length > 0;
+  const bookedSession = activeBookedSessions[0];
 
   const bookSessionMutation = useMutation({
     mutationFn: async ({ sessionId, goal }) => {
