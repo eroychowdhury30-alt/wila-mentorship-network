@@ -35,12 +35,11 @@ Deno.serve(async (req) => {
                 template_id: templateId,
                 user_id: publicKey,
                 template_params: {
-                    to_email: to,
+                    email: to,
                     recipient_name: recipient_name,
                     mentor_name: mentor_name,
                     mentee_name: mentee_name,
-                    booking_datetime: booking_datetime,
-                    email_type: email_type || 'booking'
+                    booking_datetime: booking_datetime
                 }
             })
         });
