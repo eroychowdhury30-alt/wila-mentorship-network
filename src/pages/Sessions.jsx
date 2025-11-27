@@ -137,37 +137,22 @@ export default function Sessions() {
       
       const bookingDatetime = `${sessionDate} at ${updatedSession.time_slot}`;
       
-      // Send emails (don't block booking if emails fail)
+      // Send email notification (to mentor with mentee in reply-to)
       try {
-        if (mentorEmailAddress) {
+        if (mentorEmailAddress && menteeEmailAddress) {
           await base44.functions.invoke('sendEmail', {
-            to: mentorEmailAddress,
-            recipient_name: mentor?.full_name || updatedSession.mentor_name,
+            mentor_email: mentorEmailAddress,
+            mentee_email: menteeEmailAddress,
             mentor_name: mentor?.full_name || updatedSession.mentor_name,
             mentee_name: user.full_name,
             booking_datetime: bookingDatetime,
-            email_type: 'booking'
+            mentee_info: goal,
+            meeting_link: ''
           });
           console.log('Email sent to mentor at:', mentorEmailAddress);
         }
       } catch (e) {
-        console.error('Failed to send mentor email:', e);
-      }
-
-      try {
-        if (menteeEmailAddress) {
-          await base44.functions.invoke('sendEmail', {
-            to: menteeEmailAddress,
-            recipient_name: user.full_name,
-            mentor_name: mentor?.full_name || updatedSession.mentor_name,
-            mentee_name: user.full_name,
-            booking_datetime: bookingDatetime,
-            email_type: 'booking'
-          });
-          console.log('Email sent to mentee at:', menteeEmailAddress);
-        }
-      } catch (e) {
-        console.error('Failed to send mentee email:', e);
+        console.error('Failed to send email:', e);
       }
       
       return updatedSession;
@@ -212,39 +197,25 @@ export default function Sessions() {
         month: 'long', 
         day: 'numeric' 
       });
-      const cancelDatetime = `${sessionDate} at ${session.time_slot}`;
+      const cancelDatetime = `${sessionDate} at ${session.time_slot} (CANCELLED)`;
 
+      // Email about cancellation
+      const user = await base44.auth.me();
       if (mentors.length > 0) {
         const mentor = mentors[0];
-        
-        // Email mentor about cancellation
         try {
           await base44.functions.invoke('sendEmail', {
-            to: mentor.email || mentor.created_by,
-            recipient_name: mentor.full_name,
+            mentor_email: mentor.email || mentor.created_by,
+            mentee_email: user.email,
             mentor_name: mentor.full_name,
             mentee_name: session.mentee_name,
             booking_datetime: cancelDatetime,
-            email_type: 'cancellation'
+            mentee_info: 'Session was cancelled by mentee.',
+            meeting_link: ''
           });
         } catch (e) {
-          console.error('Failed to send mentor cancellation email:', e);
+          console.error('Failed to send cancellation email:', e);
         }
-      }
-
-      // Email mentee about cancellation
-      const user = await base44.auth.me();
-      try {
-        await base44.functions.invoke('sendEmail', {
-          to: user.email,
-          recipient_name: user.full_name,
-          mentor_name: session.mentor_name,
-          mentee_name: user.full_name,
-          booking_datetime: cancelDatetime,
-          email_type: 'cancellation'
-        });
-      } catch (e) {
-        console.error('Failed to send mentee cancellation email:', e);
       }
     },
     onSuccess: () => {
