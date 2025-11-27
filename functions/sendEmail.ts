@@ -34,6 +34,7 @@ Deno.serve(async (req) => {
         }
 
         const templateParams = {
+            to_email: mentor_email,  // For mentor template "To:" field
             mentor_email: mentor_email,
             mentee_email: mentee_email,
             mentor_name: mentor_name,
@@ -62,7 +63,12 @@ Deno.serve(async (req) => {
         const mentorResponseText = await mentorResponse.text();
         console.log('EmailJS mentor response:', mentorResponseText);
 
-        // Send email to mentee
+        // Send email to mentee (need to change to_email for mentee template)
+        const menteeTemplateParams = {
+            ...templateParams,
+            to_email: mentee_email  // For mentee template "To:" field
+        };
+        
         const menteeResponse = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
             method: 'POST',
             headers: {
@@ -73,7 +79,7 @@ Deno.serve(async (req) => {
                 service_id: serviceId,
                 template_id: menteeTemplateId,
                 user_id: publicKey,
-                template_params: templateParams
+                template_params: menteeTemplateParams
             })
         });
 
