@@ -222,19 +222,18 @@ export default function MentorDashboard() {
         month: 'long', 
         day: 'numeric' 
       });
+      const cancelDatetime = `${sessionDate} at ${session.time_slot}`;
 
       // Email mentee about cancellation
       if (menteeEmail) {
         try {
           await base44.functions.invoke('sendEmail', {
-            mentor_email: profileData.email || user.email,
-            mentee_email: menteeEmail,
+            to: menteeEmail,
+            recipient_name: menteeName,
             mentor_name: profileData.full_name,
             mentee_name: menteeName,
-            date: sessionDate + ' (CANCELLED)',
-            time: session.time_slot,
-            mentee_response: 'Session was cancelled by mentor.',
-            mentor_meeting_link: ''
+            booking_datetime: cancelDatetime,
+            email_type: 'cancellation'
           });
         } catch (e) {
           console.error('Failed to send cancellation email:', e);

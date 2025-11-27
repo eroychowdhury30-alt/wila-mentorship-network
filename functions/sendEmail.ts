@@ -9,43 +9,22 @@ Deno.serve(async (req) => {
             return Response.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const { 
-            mentor_email, 
-            mentee_email, 
-            mentor_name, 
-            mentee_name, 
-            date,
-            time,
-            mentee_response,
-            mentor_meeting_link
-        } = await req.json();
+        const { to, recipient_name, mentor_name, mentee_name, booking_datetime, email_type } = await req.json();
 
-        if (!mentor_email || !mentee_email || !mentor_name || !mentee_name || !date || !time) {
+        if (!to || !recipient_name || !mentor_name || !mentee_name || !booking_datetime) {
             return Response.json({ error: 'Missing required fields' }, { status: 400 });
         }
 
         const serviceId = Deno.env.get("EMAILJS_SERVICE_ID");
-        const publicKey = Deno.env.get("EMAILJS_PUBLIC_KEY");
         const templateId = Deno.env.get("EMAILJS_TEMPLATE_ID");
+        const publicKey = Deno.env.get("EMAILJS_PUBLIC_KEY");
 
-        if (!serviceId || !publicKey) {
+        if (!serviceId || !templateId || !publicKey) {
             return Response.json({ error: 'EmailJS not configured' }, { status: 500 });
         }
 
-        const templateParams = {
-            to_email: mentor_email,  // For mentor template "To:" field
-            mentor_email: mentor_email,
-            mentee_email: mentee_email,
-            mentor_name: mentor_name,
-            mentee_name: mentee_name,
-            date: date,
-            time: time,
-            mentee_response: mentee_response || '',
-            mentor_meeting_link: mentor_meeting_link || ''
-        };
-
-        // Send email to mentor
-        const mentorResponse = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+        // Use EmailJS REST API directly
+        const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -55,46 +34,25 @@ Deno.serve(async (req) => {
                 service_id: serviceId,
                 template_id: templateId,
                 user_id: publicKey,
-                template_params: templateParams
+                template_params: {
+                    email: to,
+                    recipient_name: recipient_name,
+                    mentor_name: mentor_name,
+                    mentee_name: mentee_name,
+                    booking_datetime: booking_datetime
+                }
             })
         });
 
-        const mentorResponseText = await mentorResponse.text();
-        console.log('EmailJS mentor response:', mentorResponseText);
-
-        // Send email to mentee
-        const menteeTemplateParams = {
-            ...templateParams,
-            to_email: mentee_email
-        };
+        const responseText = await response.text();
         
-        const menteeResponse = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'origin': 'https://base44.com'
-            },
-            body: JSON.stringify({
-                service_id: serviceId,
-                template_id: templateId,
-                user_id: publicKey,
-                template_params: menteeTemplateParams
-            })
-        });
-
-        const menteeResponseText = await menteeResponse.text();
-        console.log('EmailJS mentee response:', menteeResponseText);
-        
-        if (!mentorResponse.ok || !menteeResponse.ok) {
-            console.error('EmailJS error - mentor:', mentorResponseText, 'mentee:', menteeResponseText);
-            return Response.json({ 
-                error: 'Failed to send one or more emails', 
-                mentorStatus: mentorResponse.ok,
-                menteeStatus: menteeResponse.ok
-            }, { status: 500 });
+        if (!response.ok) {
+            console.error('EmailJS error:', responseText);
+            return Response.json({ error: 'Failed to send email', details: responseText }, { status: response.status });
         }
 
-        return Response.json({ success: true, message: 'Emails sent to both mentor and mentee' });
+        console.log('EmailJS response:', responseText);
+        return Response.json({ success: true, message: 'Email sent successfully' });
     } catch (error) {
         console.error('Error sending email:', error);
         return Response.json({ error: error.message }, { status: 500 });
