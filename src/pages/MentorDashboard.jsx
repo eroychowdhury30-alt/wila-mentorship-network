@@ -222,7 +222,6 @@ export default function MentorDashboard() {
         month: 'long', 
         day: 'numeric' 
       });
-      const cancelDatetime = `${sessionDate} at ${session.time_slot} (CANCELLED)`;
 
       // Email mentee about cancellation
       if (menteeEmail) {
@@ -232,9 +231,10 @@ export default function MentorDashboard() {
             mentee_email: menteeEmail,
             mentor_name: profileData.full_name,
             mentee_name: menteeName,
-            booking_datetime: cancelDatetime,
-            mentee_info: 'Session was cancelled by mentor.',
-            meeting_link: ''
+            date: sessionDate + ' (CANCELLED)',
+            time: session.time_slot,
+            mentee_response: 'Session was cancelled by mentor.',
+            mentor_meeting_link: ''
           });
         } catch (e) {
           console.error('Failed to send cancellation email:', e);

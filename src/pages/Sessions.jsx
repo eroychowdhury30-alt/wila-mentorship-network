@@ -135,9 +135,7 @@ export default function Sessions() {
       console.log('Mentee email to use:', menteeEmailAddress);
       console.log('Current user email:', user.email);
       
-      const bookingDatetime = `${sessionDate} at ${updatedSession.time_slot}`;
-      
-      // Send email notification (to mentor with mentee in reply-to)
+      // Send email notifications
       try {
         if (mentorEmailAddress && menteeEmailAddress) {
           await base44.functions.invoke('sendEmail', {
@@ -145,14 +143,15 @@ export default function Sessions() {
             mentee_email: menteeEmailAddress,
             mentor_name: mentor?.full_name || updatedSession.mentor_name,
             mentee_name: user.full_name,
-            booking_datetime: bookingDatetime,
-            mentee_info: goal,
-            meeting_link: ''
+            date: sessionDate,
+            time: updatedSession.time_slot,
+            mentee_response: goal,
+            mentor_meeting_link: ''
           });
-          console.log('Email sent to mentor at:', mentorEmailAddress);
+          console.log('Emails sent to mentor and mentee');
         }
       } catch (e) {
-        console.error('Failed to send email:', e);
+        console.error('Failed to send emails:', e);
       }
       
       return updatedSession;
@@ -197,7 +196,6 @@ export default function Sessions() {
         month: 'long', 
         day: 'numeric' 
       });
-      const cancelDatetime = `${sessionDate} at ${session.time_slot} (CANCELLED)`;
 
       // Email about cancellation
       const user = await base44.auth.me();
@@ -209,9 +207,10 @@ export default function Sessions() {
             mentee_email: user.email,
             mentor_name: mentor.full_name,
             mentee_name: session.mentee_name,
-            booking_datetime: cancelDatetime,
-            mentee_info: 'Session was cancelled by mentee.',
-            meeting_link: ''
+            date: sessionDate + ' (CANCELLED)',
+            time: session.time_slot,
+            mentee_response: 'Session was cancelled by mentee.',
+            mentor_meeting_link: ''
           });
         } catch (e) {
           console.error('Failed to send cancellation email:', e);
