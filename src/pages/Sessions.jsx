@@ -102,78 +102,25 @@ export default function Sessions() {
 
   const bookSessionMutation = useMutation({
     mutationFn: async ({ sessionId, goal }) => {
-      const user = await base44.auth.me();
-      
-      // Update the session
-      const updatedSession = await base44.entities.Session.update(sessionId, {
-        is_booked: true,
-        booked_by: user.email,
-        mentee_name: user.full_name,
-        mentee_linkedin: user.linkedin_profile || '',
-        session_goal: goal
-      });
-      
-      // Get the mentor's details to find their email
-      console.log('Looking for mentor with name:', updatedSession.mentor_name);
-      const allMentors = await base44.entities.Mentor.list();
-      const mentor = allMentors.find(m => m.full_name === updatedSession.mentor_name);
-      console.log('Found mentor:', mentor);
-      
-      // Format the session date
-      const sessionDate = new Date(updatedSession.date).toLocaleDateString('en-US', { 
-        weekday: 'long', 
-        year: 'numeric', 
-        month: 'long', 
-        day: 'numeric' 
-      });
-      
-      // Get email addresses - mentor email from their profile, mentee from session booking
-      const mentorEmailAddress = mentor?.email || updatedSession.mentor_email || mentor?.created_by || null;
-      const menteeEmailAddress = updatedSession.booked_by; // This is the email of who booked
-      
-      console.log('=== EMAIL DEBUG ===');
-      console.log('Mentor found:', mentor);
-      console.log('Mentor email to use:', mentorEmailAddress);
-      console.log('Mentee email to use:', menteeEmailAddress);
-      console.log('Current user email:', user.email);
-      
-      // Send email notifications
-      try {
-        if (mentorEmailAddress && menteeEmailAddress) {
-          const emailResult = await base44.functions.invoke('sendEmail', {
-            mentor_email: mentorEmailAddress,
-            mentee_email: menteeEmailAddress,
-            mentor_name: mentor?.full_name || updatedSession.mentor_name,
-            mentee_name: user.full_name,
-            date: sessionDate,
-            time: updatedSession.time_slot,
-            mentee_response: goal,
-            mentor_meeting_link: ''
-          });
-          console.log('Email result:', emailResult);
-        } else {
-          console.log('Missing email addresses - mentor:', mentorEmailAddress, 'mentee:', menteeEmailAddress);
-        }
-      } catch (e) {
-        console.error('Failed to send emails:', e);
+      const result = await base44.functions.invoke('bookSession', { sessionId, goal });
+      if (result.data.error) {
+        throw new Error(result.data.error);
       }
-      
-      return updatedSession;
+      return result.data;
     },
-    onSuccess: () => {
-            queryClient.invalidateQueries(['sessions']);
-            queryClient.invalidateQueries(['user-booked-sessions']);
-            toast.success('Session booked! A confirmation email has been sent to your inbox.', {
-              duration: 5000,
-              description: 'Please check your email for session details.'
-            });
-            setShowModal(false);
-            setSelectedSession(null);
-            setSessionGoal('');
-          },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries(['sessions']);
+      queryClient.invalidateQueries(['user-booked-sessions']);
+      toast.success('Session booked!' + (data.emailSent ? ' A confirmation email has been sent.' : ''), {
+        duration: 5000
+      });
+      setShowModal(false);
+      setSelectedSession(null);
+      setSessionGoal('');
+    },
     onError: (error) => {
       console.error('Booking error:', error);
-      toast.error('Failed to book session: ' + error.message);
+      toast.error(error.message || 'Failed to book session');
     },
   });
 
