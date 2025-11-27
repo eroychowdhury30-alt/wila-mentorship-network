@@ -559,8 +559,8 @@ export default function Sessions() {
             <div className="space-y-3 pt-4">
               <Button
                 onClick={handleSignup}
-                disabled={bookSessionMutation.isPending || hasBookedSession || !sessionGoal}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={bookSessionMutation.isPending || hasBookedSession || !sessionGoal.trim()}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3"
               >
                 <Calendar className="w-4 h-4 mr-2" />
                 {hasBookedSession ? 'Already Booked a Session Today' : bookSessionMutation.isPending ? 'Booking...' : 'Signup'}
