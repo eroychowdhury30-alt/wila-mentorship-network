@@ -60,17 +60,19 @@ export default function MentorDashboard() {
   const [showMenteeModal, setShowMenteeModal] = useState(false);
   const [activeTab, setActiveTab] = useState('profile');
   const [profileData, setProfileData] = useState({
-    full_name: '',
-    email: '',
-    title: '',
-    company: '',
-    linkedin_url: '',
-    experience_years: 'Over 20 years',
-    expertise: [],
-    mentors_to: [],
-    bio: '',
-    status: 'pending'
-  });
+            full_name: '',
+            email: '',
+            title: '',
+            company: '',
+            linkedin_url: '',
+            meeting_link: '',
+            photo_url: '',
+            experience_years: 'Over 20 years',
+            expertise: [],
+            mentors_to: [],
+            bio: '',
+            status: 'pending'
+          });
   const [availableSlots, setAvailableSlots] = useState([]);
   const [selectedDate, setSelectedDate] = useState(new Date('2025-12-12'));
   const queryClient = useQueryClient();
@@ -116,35 +118,39 @@ export default function MentorDashboard() {
       );
       
       if (userMentor) {
-                setMentorProfile(userMentor);
-                setProfileData({
-                  full_name: userMentor.full_name || '',
-                  email: userMentor.email || currentUser.email || '',
-                  title: userMentor.title || '',
-                  company: userMentor.company || '',
-                  linkedin_url: userMentor.linkedin_url || '',
-                  experience_years: userMentor.experience_years || 'Over 20 years',
-                  expertise: userMentor.expertise || [],
-                  mentors_to: userMentor.mentors_to || [],
-                  bio: userMentor.bio || '',
-                  status: userMentor.status || 'pending'
-                });
-                setIsEditing(false);
-              } else {
-                setProfileData({
-                  full_name: currentUser.full_name || '',
-                  email: currentUser.email || '',
-                  title: '',
-                  company: '',
-                  linkedin_url: '',
-                  experience_years: 'Over 20 years',
-                  expertise: [],
-                  mentors_to: [],
-                  bio: '',
-                  status: 'pending'
-                });
-                setIsEditing(true);
-              }
+                            setMentorProfile(userMentor);
+                            setProfileData({
+                              full_name: userMentor.full_name || '',
+                              email: userMentor.email || currentUser.email || '',
+                              title: userMentor.title || '',
+                              company: userMentor.company || '',
+                              linkedin_url: userMentor.linkedin_url || '',
+                              meeting_link: userMentor.meeting_link || '',
+                              photo_url: userMentor.photo_url || '',
+                              experience_years: userMentor.experience_years || 'Over 20 years',
+                              expertise: userMentor.expertise || [],
+                              mentors_to: userMentor.mentors_to || [],
+                              bio: userMentor.bio || '',
+                              status: userMentor.status || 'pending'
+                            });
+                            setIsEditing(false);
+                          } else {
+                            setProfileData({
+                              full_name: currentUser.full_name || '',
+                              email: currentUser.email || '',
+                              title: '',
+                              company: '',
+                              linkedin_url: '',
+                              meeting_link: '',
+                              photo_url: '',
+                              experience_years: 'Over 20 years',
+                              expertise: [],
+                              mentors_to: [],
+                              bio: '',
+                              status: 'pending'
+                            });
+                            setIsEditing(true);
+                          }
     } catch (error) {
       console.error('Error loading mentor profile:', error);
     }
@@ -246,13 +252,13 @@ export default function MentorDashboard() {
   });
 
   const handleSaveProfile = async () => {
-    console.log('handleSaveProfile called');
-    console.log('profileData:', profileData);
-    
-    if (!profileData.full_name || !profileData.title || !profileData.company) {
-      toast.error('Please fill in all required fields');
-      return;
-    }
+            console.log('handleSaveProfile called');
+            console.log('profileData:', profileData);
+
+            if (!profileData.full_name || !profileData.title || !profileData.company || !profileData.meeting_link) {
+              toast.error('Please fill in all required fields (Name, Title, Company, Meeting Link)');
+              return;
+            }
     
     try {
       await saveProfileMutation.mutateAsync(profileData);
@@ -505,19 +511,45 @@ export default function MentorDashboard() {
                     </div>
 
                     <div>
-                      <Label htmlFor="linkedin_url">LinkedIn URL</Label>
-                      <Input
-                        id="linkedin_url"
-                        type="url"
-                        placeholder="https://linkedin.com/in/yourprofile"
-                        value={profileData.linkedin_url}
-                        onChange={(e) => setProfileData({ ...profileData, linkedin_url: e.target.value })}
-                        disabled={!isEditing}
-                      />
-                    </div>
+                                                <Label htmlFor="linkedin_url">LinkedIn URL</Label>
+                                                <Input
+                                                  id="linkedin_url"
+                                                  type="url"
+                                                  placeholder="https://linkedin.com/in/yourprofile"
+                                                  value={profileData.linkedin_url}
+                                                  onChange={(e) => setProfileData({ ...profileData, linkedin_url: e.target.value })}
+                                                  disabled={!isEditing}
+                                                />
+                                              </div>
 
-                    <div>
-                      <Label htmlFor="bio">Bio</Label>
+                                              <div>
+                                                <Label htmlFor="meeting_link">Meeting Link for Online Sessions *</Label>
+                                                <Input
+                                                  id="meeting_link"
+                                                  type="url"
+                                                  placeholder="https://zoom.us/j/... or https://meet.google.com/..."
+                                                  value={profileData.meeting_link}
+                                                  onChange={(e) => setProfileData({ ...profileData, meeting_link: e.target.value })}
+                                                  disabled={!isEditing}
+                                                />
+                                                <p className="text-xs text-gray-500 mt-1">Your Zoom, Google Meet, or other video meeting link</p>
+                                              </div>
+
+                                              <div>
+                                                <Label htmlFor="photo_url">Photo URL (optional)</Label>
+                                                <Input
+                                                  id="photo_url"
+                                                  type="url"
+                                                  placeholder="https://example.com/your-photo.jpg"
+                                                  value={profileData.photo_url}
+                                                  onChange={(e) => setProfileData({ ...profileData, photo_url: e.target.value })}
+                                                  disabled={!isEditing}
+                                                />
+                                                <p className="text-xs text-gray-500 mt-1">Direct link to your profile photo</p>
+                                              </div>
+
+                                              <div>
+                                                <Label htmlFor="bio">Bio</Label>
                       <Textarea
                         id="bio"
                         placeholder="Tell mentees about your experience..."
