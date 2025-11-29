@@ -345,41 +345,30 @@ export default function Sessions() {
               <Calendar className="w-8 h-8 text-white" />
             </div>
             <h1 className="text-4xl font-bold text-purple-600 mb-6">
-              Mentorship Day Session Sign Up
-            </h1>
-            {selectedMentor ? (
-              <div className="mb-4">
-                <div className="inline-flex items-center gap-2 bg-purple-100 px-4 py-2 rounded-lg">
-                  <span className="text-lg font-semibold text-purple-900">
-                    Viewing schedule for: {selectedMentor}
-                  </span>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleClearFilter}
-                    className="text-purple-700 hover:text-purple-900"
-                  >
-                    <ArrowLeft className="w-4 h-4 mr-1" />
-                    View All Mentors
-                  </Button>
-                </div>
-              </div>
-            ) : (
-              <p className="text-lg text-gray-700 max-w-3xl mx-auto leading-relaxed">
-                On Mentorship Day, mentors offer (free) 1-on-1 sessions (30min) in select hours. A{' '}
-                <span className="inline-flex items-center">
-                  <Calendar className="w-4 h-4 mx-1" />
-                </span>{' '}
-                icon indicates that the slot is available. You can click on the name to sign up. If there is no{' '}
-                <span className="inline-flex items-center">
-                  <Calendar className="w-4 h-4 mx-1" />
-                </span>{' '}
-                icon, it means the mentor for that session is already booked. You will receive a confirmation email from Teamup after the booking.
-              </p>
-            )}
-            <p className="text-md text-purple-600 font-semibold mt-4">
-              Note: You can only book one 30-minute session per day.
-            </p>
+                                Mentorship Day Session Sign Up
+                              </h1>
+                              {selectedMentor ? (
+                                <div className="mb-4">
+                                  <div className="inline-flex items-center gap-2 bg-purple-100 px-4 py-2 rounded-lg">
+                                    <span className="text-lg font-semibold text-purple-900">
+                                      Viewing schedule for: {selectedMentor}
+                                    </span>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={handleClearFilter}
+                                      className="text-purple-700 hover:text-purple-900"
+                                    >
+                                      <ArrowLeft className="w-4 h-4 mr-1" />
+                                      View All Mentors
+                                    </Button>
+                                  </div>
+                                </div>
+                              ) : (
+                                <p className="text-lg text-gray-700 max-w-3xl mx-auto leading-relaxed">
+                                  On Mentorship Day, mentors offer (free) 1-on-1 sessions up to an hour. A bright purple indicates that the slot is available. You can click on the name to sign up. You will receive a confirmation email with meeting details after the booking. Time displayed is in Pacific Time (US).
+                                </p>
+                              )}
           </div>
 
           {/* Already Booked Alert with Cancel Option */}
@@ -414,21 +403,13 @@ export default function Sessions() {
               <h2 className="text-xl font-semibold text-gray-900">
                 {selectedMentor ? `${selectedMentor}'s Schedule - ${formatDate(selectedDate)}` : `Mentorship Day - ${formatDate(selectedDate)}`}
               </h2>
-              <div className="flex items-center gap-2">
-                <div className="flex items-center gap-2 px-4 py-2 bg-purple-100 rounded-lg">
-                  <Calendar className="h-4 w-4 text-purple-600" />
-                  <span className="font-medium text-purple-900">{formatDate(selectedDate)}</span>
-                </div>
-                <Button variant="ghost" size="icon">
-                  <Search className="w-5 h-5 text-gray-500" />
-                </Button>
-              </div>
+              <div className="flex items-center gap-2 px-4 py-2 bg-purple-100 rounded-lg">
+                                    <Calendar className="h-4 w-4 text-purple-600" />
+                                    <span className="font-medium text-purple-900">{formatDate(selectedDate)}</span>
+                                  </div>
             </div>
 
-            <div className="flex items-center justify-end gap-4 text-sm mb-6">
-              <button className="text-gray-600 hover:text-gray-900">Timeline</button>
-              <button className="text-gray-600 hover:text-gray-900">Agenda</button>
-            </div>
+
 
             <div className="text-right text-sm text-gray-600 mb-4">
               {formatShortDate(selectedDate)}
@@ -499,9 +480,8 @@ export default function Sessions() {
             )}
 
             <div className="mt-6 text-right text-sm text-gray-500">
-              <span className="text-blue-600">Pacific Time US & Ca</span> Powered by{' '}
-              <span className="font-semibold">teamup</span>
-            </div>
+                                <span className="text-blue-600">Pacific Time (US)</span>
+                              </div>
           </div>
         </div>
       </div>
