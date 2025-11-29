@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
-import { Calendar, Search, AlertCircle, ArrowLeft, XCircle } from 'lucide-react';
+import { Calendar, AlertCircle, ArrowLeft, XCircle } from 'lucide-react';
+import { Input } from '@/components/ui/input';
 import TimeSlotCard from '../components/TimeSlotCard';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
@@ -512,38 +513,60 @@ export default function Sessions() {
           </DialogHeader>
           
           <div className="space-y-6 py-4">
-            <div className="flex items-start gap-2">
-              <Calendar className="w-5 h-5 text-gray-400 mt-0.5" />
-              <div>
-                <p className="font-semibold text-gray-900">
-                  {selectedSession && formatDate(new Date(selectedSession.date))}, {selectedSession?.time_slot} - {selectedSession?.time_slot === '9am' ? '9:30am' : selectedSession?.time_slot === '10am' ? '10:30am' : selectedSession?.time_slot === '11am' ? '11:30am' : selectedSession?.time_slot === '12pm' ? '12:30pm' : selectedSession?.time_slot === '1pm' ? '1:30pm' : selectedSession?.time_slot === '2pm' ? '2:30pm' : '3:30pm'}
-                </p>
-                <div className="mt-2">
-                  <span className="inline-block bg-purple-600 text-white text-xs px-3 py-1 rounded">
-                    WILA Mentorship Day
-                  </span>
-                </div>
-              </div>
-            </div>
+                            <div className="flex items-start gap-2">
+                              <Calendar className="w-5 h-5 text-gray-400 mt-0.5" />
+                              <div>
+                                <p className="font-semibold text-gray-900">
+                                  {selectedSession && formatDate(new Date(selectedSession.date))}, {selectedSession?.time_slot}
+                                </p>
+                                <div className="mt-2">
+                                  <span className="inline-block bg-purple-600 text-white text-xs px-3 py-1 rounded">
+                                    WILA Mentorship Day
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
 
-            <div className="text-sm text-gray-500">
-              30-minute mentorship session
-            </div>
+                            <div className="text-sm text-gray-500">
+                              Up to 1-hour mentorship session
+                            </div>
 
-            <div>
-              <Label htmlFor="session_goal">What are you looking for from this session? *</Label>
-              <Textarea
-                id="session_goal"
-                value={sessionGoal}
-                onChange={(e) => setSessionGoal(e.target.value)}
-                placeholder="e.g., Career advice, interview preparation, industry insights, networking guidance..."
-                rows={4}
-                className="mt-2"
-              />
-              <p className="text-xs text-gray-500 mt-1">
-                This helps your mentor prepare for your session
-              </p>
-            </div>
+                            <div>
+                              <Label htmlFor="mentee_name">Full Name *</Label>
+                              <Input
+                                id="mentee_name"
+                                value={menteeName}
+                                onChange={(e) => setMenteeName(e.target.value)}
+                                placeholder="Enter your full name"
+                                className="mt-2"
+                              />
+                            </div>
+
+                            <div>
+                              <Label htmlFor="mentee_linkedin">LinkedIn Profile URL *</Label>
+                              <Input
+                                id="mentee_linkedin"
+                                value={menteeLinkedin}
+                                onChange={(e) => setMenteeLinkedin(e.target.value)}
+                                placeholder="https://linkedin.com/in/yourprofile"
+                                className="mt-2"
+                              />
+                            </div>
+
+                            <div>
+                              <Label htmlFor="session_goal">What are you looking for from this session? *</Label>
+                              <Textarea
+                                id="session_goal"
+                                value={sessionGoal}
+                                onChange={(e) => setSessionGoal(e.target.value)}
+                                placeholder="e.g., Career advice, interview preparation, industry insights, networking guidance..."
+                                rows={4}
+                                className="mt-2"
+                              />
+                              <p className="text-xs text-gray-500 mt-1">
+                                This helps your mentor prepare for your session
+                              </p>
+                            </div>
 
             {hasBookedSession && (
               <Alert className="border-red-200 bg-red-50">
@@ -556,21 +579,13 @@ export default function Sessions() {
 
             <div className="space-y-3 pt-4">
               <Button
-                onClick={handleSignup}
-                disabled={bookSessionMutation.isPending || hasBookedSession || !sessionGoal.trim()}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3"
-              >
-                <Calendar className="w-4 h-4 mr-2" />
-                {hasBookedSession ? 'Already Booked a Session Today' : bookSessionMutation.isPending ? 'Booking...' : 'Signup'}
-              </Button>
-              
-              <Button
-                variant="outline"
-                className="w-full"
-                onClick={() => window.print()}
-              >
-                Print
-              </Button>
+                                    onClick={handleSignup}
+                                    disabled={bookSessionMutation.isPending || hasBookedSession || !sessionGoal.trim() || !menteeName.trim() || !menteeLinkedin.trim()}
+                                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3"
+                                  >
+                                    <Calendar className="w-4 h-4 mr-2" />
+                                    {hasBookedSession ? 'Already Booked a Session Today' : bookSessionMutation.isPending ? 'Booking...' : 'Sign Up'}
+                                  </Button>
             </div>
           </div>
         </DialogContent>
