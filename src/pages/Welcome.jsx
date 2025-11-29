@@ -25,7 +25,7 @@ export default function Welcome() {
             <div className="text-purple-600 font-bold text-2xl">WILA</div>
           </div>
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            Welcome to WILA Connect
+            Welcome to WILA Mentorship Network
           </h1>
           <p className="text-xl text-gray-600">
             How would you like to participate?
