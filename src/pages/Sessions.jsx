@@ -30,6 +30,8 @@ export default function Sessions() {
   const [currentUser, setCurrentUser] = useState(null);
   const [selectedMentor, setSelectedMentor] = useState(null);
   const [sessionGoal, setSessionGoal] = useState('');
+  const [menteeName, setMenteeName] = useState('');
+  const [menteeLinkedin, setMenteeLinkedin] = useState('');
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
@@ -99,27 +101,27 @@ export default function Sessions() {
   const bookedSession = userBookedSessions.find(s => s.status !== 'cancelled');
 
   const bookSessionMutation = useMutation({
-    mutationFn: async ({ sessionId, goal }) => {
-      const user = await base44.auth.me();
-      
-      // Double-check user hasn't already booked for this date
-      const existingBookings = await base44.entities.Session.filter({
-        booked_by: user.email,
-        date: selectedDate.toISOString().split('T')[0]
-      });
-      const activeBookings = existingBookings.filter(s => s.status !== 'cancelled');
-      if (activeBookings.length > 0) {
-        throw new Error('You have already booked a session for this date');
-      }
-      
-      // Update the session
-      const updatedSession = await base44.entities.Session.update(sessionId, {
-        is_booked: true,
-        booked_by: user.email,
-        mentee_name: user.full_name,
-        mentee_linkedin: user.linkedin_profile || '',
-        session_goal: goal
-      });
+            mutationFn: async ({ sessionId, goal, name, linkedin }) => {
+              const user = await base44.auth.me();
+
+              // Double-check user hasn't already booked for this date
+              const existingBookings = await base44.entities.Session.filter({
+                booked_by: user.email,
+                date: selectedDate.toISOString().split('T')[0]
+              });
+              const activeBookings = existingBookings.filter(s => s.status !== 'cancelled');
+              if (activeBookings.length > 0) {
+                throw new Error('You have already booked a session for this date');
+              }
+
+              // Update the session
+              const updatedSession = await base44.entities.Session.update(sessionId, {
+                is_booked: true,
+                booked_by: user.email,
+                mentee_name: name,
+                mentee_linkedin: linkedin,
+                session_goal: goal
+              });
       
       // Get the mentor's details to find their email
       console.log('Looking for mentor with name:', updatedSession.mentor_name);
@@ -179,16 +181,18 @@ export default function Sessions() {
       return updatedSession;
     },
     onSuccess: () => {
-            queryClient.invalidateQueries(['sessions']);
-            queryClient.invalidateQueries(['user-booked-sessions']);
-            toast.success('Session booked! A confirmation email has been sent to your inbox.', {
-              duration: 5000,
-              description: 'Please check your email for session details.'
-            });
-            setShowModal(false);
-            setSelectedSession(null);
-            setSessionGoal('');
-          },
+                      queryClient.invalidateQueries(['sessions']);
+                      queryClient.invalidateQueries(['user-booked-sessions']);
+                      toast.success('Session booked! A confirmation email has been sent to your inbox.', {
+                        duration: 5000,
+                        description: 'Please check your email for session details.'
+                      });
+                      setShowModal(false);
+                      setSelectedSession(null);
+                      setSessionGoal('');
+                      setMenteeName('');
+                      setMenteeLinkedin('');
+                    },
     onError: (error) => {
       console.error('Booking error:', error);
       toast.error('Failed to book session: ' + error.message);
@@ -289,23 +293,35 @@ export default function Sessions() {
   };
 
   const handleSignup = () => {
-    if (hasBookedSession) {
-      toast.error('You have already booked a session for this date.');
-      return;
-    }
-    
-    if (!sessionGoal || sessionGoal.trim().length === 0) {
-      toast.error('Please tell us what you\'re looking for from this session');
-      return;
-    }
-    
-    if (selectedSession) {
-      bookSessionMutation.mutate({ 
-        sessionId: selectedSession.id, 
-        goal: sessionGoal 
-      });
-    }
-  };
+            if (hasBookedSession) {
+              toast.error('You have already booked a session for this date.');
+              return;
+            }
+
+            if (!menteeName || menteeName.trim().length === 0) {
+              toast.error('Please enter your full name');
+              return;
+            }
+
+            if (!menteeLinkedin || menteeLinkedin.trim().length === 0) {
+              toast.error('Please enter your LinkedIn profile URL');
+              return;
+            }
+
+            if (!sessionGoal || sessionGoal.trim().length === 0) {
+              toast.error('Please tell us what you\'re looking for from this session');
+              return;
+            }
+
+            if (selectedSession) {
+              bookSessionMutation.mutate({ 
+                sessionId: selectedSession.id, 
+                goal: sessionGoal,
+                name: menteeName,
+                linkedin: menteeLinkedin
+              });
+            }
+          };
 
   const handleClearFilter = () => {
     setSelectedMentor(null);
