@@ -31,8 +31,14 @@ Deno.serve(async (req) => {
         
         // Use different template based on recipient type
         const mentorTemplateId = "template_myelvma";
-        const menteeTemplateId = Deno.env.get("EMAILJS_MENTEE_TEMPLATE_ID") || mentorTemplateId;
+        const menteeTemplateId = "template_i5x4mmr";
         const templateId = recipient_type === 'mentee' ? menteeTemplateId : mentorTemplateId;
+
+        console.log('=== EMAIL DEBUG ===');
+        console.log('Recipient type:', recipient_type);
+        console.log('Using template:', templateId);
+        console.log('Mentor template:', mentorTemplateId);
+        console.log('Mentee template:', menteeTemplateId);
 
         if (!serviceId || !publicKey) {
             return Response.json({ error: 'EmailJS not configured' }, { status: 500 });
