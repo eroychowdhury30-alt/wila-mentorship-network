@@ -9,7 +9,7 @@ Deno.serve(async (req) => {
             return Response.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const { to, mentor_name, mentee_name, session_date, session_time } = await req.json();
+        const { to, mentor_name, mentee_name, session_date, session_time, meeting_link } = await req.json();
 
         if (!to || !mentor_name || !mentee_name || !session_date || !session_time) {
             return Response.json({ error: 'Missing required fields' }, { status: 400 });
@@ -39,7 +39,8 @@ Deno.serve(async (req) => {
                     mentor_name: mentor_name,
                     mentee_name: mentee_name,
                     session_date: session_date,
-                    session_time: session_time
+                    session_time: session_time,
+                    meeting_link: meeting_link || ''
                 }
             })
         });

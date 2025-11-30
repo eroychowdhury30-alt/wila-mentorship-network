@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Briefcase, Users, Clock, ExternalLink, Calendar } from 'lucide-react';
 
-export default function MentorCard({ mentor, isMentee = false }) {
+export default function MentorCard({ mentor, isMentee = false, hasAvailability = true }) {
   const getExperienceBadgeColor = (exp) => {
     if (exp.includes('Over 20')) return 'bg-yellow-50 text-yellow-700 border-yellow-200';
     if (exp.includes('11-20')) return 'bg-purple-50 text-purple-700 border-purple-200';
@@ -94,14 +94,25 @@ export default function MentorCard({ mentor, isMentee = false }) {
               LinkedIn
             </Button>
           )}
-          <Link to={`${createPageUrl('Sessions')}?mentor=${encodeURIComponent(mentor.full_name)}`} className="flex-1">
-            <Button 
-              className="w-full bg-purple-600 hover:bg-purple-700 text-white h-10"
-            >
-              <Calendar className="w-4 h-4 mr-2" />
-              Book Session
-            </Button>
-          </Link>
+          {hasAvailability ? (
+            <Link to={`${createPageUrl('Sessions')}?mentor=${encodeURIComponent(mentor.full_name)}`} className="flex-1">
+              <Button 
+                className="w-full bg-purple-600 hover:bg-purple-700 text-white h-10"
+              >
+                <Calendar className="w-4 h-4 mr-2" />
+                Book Session
+              </Button>
+            </Link>
+          ) : (
+            <div className="flex-1">
+              <Button 
+                disabled
+                className="w-full bg-gray-300 text-gray-500 h-10 cursor-not-allowed"
+              >
+                Currently Unavailable
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     </Card>

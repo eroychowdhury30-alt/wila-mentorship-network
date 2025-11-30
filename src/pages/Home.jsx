@@ -38,6 +38,17 @@ export default function Home() {
     },
   });
 
+  // Fetch sessions to check mentor availability
+  const { data: sessions = [] } = useQuery({
+    queryKey: ['sessions-availability'],
+    queryFn: async () => {
+      return base44.entities.Session.filter({ date: '2025-12-12', is_booked: false });
+    },
+  });
+
+  // Get list of mentors with available sessions
+  const mentorsWithAvailability = new Set(sessions.map(s => s.mentor_name));
+
   const handleFilterChange = (key, value) => {
     setFilters(prev => ({ ...prev, [key]: value }));
   };
@@ -150,7 +161,12 @@ export default function Home() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {sortedMentors.map((mentor) => (
-                <MentorCard key={mentor.id} mentor={mentor} isMentee={user?.user_type === 'mentee'} />
+                <MentorCard 
+                  key={mentor.id} 
+                  mentor={mentor} 
+                  isMentee={user?.user_type === 'mentee'} 
+                  hasAvailability={mentorsWithAvailability.has(mentor.full_name)}
+                />
               ))}
             </div>
           )}
