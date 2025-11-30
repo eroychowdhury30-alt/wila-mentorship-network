@@ -8,6 +8,7 @@ import { Briefcase, Users, Clock, ExternalLink, Calendar } from 'lucide-react';
 
 export default function MentorCard({ mentor, isMentee = false, hasAvailability = true }) {
   const getExperienceBadgeColor = (exp) => {
+    if (!exp) return 'bg-gray-50 text-gray-700 border-gray-200';
     if (exp.includes('Over 20')) return 'bg-yellow-50 text-yellow-700 border-yellow-200';
     if (exp.includes('11-20')) return 'bg-purple-50 text-purple-700 border-purple-200';
     if (exp.includes('6-10')) return 'bg-teal-50 text-teal-700 border-teal-200';
