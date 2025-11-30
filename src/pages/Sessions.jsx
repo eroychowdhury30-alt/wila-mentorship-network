@@ -153,36 +153,44 @@ export default function Sessions() {
                   const meetingLink = updatedSession.meeting_link || mentor?.meeting_link || '';
 
                   try {
-                    if (mentorEmailAddress) {
-                      await base44.functions.invoke('sendEmail', {
-                        to: mentorEmailAddress,
-                        mentor_name: mentor?.full_name || updatedSession.mentor_name,
-                        mentee_name: name,
-                        session_date: sessionDate,
-                        session_time: updatedSession.time_slot,
-                        meeting_link: meetingLink
-                      });
-                      console.log('Email sent to mentor at:', mentorEmailAddress);
-                    }
-                  } catch (e) {
-                    console.error('Failed to send mentor email:', e);
-                  }
+                                if (mentorEmailAddress) {
+                                  await base44.functions.invoke('sendEmail', {
+                                    to: mentorEmailAddress,
+                                    mentor_name: mentor?.full_name || updatedSession.mentor_name,
+                                    mentee_name: name,
+                                    mentor_email: mentorEmailAddress,
+                                    mentee_email: menteeEmailAddress,
+                                    session_date: sessionDate,
+                                    session_time: updatedSession.time_slot,
+                                    meeting_link: meetingLink,
+                                    mentee_response: updatedSession.session_goal || '',
+                                    recipient_type: 'mentor'
+                                  });
+                                  console.log('Email sent to mentor at:', mentorEmailAddress);
+                                }
+                              } catch (e) {
+                                console.error('Failed to send mentor email:', e);
+                              }
 
-                  try {
-                    if (menteeEmailAddress) {
-                      await base44.functions.invoke('sendEmail', {
-                        to: menteeEmailAddress,
-                        mentor_name: mentor?.full_name || updatedSession.mentor_name,
-                        mentee_name: name,
-                        session_date: sessionDate,
-                        session_time: updatedSession.time_slot,
-                        meeting_link: meetingLink
-                      });
-                      console.log('Email sent to mentee at:', menteeEmailAddress);
-                    }
-                  } catch (e) {
-                    console.error('Failed to send mentee email:', e);
-                  }
+                              try {
+                                if (menteeEmailAddress) {
+                                  await base44.functions.invoke('sendEmail', {
+                                    to: menteeEmailAddress,
+                                    mentor_name: mentor?.full_name || updatedSession.mentor_name,
+                                    mentee_name: name,
+                                    mentor_email: mentorEmailAddress,
+                                    mentee_email: menteeEmailAddress,
+                                    session_date: sessionDate,
+                                    session_time: updatedSession.time_slot,
+                                    meeting_link: meetingLink,
+                                    mentee_response: updatedSession.session_goal || '',
+                                    recipient_type: 'mentee'
+                                  });
+                                  console.log('Email sent to mentee at:', menteeEmailAddress);
+                                }
+                              } catch (e) {
+                                console.error('Failed to send mentee email:', e);
+                              }
       
       return updatedSession;
     },
