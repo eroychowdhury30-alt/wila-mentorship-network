@@ -129,10 +129,12 @@ export default function Layout({ children }) {
                             to={createPageUrl('Welcome')} 
                             className="flex items-center gap-3 group"
                           >
-              <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-purple-700 rounded-xl flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow">
-                                    <div className="text-white font-bold text-sm">WILA</div>
-                                  </div>
-                                  <span className="text-xl font-bold text-gray-900 group-hover:text-purple-600 transition-colors">WILA Mentorship Network</span>
+              <img 
+                src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68fd42c0ae0bd67c5e62c6ca/6b67e9115_ScreenShot2025-11-29at60408PM.png" 
+                alt="WILA Logo" 
+                className="h-10 w-auto"
+              />
+              <span className="text-xl font-bold text-gray-900 group-hover:text-purple-600 transition-colors hidden sm:inline">WILA Mentorship Network</span>
             </Link>
 
             <div className="flex items-center gap-2">

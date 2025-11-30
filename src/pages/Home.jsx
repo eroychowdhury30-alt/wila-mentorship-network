@@ -94,9 +94,11 @@ export default function Home() {
       {/* Hero Section */}
       <div className="relative bg-gradient-to-r from-purple-600 to-purple-700 text-white py-20 px-6">
         <div className="max-w-5xl mx-auto text-center">
-          <div className="inline-flex items-center justify-center w-20 h-20 mb-6 bg-white rounded-2xl shadow-lg">
-            <div className="text-purple-600 font-bold text-2xl">WILA</div>
-          </div>
+          <img 
+                          src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68fd42c0ae0bd67c5e62c6ca/6b67e9115_ScreenShot2025-11-29at60408PM.png" 
+                          alt="WILA Logo" 
+                          className="h-20 w-auto mb-6"
+                        />
           <h1 className="text-5xl md:text-6xl font-bold mb-4">WILA Connect</h1>
           <p className="text-xl text-purple-100 mb-10 max-w-2xl mx-auto">
             Connect with accomplished women leaders who are ready to guide your professional journey
