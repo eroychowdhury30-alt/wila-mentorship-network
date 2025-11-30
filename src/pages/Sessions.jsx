@@ -530,7 +530,7 @@ export default function Sessions() {
                               <Calendar className="w-5 h-5 text-gray-400 mt-0.5" />
                               <div>
                                 <p className="font-semibold text-gray-900">
-                                  {selectedSession && formatDate(new Date(selectedSession.date))}, {selectedSession?.time_slot}
+                                  {selectedSession && formatDate(new Date(selectedSession.date + 'T12:00:00'))}, {selectedSession?.time_slot}
                                 </p>
                                 <div className="mt-2">
                                   <span className="inline-block bg-purple-600 text-white text-xs px-3 py-1 rounded">
