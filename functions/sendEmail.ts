@@ -9,17 +9,32 @@ Deno.serve(async (req) => {
             return Response.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const { to, mentor_name, mentee_name, session_date, session_time, meeting_link } = await req.json();
+        const { 
+            to, 
+            mentor_name, 
+            mentee_name, 
+            mentor_email,
+            mentee_email,
+            session_date, 
+            session_time, 
+            meeting_link,
+            mentee_response,
+            recipient_type // 'mentor' or 'mentee'
+        } = await req.json();
 
         if (!to || !mentor_name || !mentee_name || !session_date || !session_time) {
             return Response.json({ error: 'Missing required fields' }, { status: 400 });
         }
 
         const serviceId = Deno.env.get("EMAILJS_SERVICE_ID");
-        const templateId = "template_myelvma";
         const publicKey = Deno.env.get("EMAILJS_PUBLIC_KEY");
+        
+        // Use different template based on recipient type
+        const mentorTemplateId = "template_myelvma";
+        const menteeTemplateId = Deno.env.get("EMAILJS_MENTEE_TEMPLATE_ID") || mentorTemplateId;
+        const templateId = recipient_type === 'mentee' ? menteeTemplateId : mentorTemplateId;
 
-        if (!serviceId || !templateId || !publicKey) {
+        if (!serviceId || !publicKey) {
             return Response.json({ error: 'EmailJS not configured' }, { status: 500 });
         }
 
@@ -38,9 +53,12 @@ Deno.serve(async (req) => {
                     email: to,
                     mentor_name: mentor_name,
                     mentee_name: mentee_name,
+                    mentor_email: mentor_email || '',
+                    mentee_email: mentee_email || '',
                     session_date: session_date,
                     session_time: session_time,
-                    meeting_link: meeting_link || ''
+                    meeting_link: meeting_link || '',
+                    mentee_response: mentee_response || ''
                 }
             })
         });
