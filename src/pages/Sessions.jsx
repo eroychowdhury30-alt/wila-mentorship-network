@@ -130,8 +130,8 @@ export default function Sessions() {
       const mentor = allMentors.find(m => m.full_name === updatedSession.mentor_name);
       console.log('Found mentor:', mentor);
       
-      // Format the session date
-      const sessionDate = new Date(updatedSession.date).toLocaleDateString('en-US', { 
+      // Format the session date - add T12:00:00 to prevent timezone issues
+      const sessionDate = new Date(updatedSession.date + 'T12:00:00').toLocaleDateString('en-US', { 
         weekday: 'long', 
         year: 'numeric', 
         month: 'long', 
