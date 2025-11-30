@@ -59,16 +59,11 @@ export default function MentorCard({ mentor, isMentee = false, hasAvailability =
           <div className="mb-4">
             <p className="text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wide">Expertise</p>
             <div className="flex flex-wrap gap-1.5">
-              {mentor.expertise.slice(0, 3).map((exp, idx) => (
+              {mentor.expertise.map((exp, idx) => (
                 <span key={idx} className="text-xs text-gray-700 bg-gray-50 border border-gray-200 px-2.5 py-1 rounded-md">
                   {exp}
                 </span>
               ))}
-              {mentor.expertise.length > 3 && (
-                <span className="text-xs text-gray-500 px-2 py-1">
-                  +{mentor.expertise.length - 3} more
-                </span>
-              )}
             </div>
           </div>
         )}
@@ -77,10 +72,13 @@ export default function MentorCard({ mentor, isMentee = false, hasAvailability =
         {mentor.mentors_to && mentor.mentors_to.length > 0 && (
           <div className="mb-5">
             <p className="text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wide">Mentors</p>
-            <p className="text-sm text-gray-600 leading-relaxed">
-              {mentor.mentors_to.slice(0, 2).join(', ')}
-              {mentor.mentors_to.length > 2 && ` +${mentor.mentors_to.length - 2} more`}
-            </p>
+            <div className="flex flex-wrap gap-1.5">
+              {mentor.mentors_to.map((group, idx) => (
+                <span key={idx} className="text-xs text-gray-700 bg-purple-50 border border-purple-200 px-2.5 py-1 rounded-md">
+                  {group}
+                </span>
+              ))}
+            </div>
           </div>
         )}
 
