@@ -342,7 +342,7 @@ export default function Sessions() {
     navigate(createPageUrl('Sessions'));
   };
 
-  const timeSlots = ['9am', '10am', '11am', '12pm', '1pm', '2pm', '3pm'];
+  const timeSlots = ['9am-10am', '10am-11am', '11am-12pm', '12pm-1pm', '1pm-2pm', '2pm-3pm', '3pm-4pm'];
   
   const getSessionsForTimeSlot = (time) => {
     return sessions.filter(s => s.time_slot === time);
