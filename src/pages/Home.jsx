@@ -95,7 +95,7 @@ export default function Home() {
       <div className="relative bg-gradient-to-r from-purple-600 to-purple-700 text-white py-20 px-6">
         <div className="max-w-5xl mx-auto text-center">
           <img 
-            src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68fd42c0ae0bd67c5e62c6ca/2c4aa579d_ScreenShot2025-11-30at65641PM.png" 
+            src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68fd42c0ae0bd67c5e62c6ca/6b67e9115_ScreenShot2025-11-29at60408PM.png" 
             alt="WILA Logo" 
             className="h-32 w-auto mb-6 mx-auto"
           />
