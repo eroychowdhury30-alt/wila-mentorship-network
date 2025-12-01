@@ -95,13 +95,13 @@ export default function Home() {
       <div className="relative bg-gradient-to-r from-purple-600 to-purple-700 text-white py-20 px-6">
         <div className="max-w-5xl mx-auto text-center">
           <img 
-                          src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68fd42c0ae0bd67c5e62c6ca/6b67e9115_ScreenShot2025-11-29at60408PM.png" 
-                          alt="WILA Logo" 
-                          className="h-20 w-auto mb-6"
-                        />
-          <h1 className="text-5xl md:text-6xl font-bold mb-4">WILA Connect</h1>
+            src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68fd42c0ae0bd67c5e62c6ca/2c4aa579d_ScreenShot2025-11-30at65641PM.png" 
+            alt="WILA Logo" 
+            className="h-32 w-auto mb-6 mx-auto"
+          />
+          <h1 className="text-5xl md:text-6xl font-bold mb-4">Mentorship Network</h1>
           <p className="text-xl text-purple-100 mb-10 max-w-2xl mx-auto">
-            Connect with accomplished women leaders who are ready to guide your professional journey
+            Connect with accomplished women leaders from the Berkeley Haas alumni community who are ready to guide your professional journey
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
             <Button
@@ -115,9 +115,9 @@ export default function Home() {
               <Button
                 size="lg"
                 variant="outline"
-                className="bg-purple-500 hover:bg-purple-400 text-white border-0 font-semibold px-8 h-12 text-base shadow-lg"
+                className="bg-transparent hover:bg-purple-500 text-white border-white font-semibold px-8 h-12 text-base shadow-lg"
               >
-                Book a Session
+                Mentor Session Sign Up
               </Button>
             </Link>
           </div>
@@ -127,13 +127,13 @@ export default function Home() {
       {/* Mentor Directory Section */}
       <div id="mentor-directory" className="py-16 px-6 bg-gray-50">
         <div className="max-w-7xl mx-auto">
-          <div className="mb-10">
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">
+          <div className="mb-10 text-center">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-purple-100 rounded-full mb-4">
+              <Users className="w-8 h-8 text-purple-600" />
+            </div>
+            <h2 className="text-3xl font-bold text-purple-600 mb-2">
               Mentor Directory
             </h2>
-            <p className="text-gray-600">
-              Browse profiles and connect with mentors who can help you grow
-            </p>
           </div>
 
           <FilterBar
