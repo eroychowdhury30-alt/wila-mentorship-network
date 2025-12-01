@@ -20,6 +20,7 @@ export default function Layout({ children }) {
   const navigate = useNavigate();
 
   useEffect(() => {
+    document.title = 'WILA Mentorship Network';
     loadUser();
   }, [location.pathname]);
 
