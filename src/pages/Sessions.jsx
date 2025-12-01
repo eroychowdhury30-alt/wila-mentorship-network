@@ -375,8 +375,8 @@ export default function Sessions() {
               <Calendar className="w-8 h-8 text-white" />
             </div>
             <h1 className="text-4xl font-bold text-purple-600 mb-6">
-                                Mentorship Day Session Sign Up
-                              </h1>
+              Mentorship Day Session Sign Up
+            </h1>
                               {selectedMentor ? (
                                 <div className="mb-4">
                                   <div className="inline-flex items-center gap-2 bg-purple-100 px-4 py-2 rounded-lg">
