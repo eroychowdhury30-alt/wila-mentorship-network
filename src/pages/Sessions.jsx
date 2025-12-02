@@ -224,13 +224,9 @@ export default function Sessions() {
       const menteeName = session.mentee_name;
       const menteeEmail = session.booked_by;
       
-      // Update session to cancelled and clear booking
+      // Update session to cancelled - keep booking info for records but mark as cancelled
       await base44.entities.Session.update(session.id, {
         is_booked: false,
-        booked_by: null,
-        mentee_name: null,
-        mentee_linkedin: null,
-        session_goal: null,
         status: 'cancelled'
       });
 
