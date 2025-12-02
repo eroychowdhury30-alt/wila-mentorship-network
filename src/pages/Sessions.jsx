@@ -421,7 +421,7 @@ export default function Sessions() {
                                 <div>
                                   <span>
                                     You have booked a session with <strong>{bookedSession.mentor_name}</strong> at{' '}
-                                    <strong>{bookedSession.time_slot}</strong> on {formatDate(selectedDate)}.
+                                    <strong>{bookedSession.time_slot}</strong> on {bookedSession.date ? new Date(bookedSession.date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : formatDate(selectedDate)}.
                                   </span>
                                   <p className="text-sm mt-1 text-green-700">Note: You can only book one session at a time. To make changes, cancel the existing session first.</p>
                                 </div>
