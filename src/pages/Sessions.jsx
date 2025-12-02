@@ -268,35 +268,65 @@ export default function Sessions() {
         day: 'numeric' 
       });
 
-      // Email mentor about cancellation (mentee cancelled)
+      // Send cancellation emails via EmailJS
+      const CANCEL_SERVICE_ID = 'service_wjuvtxg';
+      const CANCEL_MENTEE_TEMPLATE_ID = 'template_yeir2de';
+      const CANCEL_MENTOR_TEMPLATE_ID = 'template_mpm1tds';
+      const CANCEL_PUBLIC_KEY = 'oKxMGW1PxIpEHoDhT';
+
+      // Email mentor about cancellation
       if (mentors.length > 0) {
         const mentor = mentors[0];
         try {
-          await base44.functions.invoke('sendCancellationEmail', {
-            to: mentor.email || mentor.created_by,
-            mentor_name: mentor.full_name,
-            mentee_name: menteeName,
-            session_date: sessionDate,
-            session_time: session.time_slot,
-            cancelled_by: 'mentee',
-            recipient_type: 'mentor'
+          await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              service_id: CANCEL_SERVICE_ID,
+              template_id: CANCEL_MENTOR_TEMPLATE_ID,
+              user_id: CANCEL_PUBLIC_KEY,
+              template_params: {
+                to_email: mentor.email || mentor.created_by,
+                email: mentor.email || mentor.created_by,
+                'mentor-name': mentor.full_name,
+                'mentee-name': menteeName,
+                mentor_name: mentor.full_name,
+                mentee_name: menteeName,
+                session_date: sessionDate,
+                session_time: session.time_slot,
+                cancelled_by: 'mentee'
+              }
+            })
           });
+          console.log('Cancellation email sent to mentor');
         } catch (e) {
           console.error('Failed to send mentor cancellation email:', e);
         }
       }
 
-      // Email mentee confirmation of cancellation
+      // Email mentee confirmation
       try {
-        await base44.functions.invoke('sendCancellationEmail', {
-          to: user.email,
-          mentor_name: session.mentor_name,
-          mentee_name: user.full_name,
-          session_date: sessionDate,
-          session_time: session.time_slot,
-          cancelled_by: 'mentee',
-          recipient_type: 'mentee'
+        await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            service_id: CANCEL_SERVICE_ID,
+            template_id: CANCEL_MENTEE_TEMPLATE_ID,
+            user_id: CANCEL_PUBLIC_KEY,
+            template_params: {
+              to_email: user.email,
+              email: user.email,
+              'mentor-name': session.mentor_name,
+              'mentee-name': user.full_name,
+              mentor_name: session.mentor_name,
+              mentee_name: user.full_name,
+              session_date: sessionDate,
+              session_time: session.time_slot,
+              cancelled_by: 'mentee'
+            }
+          })
         });
+        console.log('Cancellation email sent to mentee');
       } catch (e) {
         console.error('Failed to send mentee cancellation email:', e);
       }
