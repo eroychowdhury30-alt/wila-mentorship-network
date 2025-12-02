@@ -19,6 +19,7 @@ Deno.serve(async (req) => {
             session_time, 
             meeting_link,
             mentee_response,
+            mentee_linkedin,
             recipient_type // 'mentor' or 'mentee'
         } = await req.json();
 
@@ -71,8 +72,10 @@ Deno.serve(async (req) => {
                     mentee_email: mentee_email || '',
                     session_date: session_date,
                     session_time: session_time,
+                    time_slot: session_time,
                     meeting_link: meeting_link || '',
-                    mentee_response: mentee_response || ''
+                    mentee_response: mentee_response || '',
+                    mentee_linkedin: mentee_linkedin || ''
                 }
             })
         });
