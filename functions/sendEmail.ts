@@ -47,6 +47,11 @@ Deno.serve(async (req) => {
             return Response.json({ error: 'EmailJS not configured' }, { status: 500 });
         }
 
+        if (!templateId) {
+            console.error('Template ID missing for recipient_type:', recipient_type);
+            return Response.json({ error: `Template ID not configured for ${recipient_type}` }, { status: 500 });
+        }
+
         // Use EmailJS REST API directly
         const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
             method: 'POST',
