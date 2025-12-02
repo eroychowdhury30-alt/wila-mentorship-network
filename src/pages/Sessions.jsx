@@ -110,14 +110,13 @@ export default function Sessions() {
             mutationFn: async ({ sessionId, goal, name, linkedin }) => {
               const user = await base44.auth.me();
 
-              // Double-check user hasn't already booked for this date
+              // Double-check user hasn't already booked any session
               const existingBookings = await base44.entities.Session.filter({
-                booked_by: user.email,
-                date: selectedDate.toISOString().split('T')[0]
+                booked_by: user.email
               });
-              const activeBookings = existingBookings.filter(s => s.status !== 'cancelled');
+              const activeBookings = existingBookings.filter(s => s.status !== 'cancelled' && s.is_booked === true);
               if (activeBookings.length > 0) {
-                throw new Error('You have already booked a session for this date');
+                throw new Error('You have already booked a session. You can only book one session at a time.');
               }
 
               // Update the session
