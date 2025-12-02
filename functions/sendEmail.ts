@@ -30,8 +30,8 @@ Deno.serve(async (req) => {
         const publicKey = Deno.env.get("EMAILJS_PUBLIC_KEY");
         
         // Use different template based on recipient type
-        const mentorTemplateId = "template_myelvma";
-        const menteeTemplateId = "template_i5x4mmr";
+        const mentorTemplateId = Deno.env.get("EMAILJS_TEMPLATE_ID");
+        const menteeTemplateId = Deno.env.get("EMAILJS_MENTEE_TEMPLATE_ID");
         const templateId = recipient_type === 'mentee' ? menteeTemplateId : mentorTemplateId;
 
         console.log('=== EMAIL DEBUG ===');
