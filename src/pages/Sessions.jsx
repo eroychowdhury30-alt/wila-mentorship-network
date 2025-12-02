@@ -164,6 +164,7 @@ export default function Sessions() {
                                     session_time: updatedSession.time_slot,
                                     meeting_link: meetingLink,
                                     mentee_response: updatedSession.session_goal || '',
+                                    mentee_linkedin: linkedin || '',
                                     recipient_type: 'mentor'
                                   });
                                   console.log('Email sent to mentor at:', mentorEmailAddress);
