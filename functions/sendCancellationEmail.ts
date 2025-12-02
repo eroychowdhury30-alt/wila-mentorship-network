@@ -22,11 +22,6 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    const resendApiKey = Deno.env.get('RESEND_API_KEY');
-    if (!resendApiKey) {
-      return Response.json({ error: 'RESEND_API_KEY not configured' }, { status: 500 });
-    }
-
     const isMentorCancelling = cancelled_by === 'mentor';
     const subject = `WILA Mentorship Session Cancelled - ${session_date}`;
     
@@ -81,28 +76,15 @@ Deno.serve(async (req) => {
 </html>
     `;
 
-    const response = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${resendApiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        from: 'WILA Mentorship <noreply@wilamentorship.org>',
-        to: [to],
-        subject: subject,
-        html: htmlContent,
-      }),
+    // Use Base44's built-in SendEmail integration
+    await base44.integrations.Core.SendEmail({
+      to: to,
+      subject: subject,
+      body: htmlContent,
+      from_name: 'WILA Mentorship'
     });
 
-    const result = await response.json();
-
-    if (!response.ok) {
-      console.error('Resend API error:', result);
-      return Response.json({ error: 'Failed to send email', details: result }, { status: 500 });
-    }
-
-    return Response.json({ success: true, messageId: result.id });
+    return Response.json({ success: true });
   } catch (error) {
     console.error('Error sending cancellation email:', error);
     return Response.json({ error: error.message }, { status: 500 });
