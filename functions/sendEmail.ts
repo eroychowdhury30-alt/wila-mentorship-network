@@ -44,29 +44,38 @@ Deno.serve(async (req) => {
         }
 
         // Use EmailJS REST API with private key for server-side calls
+        const emailBody = {
+            service_id: serviceId,
+            template_id: templateId,
+            user_id: publicKey,
+            template_params: {
+                email: to,
+                to_email: to,
+                mentor_name: mentor_name,
+                mentee_name: mentee_name,
+                mentor_email: mentor_email || '',
+                mentee_email: mentee_email || '',
+                session_date: session_date,
+                session_time: session_time,
+                'Time-Slot': session_time,
+                meeting_link: meeting_link || '',
+                mentee_response: mentee_response || ''
+            }
+        };
+        
+        // Add private key if available
+        if (privateKey) {
+            emailBody.accessToken = privateKey;
+        }
+        
+        console.log('Sending email with body:', JSON.stringify(emailBody, null, 2));
+        
         const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({
-                service_id: serviceId,
-                template_id: templateId,
-                user_id: publicKey,
-                accessToken: privateKey,
-                template_params: {
-                    email: to,
-                    mentor_name: mentor_name,
-                    mentee_name: mentee_name,
-                    mentor_email: mentor_email || '',
-                    mentee_email: mentee_email || '',
-                    session_date: session_date,
-                    session_time: session_time,
-                    'Time-Slot': session_time,
-                    meeting_link: meeting_link || '',
-                    mentee_response: mentee_response || ''
-                }
-            })
+            body: JSON.stringify(emailBody)
         });
 
         const responseText = await response.text();
