@@ -126,7 +126,8 @@ export default function Sessions() {
                 booked_by: user.email,
                 mentee_name: name,
                 mentee_linkedin: linkedin,
-                session_goal: goal
+                session_goal: goal,
+                status: 'scheduled'
               });
       
       // Get the mentor's details to find their email
