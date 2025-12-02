@@ -154,49 +154,74 @@ export default function Sessions() {
       console.log('Mentee email to use:', menteeEmailAddress);
       console.log('Current user email:', user.email);
       
-      // Send emails (don't block booking if emails fail)
-      // Get meeting link from session or mentor
-                  const meetingLink = updatedSession.meeting_link || mentor?.meeting_link || '';
+      // Send emails via EmailJS directly from frontend
+      const meetingLink = updatedSession.meeting_link || mentor?.meeting_link || '';
+      const SERVICE_ID = 'service_0ey0krq';
+      const MENTOR_TEMPLATE_ID = 'template_myelvma';
+      const MENTEE_TEMPLATE_ID = 'template_i5x4mmr';
+      const PUBLIC_KEY = 'oKxMGW1PxIpEHoDhT';
 
-                  try {
-                                if (mentorEmailAddress) {
-                                  await base44.functions.invoke('sendEmail', {
-                                    to: mentorEmailAddress,
-                                    mentor_name: mentor?.full_name || updatedSession.mentor_name,
-                                    mentee_name: name,
-                                    mentor_email: mentorEmailAddress,
-                                    mentee_email: menteeEmailAddress,
-                                    session_date: sessionDate,
-                                    session_time: updatedSession.time_slot,
-                                    meeting_link: meetingLink,
-                                    mentee_response: updatedSession.session_goal || '',
-                                    recipient_type: 'mentor'
-                                  });
-                                  console.log('Email sent to mentor at:', mentorEmailAddress);
-                                }
-                              } catch (e) {
-                                console.error('Failed to send mentor email:', e);
-                              }
+      // Send to mentor
+      if (mentorEmailAddress) {
+        try {
+          await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              service_id: SERVICE_ID,
+              template_id: MENTOR_TEMPLATE_ID,
+              user_id: PUBLIC_KEY,
+              template_params: {
+                to_email: mentorEmailAddress,
+                email: mentorEmailAddress,
+                mentor_name: mentor?.full_name || updatedSession.mentor_name,
+                mentee_name: name,
+                mentor_email: mentorEmailAddress,
+                mentee_email: menteeEmailAddress,
+                session_date: sessionDate,
+                session_time: updatedSession.time_slot,
+                'Time-Slot': updatedSession.time_slot,
+                meeting_link: meetingLink,
+                mentee_response: goal || ''
+              }
+            })
+          });
+          console.log('Email sent to mentor');
+        } catch (e) {
+          console.error('Failed to send mentor email:', e);
+        }
+      }
 
-                              try {
-                                if (menteeEmailAddress) {
-                                  await base44.functions.invoke('sendEmail', {
-                                    to: menteeEmailAddress,
-                                    mentor_name: mentor?.full_name || updatedSession.mentor_name,
-                                    mentee_name: name,
-                                    mentor_email: mentorEmailAddress,
-                                    mentee_email: menteeEmailAddress,
-                                    session_date: sessionDate,
-                                    session_time: updatedSession.time_slot,
-                                    meeting_link: meetingLink,
-                                    mentee_response: updatedSession.session_goal || '',
-                                    recipient_type: 'mentee'
-                                  });
-                                  console.log('Email sent to mentee at:', menteeEmailAddress);
-                                }
-                              } catch (e) {
-                                console.error('Failed to send mentee email:', e);
-                              }
+      // Send to mentee
+      if (menteeEmailAddress) {
+        try {
+          await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              service_id: SERVICE_ID,
+              template_id: MENTEE_TEMPLATE_ID,
+              user_id: PUBLIC_KEY,
+              template_params: {
+                to_email: menteeEmailAddress,
+                email: menteeEmailAddress,
+                mentor_name: mentor?.full_name || updatedSession.mentor_name,
+                mentee_name: name,
+                mentor_email: mentorEmailAddress,
+                mentee_email: menteeEmailAddress,
+                session_date: sessionDate,
+                session_time: updatedSession.time_slot,
+                'Time-Slot': updatedSession.time_slot,
+                meeting_link: meetingLink,
+                mentee_response: goal || ''
+              }
+            })
+          });
+          console.log('Email sent to mentee');
+        } catch (e) {
+          console.error('Failed to send mentee email:', e);
+        }
+      }
       
       return updatedSession;
     },
