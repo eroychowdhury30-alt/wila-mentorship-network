@@ -195,8 +195,8 @@ export default function Sessions() {
       return updatedSession;
     },
     onSuccess: () => {
-                      queryClient.invalidateQueries(['sessions']);
-                      queryClient.invalidateQueries(['user-booked-sessions']);
+                      queryClient.invalidateQueries({ queryKey: ['sessions'] });
+                      queryClient.invalidateQueries({ queryKey: ['user-booked-sessions'] });
                       toast.success('Session booked! A confirmation email has been sent to your inbox.', {
                         duration: 5000,
                         description: 'Please check your email for session details.'
