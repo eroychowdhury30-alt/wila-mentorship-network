@@ -23,6 +23,7 @@ import {
 } from '@/components/ui/popover';
 import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import emailjs from '@emailjs/browser';
 
 export default function Sessions() {
   const [selectedSession, setSelectedSession] = useState(null);
