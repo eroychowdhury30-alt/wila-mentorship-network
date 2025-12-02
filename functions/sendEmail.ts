@@ -35,10 +35,13 @@ Deno.serve(async (req) => {
         const templateId = recipient_type === 'mentee' ? menteeTemplateId : mentorTemplateId;
 
         console.log('=== EMAIL DEBUG ===');
+        console.log('To:', to);
         console.log('Recipient type:', recipient_type);
         console.log('Using template:', templateId);
-        console.log('Mentor template:', mentorTemplateId);
-        console.log('Mentee template:', menteeTemplateId);
+        console.log('Session time:', session_time);
+        console.log('Session date:', session_date);
+        console.log('Mentor name:', mentor_name);
+        console.log('Mentee name:', mentee_name);
 
         if (!serviceId || !publicKey) {
             return Response.json({ error: 'EmailJS not configured' }, { status: 500 });
