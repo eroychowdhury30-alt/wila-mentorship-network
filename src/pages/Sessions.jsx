@@ -518,8 +518,7 @@ export default function Sessions() {
             )}
 
             <div className="mt-6 text-right text-sm text-gray-500">
-                                <span className="text-gray-600">Note: You can only book one session at a time. To make changes, cancel the existing session first.</span>
-                    <span className="ml-4 text-blue-600">Pacific Time (US)</span>
+                                <span className="text-blue-600">Pacific Time (US)</span>
                               </div>
           </div>
         </div>
