@@ -101,9 +101,8 @@ export default function Sessions() {
     enabled: !!currentUser?.email,
   });
 
-  // Filter for active (non-cancelled) sessions on the selected date
-  const dateStr = selectedDate.toISOString().split('T')[0];
-  const activeBookedSessions = userBookedSessions.filter(s => s.status !== 'cancelled' && s.date === dateStr);
+  // Filter for active (non-cancelled) sessions - user can only book ONE session total
+  const activeBookedSessions = userBookedSessions.filter(s => s.status !== 'cancelled' && s.is_booked === true);
   const hasBookedSession = activeBookedSessions.length > 0;
   const bookedSession = activeBookedSessions[0];
 
