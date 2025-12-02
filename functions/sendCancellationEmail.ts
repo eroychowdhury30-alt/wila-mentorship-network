@@ -48,11 +48,10 @@ Deno.serve(async (req) => {
         user_id: publicKey,
         template_params: {
           email: to,
-          mentor_name: mentor_name,
-          mentee_name: mentee_name || '',
+          'mentor-name': mentor_name,
+          'mentee-name': mentee_name || '',
           session_date: session_date,
           session_time: session_time,
-          'Time-Slot': session_time,
           cancelled_by: cancelled_by || ''
         }
       })
