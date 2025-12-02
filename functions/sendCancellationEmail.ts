@@ -25,7 +25,6 @@ Deno.serve(async (req) => {
 
     const serviceId = Deno.env.get("EMAILJS_SERVICE_ID");
     const publicKey = Deno.env.get("EMAILJS_PUBLIC_KEY");
-    const privateKey = Deno.env.get("EMAILJS_PRIVATE_KEY");
 
     // Use different template based on recipient type
     const menteeTemplateId = "template_yeir2de"; // Cancellation email to mentee
@@ -36,17 +35,17 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'EmailJS not configured' }, { status: 500 });
     }
 
-    // Use EmailJS REST API with private key for server-side calls
+    // Use EmailJS REST API directly
     const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'origin': 'https://base44.com'
       },
       body: JSON.stringify({
         service_id: serviceId,
         template_id: templateId,
         user_id: publicKey,
-        accessToken: privateKey,
         template_params: {
           email: to,
           'mentor-name': mentor_name,
