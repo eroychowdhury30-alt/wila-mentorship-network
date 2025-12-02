@@ -181,19 +181,21 @@ export default function Sessions() {
 
                               try {
                                 if (menteeEmailAddress) {
-                                  await base44.functions.invoke('sendEmail', {
+                                  console.log('Sending mentee email to:', menteeEmailAddress);
+                                  const menteeEmailResult = await base44.functions.invoke('sendEmail', {
                                     to: menteeEmailAddress,
                                     mentor_name: mentor?.full_name || updatedSession.mentor_name,
                                     mentee_name: name,
-                                    mentor_email: mentorEmailAddress,
+                                    mentor_email: mentorEmailAddress || '',
                                     mentee_email: menteeEmailAddress,
                                     session_date: sessionDate,
                                     session_time: updatedSession.time_slot,
                                     meeting_link: meetingLink,
-                                    mentee_response: updatedSession.session_goal || '',
+                                    mentee_response: goal || '',
+                                    mentee_linkedin: linkedin || '',
                                     recipient_type: 'mentee'
                                   });
-                                  console.log('Email sent to mentee at:', menteeEmailAddress);
+                                  console.log('Mentee email result:', menteeEmailResult);
                                 }
                               } catch (e) {
                                 console.error('Failed to send mentee email:', e);
