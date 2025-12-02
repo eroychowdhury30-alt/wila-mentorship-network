@@ -229,18 +229,36 @@ export default function MentorDashboard() {
         day: 'numeric' 
       });
 
+      // Send cancellation emails via EmailJS directly
+      const CANCEL_SERVICE_ID = 'service_wjuvtxg';
+      const CANCEL_MENTEE_TEMPLATE_ID = 'template_yeir2de';
+      const CANCEL_MENTOR_TEMPLATE_ID = 'template_mpm1tds';
+      const CANCEL_PUBLIC_KEY = 'oKxMGW1PxIpEHoDhT';
+
       // Email mentee about cancellation (mentor cancelled)
       if (menteeEmail) {
         try {
-          await base44.functions.invoke('sendCancellationEmail', {
-            to: menteeEmail,
-            mentor_name: profileData.full_name,
-            mentee_name: menteeName,
-            session_date: sessionDate,
-            session_time: session.time_slot,
-            cancelled_by: 'mentor',
-            recipient_type: 'mentee'
+          await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              service_id: CANCEL_SERVICE_ID,
+              template_id: CANCEL_MENTEE_TEMPLATE_ID,
+              user_id: CANCEL_PUBLIC_KEY,
+              template_params: {
+                to_email: menteeEmail,
+                email: menteeEmail,
+                'mentor-name': profileData.full_name,
+                'mentee-name': menteeName,
+                mentor_name: profileData.full_name,
+                mentee_name: menteeName,
+                session_date: sessionDate,
+                session_time: session.time_slot,
+                cancelled_by: 'mentor'
+              }
+            })
           });
+          console.log('Cancellation email sent to mentee');
         } catch (e) {
           console.error('Failed to send cancellation email:', e);
         }
@@ -248,15 +266,27 @@ export default function MentorDashboard() {
 
       // Email mentor confirmation
       try {
-        await base44.functions.invoke('sendCancellationEmail', {
-          to: profileData.email,
-          mentor_name: profileData.full_name,
-          mentee_name: menteeName,
-          session_date: sessionDate,
-          session_time: session.time_slot,
-          cancelled_by: 'mentor',
-          recipient_type: 'mentor'
+        await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            service_id: CANCEL_SERVICE_ID,
+            template_id: CANCEL_MENTOR_TEMPLATE_ID,
+            user_id: CANCEL_PUBLIC_KEY,
+            template_params: {
+              to_email: profileData.email,
+              email: profileData.email,
+              'mentor-name': profileData.full_name,
+              'mentee-name': menteeName,
+              mentor_name: profileData.full_name,
+              mentee_name: menteeName,
+              session_date: sessionDate,
+              session_time: session.time_slot,
+              cancelled_by: 'mentor'
+            }
+          })
         });
+        console.log('Cancellation confirmation sent to mentor');
       } catch (e) {
         console.error('Failed to send mentor confirmation email:', e);
       }
