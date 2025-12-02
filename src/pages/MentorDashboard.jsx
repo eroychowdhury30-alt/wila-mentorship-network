@@ -222,27 +222,41 @@ export default function MentorDashboard() {
         status: 'cancelled'
       });
 
-      const sessionDate = new Date(session.date).toLocaleDateString('en-US', { 
+      const sessionDate = new Date(session.date + 'T12:00:00').toLocaleDateString('en-US', { 
         weekday: 'long', 
         year: 'numeric', 
         month: 'long', 
         day: 'numeric' 
       });
-      const cancelDatetime = `${sessionDate} at ${session.time_slot}`;
 
-      // Email mentee about cancellation
+      // Email mentee about cancellation (mentor cancelled)
       if (menteeEmail) {
         try {
-          await base44.functions.invoke('sendEmail', {
+          await base44.functions.invoke('sendCancellationEmail', {
             to: menteeEmail,
             mentor_name: profileData.full_name,
             mentee_name: menteeName,
             session_date: sessionDate,
-            session_time: session.time_slot
+            session_time: session.time_slot,
+            cancelled_by: 'mentor'
           });
         } catch (e) {
           console.error('Failed to send cancellation email:', e);
         }
+      }
+
+      // Email mentor confirmation
+      try {
+        await base44.functions.invoke('sendCancellationEmail', {
+          to: profileData.email,
+          mentor_name: profileData.full_name,
+          mentee_name: menteeName,
+          session_date: sessionDate,
+          session_time: session.time_slot,
+          cancelled_by: 'mentor'
+        });
+      } catch (e) {
+        console.error('Failed to send mentor confirmation email:', e);
       }
     },
     onSuccess: () => {

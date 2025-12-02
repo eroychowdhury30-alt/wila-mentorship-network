@@ -215,6 +215,10 @@ export default function Sessions() {
 
   const cancelSessionMutation = useMutation({
     mutationFn: async (session) => {
+      const user = await base44.auth.me();
+      const menteeName = session.mentee_name;
+      const menteeEmail = session.booked_by;
+      
       // Update session to cancelled and clear booking
       await base44.entities.Session.update(session.id, {
         is_booked: false,
@@ -230,38 +234,39 @@ export default function Sessions() {
         full_name: session.mentor_name 
       });
       
-      const sessionDate = new Date(session.date).toLocaleDateString('en-US', { 
+      const sessionDate = new Date(session.date + 'T12:00:00').toLocaleDateString('en-US', { 
         weekday: 'long', 
         year: 'numeric', 
         month: 'long', 
         day: 'numeric' 
       });
+
+      // Email mentor about cancellation (mentee cancelled)
       if (mentors.length > 0) {
         const mentor = mentors[0];
-        
-        // Email mentor about cancellation
         try {
-          await base44.functions.invoke('sendEmail', {
+          await base44.functions.invoke('sendCancellationEmail', {
             to: mentor.email || mentor.created_by,
             mentor_name: mentor.full_name,
-            mentee_name: session.mentee_name,
+            mentee_name: menteeName,
             session_date: sessionDate,
-            session_time: session.time_slot
+            session_time: session.time_slot,
+            cancelled_by: 'mentee'
           });
         } catch (e) {
           console.error('Failed to send mentor cancellation email:', e);
         }
       }
 
-      // Email mentee about cancellation
-      const user = await base44.auth.me();
+      // Email mentee confirmation of cancellation
       try {
-        await base44.functions.invoke('sendEmail', {
+        await base44.functions.invoke('sendCancellationEmail', {
           to: user.email,
           mentor_name: session.mentor_name,
           mentee_name: user.full_name,
           session_date: sessionDate,
-          session_time: session.time_slot
+          session_time: session.time_slot,
+          cancelled_by: 'mentee'
         });
       } catch (e) {
         console.error('Failed to send mentee cancellation email:', e);
