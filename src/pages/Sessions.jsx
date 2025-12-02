@@ -89,34 +89,30 @@ export default function Sessions() {
   });
 
   // Check if user has already booked a session for the selected date
-  const { data: userBookedSessions = [], isLoading: userSessionsLoading } = useQuery({
-    queryKey: ['user-booked-sessions', currentUser?.email],
-    queryFn: async () => {
-      const results = await base44.entities.Session.filter({ 
-        booked_by: currentUser?.email
-      });
-      console.log('User booked sessions query:', { email: currentUser?.email, results });
-      return results;
-    },
+  const { data: userBookedSessions = [] } = useQuery({
+    queryKey: ['user-booked-sessions', currentUser?.email, selectedDate.toISOString().split('T')[0]],
+    queryFn: () => base44.entities.Session.filter({ 
+      booked_by: currentUser?.email,
+      date: selectedDate.toISOString().split('T')[0]
+    }),
     enabled: !!currentUser?.email,
   });
 
-  // Filter for active (non-cancelled) sessions - user can only book ONE session total
-  const activeBookedSessions = userBookedSessions.filter(s => s.status !== 'cancelled' && s.is_booked === true);
-  const hasBookedSession = activeBookedSessions.length > 0;
-  const bookedSession = activeBookedSessions[0];
+  const hasBookedSession = userBookedSessions.filter(s => s.status !== 'cancelled').length > 0;
+  const bookedSession = userBookedSessions.find(s => s.status !== 'cancelled');
 
   const bookSessionMutation = useMutation({
             mutationFn: async ({ sessionId, goal, name, linkedin }) => {
               const user = await base44.auth.me();
 
-              // Double-check user hasn't already booked any session
+              // Double-check user hasn't already booked for this date
               const existingBookings = await base44.entities.Session.filter({
-                booked_by: user.email
+                booked_by: user.email,
+                date: selectedDate.toISOString().split('T')[0]
               });
-              const activeBookings = existingBookings.filter(s => s.status !== 'cancelled' && s.is_booked === true);
+              const activeBookings = existingBookings.filter(s => s.status !== 'cancelled');
               if (activeBookings.length > 0) {
-                throw new Error('You have already booked a session. You can only book one session at a time.');
+                throw new Error('You have already booked a session for this date');
               }
 
               // Update the session
@@ -125,8 +121,7 @@ export default function Sessions() {
                 booked_by: user.email,
                 mentee_name: name,
                 mentee_linkedin: linkedin,
-                session_goal: goal,
-                status: 'scheduled'
+                session_goal: goal
               });
       
       // Get the mentor's details to find their email
@@ -153,74 +148,49 @@ export default function Sessions() {
       console.log('Mentee email to use:', menteeEmailAddress);
       console.log('Current user email:', user.email);
       
-      // Send emails via EmailJS directly from frontend
-      const meetingLink = updatedSession.meeting_link || mentor?.meeting_link || '';
-      const SERVICE_ID = 'service_0ey0krq';
-      const MENTOR_TEMPLATE_ID = 'template_myelvma';
-      const MENTEE_TEMPLATE_ID = 'template_i5x4mmr';
-      const PUBLIC_KEY = 'oKxMGW1PxIpEHoDhT';
+      // Send emails (don't block booking if emails fail)
+      // Get meeting link from session or mentor
+                  const meetingLink = updatedSession.meeting_link || mentor?.meeting_link || '';
 
-      // Send to mentor
-      if (mentorEmailAddress) {
-        try {
-          await fetch('https://api.emailjs.com/api/v1.0/email/send', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              service_id: SERVICE_ID,
-              template_id: MENTOR_TEMPLATE_ID,
-              user_id: PUBLIC_KEY,
-              template_params: {
-                to_email: mentorEmailAddress,
-                email: mentorEmailAddress,
-                mentor_name: mentor?.full_name || updatedSession.mentor_name,
-                mentee_name: name,
-                mentor_email: mentorEmailAddress,
-                mentee_email: menteeEmailAddress,
-                session_date: sessionDate,
-                session_time: updatedSession.time_slot,
-                'Time-Slot': updatedSession.time_slot,
-                meeting_link: meetingLink,
-                mentee_response: goal || ''
-              }
-            })
-          });
-          console.log('Email sent to mentor');
-        } catch (e) {
-          console.error('Failed to send mentor email:', e);
-        }
-      }
+                  try {
+                                if (mentorEmailAddress) {
+                                  await base44.functions.invoke('sendEmail', {
+                                    to: mentorEmailAddress,
+                                    mentor_name: mentor?.full_name || updatedSession.mentor_name,
+                                    mentee_name: name,
+                                    mentor_email: mentorEmailAddress,
+                                    mentee_email: menteeEmailAddress,
+                                    session_date: sessionDate,
+                                    session_time: updatedSession.time_slot,
+                                    meeting_link: meetingLink,
+                                    mentee_response: updatedSession.session_goal || '',
+                                    recipient_type: 'mentor'
+                                  });
+                                  console.log('Email sent to mentor at:', mentorEmailAddress);
+                                }
+                              } catch (e) {
+                                console.error('Failed to send mentor email:', e);
+                              }
 
-      // Send to mentee
-      if (menteeEmailAddress) {
-        try {
-          await fetch('https://api.emailjs.com/api/v1.0/email/send', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              service_id: SERVICE_ID,
-              template_id: MENTEE_TEMPLATE_ID,
-              user_id: PUBLIC_KEY,
-              template_params: {
-                to_email: menteeEmailAddress,
-                email: menteeEmailAddress,
-                mentor_name: mentor?.full_name || updatedSession.mentor_name,
-                mentee_name: name,
-                mentor_email: mentorEmailAddress,
-                mentee_email: menteeEmailAddress,
-                session_date: sessionDate,
-                session_time: updatedSession.time_slot,
-                'Time-Slot': updatedSession.time_slot,
-                meeting_link: meetingLink,
-                mentee_response: goal || ''
-              }
-            })
-          });
-          console.log('Email sent to mentee');
-        } catch (e) {
-          console.error('Failed to send mentee email:', e);
-        }
-      }
+                              try {
+                                if (menteeEmailAddress) {
+                                  await base44.functions.invoke('sendEmail', {
+                                    to: menteeEmailAddress,
+                                    mentor_name: mentor?.full_name || updatedSession.mentor_name,
+                                    mentee_name: name,
+                                    mentor_email: mentorEmailAddress,
+                                    mentee_email: menteeEmailAddress,
+                                    session_date: sessionDate,
+                                    session_time: updatedSession.time_slot,
+                                    meeting_link: meetingLink,
+                                    mentee_response: updatedSession.session_goal || '',
+                                    recipient_type: 'mentee'
+                                  });
+                                  console.log('Email sent to mentee at:', menteeEmailAddress);
+                                }
+                              } catch (e) {
+                                console.error('Failed to send mentee email:', e);
+                              }
       
       return updatedSession;
     },
@@ -245,13 +215,13 @@ export default function Sessions() {
 
   const cancelSessionMutation = useMutation({
     mutationFn: async (session) => {
-      const user = await base44.auth.me();
-      const menteeName = session.mentee_name;
-      const menteeEmail = session.booked_by;
-      
-      // Update session to cancelled - keep booking info for records but mark as cancelled
+      // Update session to cancelled and clear booking
       await base44.entities.Session.update(session.id, {
         is_booked: false,
+        booked_by: null,
+        mentee_name: null,
+        mentee_linkedin: null,
+        session_goal: null,
         status: 'cancelled'
       });
 
@@ -260,72 +230,39 @@ export default function Sessions() {
         full_name: session.mentor_name 
       });
       
-      const sessionDate = new Date(session.date + 'T12:00:00').toLocaleDateString('en-US', { 
+      const sessionDate = new Date(session.date).toLocaleDateString('en-US', { 
         weekday: 'long', 
         year: 'numeric', 
         month: 'long', 
         day: 'numeric' 
       });
-
-      // Send cancellation emails via EmailJS
-      const CANCEL_SERVICE_ID = 'service_wjuvtxg';
-      const CANCEL_MENTEE_TEMPLATE_ID = 'template_yeir2de';
-      const CANCEL_MENTOR_TEMPLATE_ID = 'template_mpm1tds';
-      const CANCEL_PUBLIC_KEY = 'oKxMGW1PxIpEHoDhT';
-
-      // Email mentor about cancellation
       if (mentors.length > 0) {
         const mentor = mentors[0];
+        
+        // Email mentor about cancellation
         try {
-          await fetch('https://api.emailjs.com/api/v1.0/email/send', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              service_id: CANCEL_SERVICE_ID,
-              template_id: CANCEL_MENTOR_TEMPLATE_ID,
-              user_id: CANCEL_PUBLIC_KEY,
-              template_params: {
-                to_email: mentor.email || mentor.created_by,
-                email: mentor.email || mentor.created_by,
-                'mentor-name': mentor.full_name,
-                'mentee-name': menteeName,
-                mentor_name: mentor.full_name,
-                mentee_name: menteeName,
-                session_date: sessionDate,
-                session_time: session.time_slot,
-                cancelled_by: 'mentee'
-              }
-            })
+          await base44.functions.invoke('sendEmail', {
+            to: mentor.email || mentor.created_by,
+            mentor_name: mentor.full_name,
+            mentee_name: session.mentee_name,
+            session_date: sessionDate,
+            session_time: session.time_slot
           });
-          console.log('Cancellation email sent to mentor');
         } catch (e) {
           console.error('Failed to send mentor cancellation email:', e);
         }
       }
 
-      // Email mentee confirmation
+      // Email mentee about cancellation
+      const user = await base44.auth.me();
       try {
-        await fetch('https://api.emailjs.com/api/v1.0/email/send', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            service_id: CANCEL_SERVICE_ID,
-            template_id: CANCEL_MENTEE_TEMPLATE_ID,
-            user_id: CANCEL_PUBLIC_KEY,
-            template_params: {
-              to_email: user.email,
-              email: user.email,
-              'mentor-name': session.mentor_name,
-              'mentee-name': user.full_name,
-              mentor_name: session.mentor_name,
-              mentee_name: user.full_name,
-              session_date: sessionDate,
-              session_time: session.time_slot,
-              cancelled_by: 'mentee'
-            }
-          })
+        await base44.functions.invoke('sendEmail', {
+          to: user.email,
+          mentor_name: session.mentor_name,
+          mentee_name: user.full_name,
+          session_date: sessionDate,
+          session_time: session.time_slot
         });
-        console.log('Cancellation email sent to mentee');
       } catch (e) {
         console.error('Failed to send mentee cancellation email:', e);
       }
@@ -360,7 +297,7 @@ export default function Sessions() {
     }
     
     if (hasBookedSession) {
-      toast.error('You have already booked a session. You can only book one session at a time.');
+      toast.error('You have already booked a session for this date. You can only book one 30-minute session per day.');
       return;
     }
     
@@ -466,18 +403,15 @@ export default function Sessions() {
 
           {/* Already Booked Alert with Cancel Option */}
           {hasBookedSession && bookedSession && (
-                          <Alert className="mb-6 border-green-200 bg-green-50">
-                            <AlertCircle className="h-4 w-4 text-green-600" />
-                            <AlertTitle className="text-green-900">Session Already Booked!</AlertTitle>
-                            <AlertDescription className="text-green-800">
-                              <div className="flex items-center justify-between">
-                                <div>
-                                  <span>
-                                    You have booked a session with <strong>{bookedSession.mentor_name}</strong> at{' '}
-                                    <strong>{bookedSession.time_slot}</strong> on {bookedSession.date ? new Date(bookedSession.date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : formatDate(selectedDate)}.
-                                  </span>
-                                  <p className="text-sm mt-1 text-green-700">Note: You can only book one session at a time. To make changes, cancel the existing session first.</p>
-                                </div>
+            <Alert className="mb-6 border-green-200 bg-green-50">
+              <AlertCircle className="h-4 w-4 text-green-600" />
+              <AlertTitle className="text-green-900">Session Already Booked!</AlertTitle>
+              <AlertDescription className="text-green-800">
+                <div className="flex items-center justify-between">
+                  <span>
+                    You have booked a session with <strong>{bookedSession.mentor_name}</strong> at{' '}
+                    <strong>{bookedSession.time_slot}</strong> on {formatDate(selectedDate)}.
+                  </span>
                   <Button
                     variant="outline"
                     size="sm"
