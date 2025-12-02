@@ -408,15 +408,18 @@ export default function Sessions() {
 
           {/* Already Booked Alert with Cancel Option */}
           {hasBookedSession && bookedSession && (
-            <Alert className="mb-6 border-green-200 bg-green-50">
-              <AlertCircle className="h-4 w-4 text-green-600" />
-              <AlertTitle className="text-green-900">Session Already Booked!</AlertTitle>
-              <AlertDescription className="text-green-800">
-                <div className="flex items-center justify-between">
-                  <span>
-                    You have booked a session with <strong>{bookedSession.mentor_name}</strong> at{' '}
-                    <strong>{bookedSession.time_slot}</strong> on {formatDate(selectedDate)}.
-                  </span>
+                          <Alert className="mb-6 border-green-200 bg-green-50">
+                            <AlertCircle className="h-4 w-4 text-green-600" />
+                            <AlertTitle className="text-green-900">Session Already Booked!</AlertTitle>
+                            <AlertDescription className="text-green-800">
+                              <div className="flex items-center justify-between">
+                                <div>
+                                  <span>
+                                    You have booked a session with <strong>{bookedSession.mentor_name}</strong> at{' '}
+                                    <strong>{bookedSession.time_slot}</strong> on {formatDate(selectedDate)}.
+                                  </span>
+                                  <p className="text-sm mt-1 text-green-700">Note: You can only book one session at a time. To make changes, cancel the existing session first.</p>
+                                </div>
                   <Button
                     variant="outline"
                     size="sm"
