@@ -89,12 +89,17 @@ export default function Sessions() {
   });
 
   // Check if user has already booked a session for the selected date
-  const { data: userBookedSessions = [] } = useQuery({
+  const { data: userBookedSessions = [], isLoading: userSessionsLoading } = useQuery({
     queryKey: ['user-booked-sessions', currentUser?.email, selectedDate.toISOString().split('T')[0]],
-    queryFn: () => base44.entities.Session.filter({ 
-      booked_by: currentUser?.email,
-      date: selectedDate.toISOString().split('T')[0]
-    }),
+    queryFn: async () => {
+      const dateStr = selectedDate.toISOString().split('T')[0];
+      const results = await base44.entities.Session.filter({ 
+        booked_by: currentUser?.email,
+        date: dateStr
+      });
+      console.log('User booked sessions query:', { email: currentUser?.email, date: dateStr, results });
+      return results;
+    },
     enabled: !!currentUser?.email,
   });
 

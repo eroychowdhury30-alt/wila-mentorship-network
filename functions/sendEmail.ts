@@ -63,6 +63,7 @@ Deno.serve(async (req) => {
                     mentee_email: mentee_email || '',
                     session_date: session_date,
                     session_time: session_time,
+                    'Time-Slot': session_time,
                     meeting_link: meeting_link || '',
                     mentee_response: mentee_response || ''
                 }
