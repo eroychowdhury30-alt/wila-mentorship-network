@@ -238,7 +238,8 @@ export default function MentorDashboard() {
             mentee_name: menteeName,
             session_date: sessionDate,
             session_time: session.time_slot,
-            cancelled_by: 'mentor'
+            cancelled_by: 'mentor',
+            recipient_type: 'mentee'
           });
         } catch (e) {
           console.error('Failed to send cancellation email:', e);
@@ -253,7 +254,8 @@ export default function MentorDashboard() {
           mentee_name: menteeName,
           session_date: sessionDate,
           session_time: session.time_slot,
-          cancelled_by: 'mentor'
+          cancelled_by: 'mentor',
+          recipient_type: 'mentor'
         });
       } catch (e) {
         console.error('Failed to send mentor confirmation email:', e);
