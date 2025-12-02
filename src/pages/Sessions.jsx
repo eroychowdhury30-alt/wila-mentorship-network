@@ -306,7 +306,7 @@ export default function Sessions() {
     }
     
     if (hasBookedSession) {
-      toast.error('You have already booked a session for this date. You can only book one 30-minute session per day.');
+      toast.error('You have already booked a session. You can only book one session at a time.');
       return;
     }
     
