@@ -117,39 +117,41 @@ export default function MentorDashboard() {
       const userMentor = allMentors[0];
       
       if (userMentor) {
-                            setMentorProfile(userMentor);
-                            setProfileData({
-                              full_name: userMentor.full_name || '',
-                              email: userMentor.email || currentUser.email || '',
-                              title: userMentor.title || '',
-                              company: userMentor.company || '',
-                              linkedin_url: userMentor.linkedin_url || '',
-                              meeting_link: userMentor.meeting_link || '',
-                              photo_url: userMentor.photo_url || '',
-                              experience_years: userMentor.experience_years || 'Over 20 years',
-                              expertise: userMentor.expertise || [],
-                              mentors_to: userMentor.mentors_to || [],
-                              bio: userMentor.bio || '',
-                              status: userMentor.status || 'pending'
-                            });
-                            setIsEditing(false);
-                          } else {
-                            setProfileData({
-                              full_name: currentUser.full_name || '',
-                              email: currentUser.email || '',
-                              title: '',
-                              company: '',
-                              linkedin_url: '',
-                              meeting_link: '',
-                              photo_url: '',
-                              experience_years: 'Over 20 years',
-                              expertise: [],
-                              mentors_to: [],
-                              bio: '',
-                              status: 'pending'
-                            });
-                            setIsEditing(true);
-                          }
+        setMentorProfile(userMentor);
+        setProfileData({
+          full_name: userMentor.full_name || '',
+          email: userMentor.email || currentUser.email || '',
+          title: userMentor.title || '',
+          company: userMentor.company || '',
+          linkedin_url: userMentor.linkedin_url || '',
+          meeting_link: userMentor.meeting_link || '',
+          photo_url: userMentor.photo_url || '',
+          experience_years: userMentor.experience_years || 'Over 20 years',
+          expertise: userMentor.expertise || [],
+          mentors_to: userMentor.mentors_to || [],
+          bio: userMentor.bio || '',
+          status: userMentor.status || 'pending'
+        });
+        setIsEditing(false);
+      } else {
+        // No existing profile - show empty form for new mentor
+        setMentorProfile(null);
+        setProfileData({
+          full_name: currentUser.full_name || '',
+          email: currentUser.email || '',
+          title: '',
+          company: '',
+          linkedin_url: '',
+          meeting_link: '',
+          photo_url: '',
+          experience_years: 'Over 20 years',
+          expertise: [],
+          mentors_to: [],
+          bio: '',
+          status: 'pending'
+        });
+        setIsEditing(true);
+      }
     } catch (error) {
       console.error('Error loading mentor profile:', error);
     }
