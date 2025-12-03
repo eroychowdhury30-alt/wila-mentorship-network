@@ -49,6 +49,25 @@ export default function Layout({ children }) {
       }
       
       const currentUser = await base44.auth.me();
+      
+      // Check if user has a pre-created mentor profile (by email)
+      if (!currentUser.user_type) {
+        const mentorsByEmail = await base44.entities.Mentor.filter({ email: currentUser.email });
+        if (mentorsByEmail.length > 0) {
+          // User has a mentor profile - set them as mentor
+          await base44.auth.updateMe({ user_type: 'mentor', onboarding_completed: true });
+          currentUser.user_type = 'mentor';
+          currentUser.onboarding_completed = true;
+          setUser(currentUser);
+          localStorage.removeItem('intended_user_type');
+          if (currentPage === 'Welcome') {
+            navigate(createPageUrl('MentorDashboard'), { replace: true });
+          }
+          setIsLoading(false);
+          return;
+        }
+      }
+      
       setUser(currentUser);
       
       // Check for intended user type from localStorage (from Welcome page selection)
