@@ -111,9 +111,15 @@ export default function MentorDashboard() {
 
   const loadMentorProfile = async (currentUser) => {
     try {
-      const allMentors = await base44.entities.Mentor.filter({ created_by: currentUser.email });
+      // First check for mentor profile by email (for pre-created profiles)
+      let allMentors = await base44.entities.Mentor.filter({ email: currentUser.email });
       
-      // Get the first mentor profile created by this user (they should only have one)
+      // If not found by email, check by created_by
+      if (allMentors.length === 0) {
+        allMentors = await base44.entities.Mentor.filter({ created_by: currentUser.email });
+      }
+      
+      // Get the first mentor profile
       const userMentor = allMentors[0];
       
       if (userMentor) {
