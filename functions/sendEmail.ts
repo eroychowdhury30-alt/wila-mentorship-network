@@ -65,6 +65,7 @@ Deno.serve(async (req) => {
                 template_id: templateId,
                 user_id: publicKey,
                 template_params: {
+                    to_email: to,
                     email: to,
                     mentor_name: mentor_name,
                     mentee_name: mentee_name,
