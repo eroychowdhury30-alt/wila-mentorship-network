@@ -160,7 +160,14 @@ export default function MentorDashboard() {
   const saveProfileMutation = useMutation({
     mutationFn: async (data) => {
       console.log('Saving profile with data:', data);
-      if (mentorProfile) {
+      
+      // Double-check if a mentor profile already exists for this user
+      const existingMentors = await base44.entities.Mentor.filter({ created_by: user.email });
+      
+      if (existingMentors.length > 0) {
+        // Update existing profile
+        return await base44.entities.Mentor.update(existingMentors[0].id, data);
+      } else if (mentorProfile) {
         return await base44.entities.Mentor.update(mentorProfile.id, data);
       } else {
         return await base44.entities.Mentor.create({ ...data, status: 'pending' });
