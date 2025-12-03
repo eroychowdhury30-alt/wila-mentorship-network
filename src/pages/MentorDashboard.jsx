@@ -113,9 +113,8 @@ export default function MentorDashboard() {
     try {
       const allMentors = await base44.entities.Mentor.filter({ created_by: currentUser.email });
       
-      const userMentor = allMentors.find(m => 
-        m.full_name.toLowerCase() === currentUser.full_name.toLowerCase()
-      );
+      // Get the first mentor profile created by this user (they should only have one)
+      const userMentor = allMentors[0];
       
       if (userMentor) {
                             setMentorProfile(userMentor);
