@@ -50,10 +50,13 @@ export default function Layout({ children }) {
       
       const currentUser = await base44.auth.me();
       
-      // Check if user has a pre-created mentor profile (by email)
+      // Check if user has a pre-created mentor profile (by email) - case insensitive
       if (!currentUser.user_type) {
-        const mentorsByEmail = await base44.entities.Mentor.filter({ email: currentUser.email });
-        if (mentorsByEmail.length > 0) {
+        const allMentors = await base44.entities.Mentor.list();
+        const mentorByEmail = allMentors.find(m => 
+          m.email && m.email.toLowerCase() === currentUser.email.toLowerCase()
+        );
+        if (mentorByEmail) {
           // User has a mentor profile - set them as mentor
           await base44.auth.updateMe({ user_type: 'mentor', onboarding_completed: true });
           currentUser.user_type = 'mentor';
