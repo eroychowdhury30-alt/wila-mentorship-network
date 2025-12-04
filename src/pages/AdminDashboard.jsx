@@ -438,7 +438,7 @@ export default function AdminDashboard() {
                           <div className="space-y-2">
                             <div className="flex items-center gap-3">
                               <Badge className="bg-purple-600 text-white">
-                                {new Date(session.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                                {new Date(session.date + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                               </Badge>
                               <Badge variant="outline">{session.time_slot}</Badge>
                               <Badge className={session.status === 'cancelled' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}>
