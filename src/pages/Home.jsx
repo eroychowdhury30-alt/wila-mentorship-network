@@ -155,7 +155,7 @@ export default function Home() {
             <div className="flex flex-wrap gap-4 justify-center">
               <Button
                 size="lg"
-                onClick={scrollToMentors}
+                onClick={() => setShowMatchingModal(true)}
                 className="font-semibold px-8 h-12 text-base shadow-lg rounded-full hover:opacity-90" style={{background: '#FDB515', color: '#003262'}}
               >
                 Browse Mentors
