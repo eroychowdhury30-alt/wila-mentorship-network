@@ -151,9 +151,19 @@ export default function AdminDashboard() {
       queryClient.invalidateQueries(['pending-mentors']);
       queryClient.invalidateQueries(['approved-mentors']);
       queryClient.invalidateQueries(['paused-mentors']);
+      queryClient.invalidateQueries(['rejected-mentors']);
       toast.success('Mentor profile updated');
       setEditingMentor(null);
       setEditMentorData(null);
+    },
+  });
+
+  const restoreMentorMutation = useMutation({
+    mutationFn: (mentorId) => base44.entities.Mentor.update(mentorId, { status: 'pending' }),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['rejected-mentors']);
+      queryClient.invalidateQueries(['pending-mentors']);
+      toast.success('Mentor restored to pending status');
     },
   });
 
