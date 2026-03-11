@@ -1,12 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { createPageUrl } from '@/utils';
 import { Button } from '@/components/ui/button';
 import { Users, UserCheck, ArrowRight, CheckCircle } from 'lucide-react';
 
 export default function Welcome() {
+  const [showMatchingModal, setShowMatchingModal] = useState(false);
+
   const handleMenteeClick = () => {
-    window.location.href = createPageUrl('Home');
+    setShowMatchingModal(true);
   };
 
   const handleMentorClick = async () => {
