@@ -9,9 +9,14 @@ export default function Welcome() {
     window.location.href = createPageUrl('Home');
   };
 
-  const handleMentorClick = () => {
+  const handleMentorClick = async () => {
     localStorage.setItem('intended_user_type', 'mentor');
-    base44.auth.redirectToLogin(window.location.origin + createPageUrl('MentorDashboard'));
+    const isAuth = await base44.auth.isAuthenticated();
+    if (isAuth) {
+      window.location.href = createPageUrl('MentorDashboard');
+    } else {
+      base44.auth.redirectToLogin(window.location.origin + createPageUrl('MentorDashboard'));
+    }
   };
 
   return (
