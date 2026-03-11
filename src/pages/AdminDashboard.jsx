@@ -278,6 +278,10 @@ export default function AdminDashboard() {
               <Pause className="w-4 h-4" />
               Paused ({pausedMentors.length})
             </TabsTrigger>
+            <TabsTrigger value="rejected" className="gap-2">
+              <XCircle className="w-4 h-4" />
+              Rejected ({rejectedMentors.length})
+            </TabsTrigger>
             <TabsTrigger value="sessions" className="gap-2">
               <Calendar className="w-4 h-4" />
               Sessions ({bookedSessions.length})
@@ -577,6 +581,56 @@ export default function AdminDashboard() {
                             Remove
                           </Button>
                         </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Rejected Mentors */}
+          <TabsContent value="rejected">
+            <Card>
+              <CardHeader>
+                <CardTitle>Rejected Mentor Applications</CardTitle>
+                <p className="text-sm text-gray-600 mt-1">{user?.role === 'superadmin' ? 'SuperAdmin can restore rejected mentors' : 'View rejected applications'}</p>
+              </CardHeader>
+              <CardContent>
+                {rejectedMentors.length === 0 ? (
+                  <p className="text-center text-gray-500 py-8">No rejected mentors</p>
+                ) : (
+                  <div className="space-y-3">
+                    {rejectedMentors.map((mentor) => (
+                      <div key={mentor.id} className="flex items-center justify-between p-3 border border-red-200 rounded-lg hover:bg-red-50">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center text-red-600 font-semibold text-sm">
+                            {mentor.full_name.split(' ').map(n => n[0]).join('')}
+                          </div>
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <p className="font-medium">{mentor.full_name}</p>
+                              <Badge className="bg-red-600 text-white text-xs">Rejected</Badge>
+                            </div>
+                            <p className="text-sm text-gray-600">{mentor.title} at {mentor.company}</p>
+                          </div>
+                        </div>
+                        {user?.role === 'superadmin' && (
+                          <Button
+                            onClick={() => {
+                              if (confirm(`Restore ${mentor.full_name} to pending status?`)) {
+                                restoreMentorMutation.mutate(mentor.id);
+                              }
+                            }}
+                            variant="outline"
+                            size="sm"
+                            className="text-green-600 border-green-300 hover:bg-green-50"
+                            disabled={restoreMentorMutation.isPending}
+                          >
+                            <CheckCircle className="w-4 h-4 mr-2" />
+                            Restore
+                          </Button>
+                        )}
                       </div>
                     ))}
                   </div>
