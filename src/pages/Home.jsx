@@ -96,6 +96,46 @@ export default function Home() {
     }
   };
 
+  const handleMatchingModeSelect = (mode) => {
+    if (mode === 'manual') {
+      setShowMatchingModal(false);
+      scrollToMentors();
+    } else {
+      setShowMatchingModal(false);
+      setShowQuestionnaire(true);
+    }
+  };
+
+  const handleQuestionnaireSubmit = async (responses) => {
+    setIsMatchingLoading(true);
+    try {
+      const matched = await base44.functions.invoke('smartMatchMentor', {
+        mentee_goals: responses.goals,
+        experience_level: responses.experience_level,
+        industries: responses.industries,
+        skills: responses.skills_to_develop,
+        mentoring_style: responses.mentoring_style,
+        mentors: mentors
+      });
+      
+      setMatchedMentors(matched.matched_mentors || []);
+      setShowQuestionnaire(false);
+      
+      // Scroll to results after a brief delay
+      setTimeout(() => {
+        const resultsSection = document.getElementById('matched-results');
+        if (resultsSection) {
+          resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 300);
+    } catch (error) {
+      console.error('Matching error:', error);
+      alert('Error finding matches. Please try again.');
+    } finally {
+      setIsMatchingLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
