@@ -12,12 +12,17 @@ import MenteeQuestionnaire from '../components/MenteeQuestionnaire';
 
 export default function Home() {
   const [user, setUser] = useState(null);
+  const [showMatchingModal, setShowMatchingModal] = useState(false);
+  const [showQuestionnaire, setShowQuestionnaire] = useState(false);
+  const [isMatchingLoading, setIsMatchingLoading] = useState(false);
+  const [matchedMentors, setMatchedMentors] = useState([]);
   const [filters, setFilters] = useState({
     sortBy: 'firstName',
     experience: 'all',
     expertise: 'all',
     mentees: 'all'
   });
+  const navigate = useNavigate();
 
   useEffect(() => {
     loadUser();
