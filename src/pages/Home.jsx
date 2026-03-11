@@ -136,8 +136,24 @@ export default function Home() {
     }
   };
 
+  if (showQuestionnaire) {
+    return (
+      <MenteeQuestionnaire
+        onBack={() => setShowQuestionnaire(false)}
+        onSubmit={handleQuestionnaireSubmit}
+        isLoading={isMatchingLoading}
+      />
+    );
+  }
+
   return (
     <div className="min-h-screen bg-white">
+      <MatchingModal
+        open={showMatchingModal}
+        onOpenChange={setShowMatchingModal}
+        onSelectMode={handleMatchingModeSelect}
+      />
+
       {/* Hero Section */}
       <div className="relative overflow-hidden text-white" style={{background: 'linear-gradient(135deg, #001a35 0%, #003262 60%, #004080 100%)'}}>
         <div className="absolute inset-0 opacity-10" style={{backgroundImage: 'radial-gradient(circle at 20% 50%, white 1px, transparent 1px), radial-gradient(circle at 80% 20%, white 1px, transparent 1px)', backgroundSize: '60px 60px'}} />
