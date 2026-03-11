@@ -74,7 +74,7 @@ export default function MentorDashboard() {
             status: 'pending'
           });
   const [availableSlots, setAvailableSlots] = useState([]);
-  const [selectedDate, setSelectedDate] = useState(new Date('2025-12-12'));
+  const [selectedDate, setSelectedDate] = useState(new Date());
   const queryClient = useQueryClient();
 
   useEffect(() => {
@@ -92,11 +92,13 @@ export default function MentorDashboard() {
   };
 
   const { data: existingSessions = [], isLoading: sessionsLoading } = useQuery({
-    queryKey: ['mentor-sessions', mentorProfile?.full_name, selectedDate.toISOString().split('T')[0]],
-    queryFn: () => base44.entities.Session.filter({ 
-      mentor_name: mentorProfile?.full_name,
-      date: selectedDate.toISOString().split('T')[0]
-    }),
+    queryKey: ['mentor-sessions', mentorProfile?.full_name],
+    queryFn: async () => {
+      const allSessions = await base44.entities.Session.filter({ 
+        mentor_name: mentorProfile?.full_name
+      });
+      return allSessions;
+    },
     enabled: !!mentorProfile?.full_name,
   });
 
