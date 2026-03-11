@@ -167,15 +167,6 @@ export default function AdminDashboard() {
     },
   });
 
-  const restoreAdminMutation = useMutation({
-    mutationFn: (userId) => base44.entities.User.update(userId, { role: 'admin' }),
-    onSuccess: () => {
-      queryClient.invalidateQueries(['all-users']);
-      queryClient.invalidateQueries(['all-admins']);
-      toast.success('Admin access restored');
-    },
-  });
-
   const canRemoveAdmin = user?.role === 'superadmin';
 
   if (!user || (user.role !== 'admin' && user.role !== 'superadmin')) {
@@ -278,16 +269,10 @@ export default function AdminDashboard() {
                 Active ({activeMentors})
               </TabsTrigger>
               {user?.role === 'superadmin' && (
-                <>
-                  <TabsTrigger value="edit-mentors" className="gap-2">
-                    <Users className="w-4 h-4" />
-                    Edit Mentors
-                  </TabsTrigger>
-                  <TabsTrigger value="admin-users" className="gap-2">
-                    <Shield className="w-4 h-4" />
-                    Admin Users
-                  </TabsTrigger>
-                </>
+                <TabsTrigger value="edit-mentors" className="gap-2">
+                  <Users className="w-4 h-4" />
+                  Edit Mentors
+                </TabsTrigger>
               )}
             <TabsTrigger value="paused" className="gap-2">
               <Pause className="w-4 h-4" />
@@ -603,49 +588,6 @@ export default function AdminDashboard() {
               </CardContent>
             </Card>
           </TabsContent>
-
-          {/* SuperAdmin: Admin Users Management */}
-          {user?.role === 'superadmin' && (
-            <TabsContent value="admin-users">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Admin Users Management (SuperAdmin Only)</CardTitle>
-                  <p className="text-sm text-gray-600 mt-1">Restore admin access for demoted users</p>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    {allUsers
-                      .filter(u => u.role !== 'admin' && u.role !== 'superadmin')
-                      .map((user) => (
-                        <div key={user.id} className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50">
-                          <div>
-                            <p className="font-medium">{user.full_name}</p>
-                            <p className="text-sm text-gray-600">{user.email}</p>
-                            {user.role && <p className="text-xs text-gray-500 mt-1">Current role: {user.role}</p>}
-                          </div>
-                          <Button
-                            onClick={() => {
-                              if (confirm(`Restore admin access for ${user.full_name}?`)) {
-                                restoreAdminMutation.mutate(user.id);
-                              }
-                            }}
-                            size="sm"
-                            className="bg-orange-600 hover:bg-orange-700"
-                            disabled={restoreAdminMutation.isPending}
-                          >
-                            <Shield className="w-4 h-4 mr-2" />
-                            Make Admin
-                          </Button>
-                        </div>
-                      ))}
-                    {allUsers.filter(u => u.role !== 'admin' && u.role !== 'superadmin').length === 0 && (
-                      <p className="text-center text-gray-500 py-8">All users are already admin or superadmin</p>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-          )}
 
           {/* Rejected Mentors */}
           <TabsContent value="rejected">
