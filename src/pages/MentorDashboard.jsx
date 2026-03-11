@@ -117,12 +117,6 @@ export default function MentorDashboard() {
         m.email && m.email.toLowerCase() === currentUser.email.toLowerCase()
       );
       
-      // If not found by email, check by created_by
-      if (!userMentor) {
-        userMentor = allMentors.find(m => 
-          m.created_by && m.created_by.toLowerCase() === currentUser.email.toLowerCase()
-        );
-      }
       
       if (userMentor) {
         setMentorProfile(userMentor);
@@ -169,13 +163,7 @@ export default function MentorDashboard() {
     mutationFn: async (data) => {
       console.log('Saving profile with data:', data);
       
-      // Double-check if a mentor profile already exists for this user
-      const existingMentors = await base44.entities.Mentor.filter({ created_by: user.email });
-      
-      if (existingMentors.length > 0) {
-        // Update existing profile
-        return await base44.entities.Mentor.update(existingMentors[0].id, data);
-      } else if (mentorProfile) {
+      if (mentorProfile) {
         return await base44.entities.Mentor.update(mentorProfile.id, data);
       } else {
         return await base44.entities.Mentor.create({ ...data, status: 'pending' });
