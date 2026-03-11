@@ -14,79 +14,66 @@ Deno.serve(async (req) => {
       mentors
     } = payload;
 
-    // Map experience levels to mentor years
-    const experienceLevelMap = {
-      'Entry-level (0-2 years)': ['1-2 years', '2-5 years'],
-      'Mid-level (2-5 years)': ['2-5 years', '5-10 years'],
-      'Senior (5-10 years)': ['5-10 years', '10+ years'],
-      'Executive (10+ years)': ['10+ years']
-    };
+    // Format mentor data for AI
+    const mentorProfiles = mentors.map(m => ({
+      id: m.id,
+      name: m.full_name,
+      title: m.title,
+      company: m.company,
+      expertise: m.expertise || [],
+      experience: m.experience_years,
+      mentors_to: m.mentors_to || [],
+      bio: m.bio
+    }));
 
-    const compatibleExperienceLevels = experienceLevelMap[experience_level] || [];
+    // Use AI to find best matches
+    const result = await base44.integrations.Core.InvokeLLM({
+      prompt: `You are an expert mentor matching assistant. Match the following mentee profile with the best mentor candidates from the list provided.
 
-    // Scoring function
-    const scoreMentor = (mentor) => {
-      let score = 0;
+MENTEE PROFILE:
+- Goals: ${mentee_goals.join(', ')}
+- Experience Level: ${experience_level}
+- Industries of Interest: ${industries.join(', ')}
+- Skills to Develop: ${skills.join(', ')}
+- Preferred Mentoring Style: ${mentoring_style}
 
-      // 1. Expertise match (40 points max)
-      if (mentor.expertise && mentor.expertise.length > 0) {
-        const goalsLower = mentee_goals.map(g => g.toLowerCase());
-        const expertiseMatches = mentor.expertise.filter(exp =>
-          goalsLower.some(goal => 
-            goal.includes(exp.toLowerCase()) || exp.toLowerCase().includes(goal)
-          )
-        );
-        score += (expertiseMatches.length / mentor.expertise.length) * 40;
+AVAILABLE MENTORS:
+${mentorProfiles.map((m, i) => `
+${i + 1}. ${m.name}
+   Title: ${m.title} at ${m.company}
+   Experience: ${m.experience}
+   Expertise: ${m.expertise.join(', ')}
+   Mentors: ${m.mentors_to.join(', ')}
+   Bio: ${m.bio || 'No bio provided'}
+`).join('\n')}
+
+Return the TOP 5 BEST MATCHES as a JSON array with the mentor names in order of fit. Consider expertise alignment, experience level match, career goals alignment, and mentoring style compatibility.`,
+      response_json_schema: {
+        type: "object",
+        properties: {
+          matched_mentor_names: {
+            type: "array",
+            items: { type: "string" },
+            description: "Names of matched mentors in order of best fit"
+          },
+          reasoning: {
+            type: "string",
+            description: "Brief explanation of the matching logic"
+          }
+        },
+        required: ["matched_mentor_names"]
       }
+    });
 
-      // 2. Target mentee match (25 points max)
-      if (mentor.mentors_to && mentor.mentors_to.length > 0) {
-        const menteesToLower = mentor.mentors_to.map(m => m.toLowerCase());
-        const levelMatch = menteesToLower.some(m =>
-          m.includes('all') ||
-          (experience_level.includes('Entry') && m.includes('entry')) ||
-          (experience_level.includes('Mid') && m.includes('mid')) ||
-          (experience_level.includes('Senior') && m.includes('senior')) ||
-          (experience_level.includes('Executive') && m.includes('exec'))
-        );
-        if (levelMatch) score += 25;
-      }
-
-      // 3. Industry match (20 points max)
-      if (industries.length > 0 && mentor.expertise && mentor.expertise.length > 0) {
-        const industriesLower = industries.map(i => i.toLowerCase());
-        const industryMatches = mentor.expertise.filter(exp =>
-          industriesLower.some(ind => exp.toLowerCase().includes(ind))
-        );
-        score += (industryMatches.length / Math.max(industries.length, mentor.expertise.length)) * 20;
-      }
-
-      // 4. Experience level compatibility (15 points max)
-      if (compatibleExperienceLevels.length > 0 && mentor.experience_years) {
-        const mentorExpLower = mentor.experience_years.toLowerCase();
-        const isCompatible = compatibleExperienceLevels.some(level =>
-          mentorExpLower.includes(level.toLowerCase()) ||
-          (level === '10+ years' && (mentorExpLower.includes('10+') || mentorExpLower.includes('15')))
-        );
-        if (isCompatible) score += 15;
-      }
-
-      return score;
-    };
-
-    // Score all mentors
-    const scoredMentors = mentors
-      .map(mentor => ({
-        ...mentor,
-        matchScore: scoreMentor(mentor)
-      }))
-      .filter(m => m.matchScore > 0)
-      .sort((a, b) => b.matchScore - a.matchScore)
-      .slice(0, 5); // Return top 5 matches
+    // Map matched names back to full mentor objects
+    const matchedMentors = result.matched_mentor_names
+      .map(name => mentors.find(m => m.full_name === name))
+      .filter(m => m !== undefined);
 
     return Response.json({
-      matched_mentors: scoredMentors,
-      total_matched: scoredMentors.length
+      matched_mentors: matchedMentors,
+      total_matched: matchedMentors.length,
+      reasoning: result.reasoning
     });
   } catch (error) {
     console.error('Smart matching error:', error);
