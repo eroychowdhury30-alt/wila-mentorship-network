@@ -770,7 +770,7 @@ export default function MentorDashboard() {
                     <CardContent>
                       {sessionsLoading ? (
                         <div className="text-center py-8">
-                          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto"></div>
+                          <div className="animate-spin rounded-full h-8 w-8 border-b-2 mx-auto"></div>
                         </div>
                       ) : bookedSessions.length === 0 ? (
                         <div className="text-center py-8">

@@ -14,7 +14,7 @@ export default function FilterBar({ filters, onFilterChange, onClearAll }) {
     <div className="bg-white border border-gray-100 rounded-2xl p-5 mb-8 shadow-sm">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <Filter className="w-4 h-4 text-haas-blue" />
+          <Filter className="w-4 h-4" style={{color:'#003262'}} />
           <h3 className="text-sm font-semibold text-gray-700">Filter & Sort</h3>
         </div>
         <Button
