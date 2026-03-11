@@ -442,10 +442,21 @@ export default function Sessions() {
               <h2 className="text-xl font-semibold text-gray-900">
                 {selectedMentor ? `${selectedMentor}'s Schedule - ${formatDate(selectedDate)}` : `Mentorship Day - ${formatDate(selectedDate)}`}
               </h2>
-              <div className="flex items-center gap-2 px-4 py-2 rounded-lg" style={{background:'#EDF2F8'}}>
-                                <Calendar className="h-4 w-4" style={{color:'#003262'}} />
-                                <span className="font-medium" style={{color:'#003262'}}>{formatDate(selectedDate)}</span>
-                                  </div>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" className="gap-2">
+                    <Calendar className="h-4 w-4" />
+                    {formatShortDate(selectedDate)}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="end">
+                  <CalendarComponent
+                    mode="single"
+                    selected={selectedDate}
+                    onSelect={(date) => setSelectedDate(date || new Date())}
+                  />
+                </PopoverContent>
+              </Popover>
             </div>
 
 
