@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Shield, Users, UserCheck, UserX, Clock, CheckCircle, XCircle, Trash2, Pause, Play, Calendar, ExternalLink } from 'lucide-react';
+import { Shield, Users, UserCheck, UserX, Clock, CheckCircle, XCircle, Trash2, Pause, Play, Calendar, ExternalLink, Crown } from 'lucide-react';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
@@ -22,7 +22,7 @@ export default function AdminDashboard() {
   const checkAdmin = async () => {
     try {
       const currentUser = await base44.auth.me();
-      if (currentUser.role !== 'admin') {
+      if (currentUser.role !== 'admin' && currentUser.role !== 'superadmin') {
         toast.error('Access denied - Admin only');
         navigate(createPageUrl('Home'));
         return;
@@ -52,6 +52,14 @@ export default function AdminDashboard() {
   const { data: allUsers = [] } = useQuery({
     queryKey: ['all-users'],
     queryFn: () => base44.entities.User.list(),
+  });
+
+  const { data: allAdmins = [] } = useQuery({
+    queryKey: ['all-admins'],
+    queryFn: async () => {
+      const users = await base44.entities.User.list();
+      return users.filter(u => u.role === 'admin' || u.role === 'superadmin');
+    },
   });
 
   const { data: allSessions = [] } = useQuery({
@@ -112,7 +120,27 @@ export default function AdminDashboard() {
     },
   });
 
-  if (!user || user.role !== 'admin') {
+  const removeAdminMutation = useMutation({
+    mutationFn: (userId) => base44.entities.User.update(userId, { role: 'user' }),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['all-users']);
+      queryClient.invalidateQueries(['all-admins']);
+      toast.success('Admin privileges removed');
+    },
+  });
+
+  const makeAdminMutation = useMutation({
+    mutationFn: (userId) => base44.entities.User.update(userId, { role: 'admin' }),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['all-users']);
+      queryClient.invalidateQueries(['all-admins']);
+      toast.success('User promoted to admin');
+    },
+  });
+
+  const canRemoveAdmin = user?.role === 'superadmin';
+
+  if (!user || (user.role !== 'admin' && user.role !== 'superadmin')) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
@@ -130,10 +158,21 @@ export default function AdminDashboard() {
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">
-            <Shield className="w-8 h-8 text-purple-600" />
-            <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
+            {user?.role === 'superadmin' ? (
+              <>
+                <Crown className="w-8 h-8 text-amber-500" />
+                <h1 className="text-3xl font-bold text-gray-900">SuperAdmin Dashboard</h1>
+              </>
+            ) : (
+              <>
+                <Shield className="w-8 h-8 text-purple-600" />
+                <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
+              </>
+            )}
           </div>
-          <p className="text-gray-600">Manage mentors, mentees, and platform operations</p>
+          <p className="text-gray-600">
+            {user?.role === 'superadmin' ? 'Full platform control' : 'Manage mentors, mentees, and platform operations'}
+          </p>
         </div>
 
         {/* Stats Overview */}
