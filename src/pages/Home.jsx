@@ -92,34 +92,54 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
-      <div className="relative bg-gradient-to-r from-purple-600 to-purple-700 text-white py-20 px-6">
-        <div className="max-w-5xl mx-auto text-center">
-          <img 
-            src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68fd42c0ae0bd67c5e62c6ca/6b67e9115_ScreenShot2025-11-29at60408PM.png" 
-            alt="WILA Logo" 
-            className="h-32 w-auto mb-6 mx-auto"
-          />
-          <h1 className="text-5xl md:text-6xl font-bold mb-4">Mentorship Network</h1>
-          <p className="text-xl text-purple-100 mb-10 max-w-2xl mx-auto">
-            Connect with accomplished women leaders from the Berkeley Haas alumni community who are ready to guide your professional journey
-          </p>
-          <div className="flex flex-wrap gap-4 justify-center">
-            <Button
-              size="lg"
-              onClick={scrollToMentors}
-              className="bg-white text-purple-600 hover:bg-purple-50 font-semibold px-8 h-12 text-base shadow-lg"
-            >
-              Browse Mentors
-            </Button>
-            <Link to={createPageUrl('Sessions')}>
+      <div className="relative overflow-hidden bg-gradient-to-br from-purple-900 via-purple-700 to-purple-600 text-white">
+        <div className="absolute inset-0 opacity-10" style={{backgroundImage: 'radial-gradient(circle at 20% 50%, white 1px, transparent 1px), radial-gradient(circle at 80% 20%, white 1px, transparent 1px)', backgroundSize: '60px 60px'}} />
+        <div className="relative max-w-6xl mx-auto px-6 py-24 md:py-32">
+          <div className="flex flex-col items-center text-center">
+            <img 
+              src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68fd42c0ae0bd67c5e62c6ca/6b67e9115_ScreenShot2025-11-29at60408PM.png" 
+              alt="WILA Logo" 
+              className="h-24 w-auto mb-8 mx-auto drop-shadow-lg"
+            />
+            <h1 className="text-4xl md:text-6xl font-bold mb-5 tracking-tight">Mentorship Network</h1>
+            <p className="text-lg md:text-xl text-purple-100 mb-10 max-w-2xl leading-relaxed">
+              Connect with accomplished women leaders from the Berkeley Haas alumni community who are ready to guide your professional journey.
+            </p>
+            <div className="flex flex-wrap gap-4 justify-center">
               <Button
                 size="lg"
-                variant="outline"
-                className="bg-transparent hover:bg-purple-500 text-white border-white font-semibold px-8 h-12 text-base shadow-lg"
+                onClick={scrollToMentors}
+                className="bg-white text-purple-700 hover:bg-purple-50 font-semibold px-8 h-12 text-base shadow-lg rounded-full"
               >
-                Mentor Session Sign Up
+                Browse Mentors
               </Button>
-            </Link>
+              <Link to={createPageUrl('Sessions')}>
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="bg-white/10 hover:bg-white/20 text-white border-white/40 font-semibold px-8 h-12 text-base rounded-full backdrop-blur-sm"
+                >
+                  Book a Session
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </div>
+        {/* Stats bar */}
+        <div className="border-t border-white/20 bg-white/10 backdrop-blur-sm">
+          <div className="max-w-6xl mx-auto px-6 py-5 flex flex-wrap justify-center gap-10">
+            <div className="text-center">
+              <p className="text-2xl font-bold">{mentors.length}+</p>
+              <p className="text-purple-200 text-sm">Expert Mentors</p>
+            </div>
+            <div className="text-center">
+              <p className="text-2xl font-bold">Free</p>
+              <p className="text-purple-200 text-sm">1-on-1 Sessions</p>
+            </div>
+            <div className="text-center">
+              <p className="text-2xl font-bold">Haas</p>
+              <p className="text-purple-200 text-sm">Alumni Network</p>
+            </div>
           </div>
         </div>
       </div>
@@ -127,13 +147,13 @@ export default function Home() {
       {/* Mentor Directory Section */}
       <div id="mentor-directory" className="py-16 px-6 bg-gray-50">
         <div className="max-w-7xl mx-auto">
-          <div className="mb-10 text-center">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-purple-100 rounded-full mb-4">
-              <Users className="w-8 h-8 text-purple-600" />
+          <div className="mb-10 flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+            <div>
+              <h2 className="text-3xl font-bold text-gray-900 mb-1">Mentor Directory</h2>
+              <p className="text-gray-500">
+                <span className="font-semibold text-purple-600">{sortedMentors.length}</span> {sortedMentors.length === 1 ? 'mentor' : 'mentors'} available
+              </p>
             </div>
-            <h2 className="text-3xl font-bold text-purple-600 mb-2">
-              Mentor Directory
-            </h2>
           </div>
 
           <FilterBar
@@ -142,22 +162,17 @@ export default function Home() {
             onClearAll={handleClearAll}
           />
 
-          <div className="mb-8">
-            <p className="text-sm text-gray-600">
-              <span className="font-semibold text-gray-900">{sortedMentors.length}</span> {sortedMentors.length === 1 ? 'mentor' : 'mentors'} found
-            </p>
-          </div>
-
           {isLoading ? (
             <div className="text-center py-20">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
             </div>
           ) : sortedMentors.length === 0 ? (
-            <div className="text-center py-20 bg-white rounded-xl border border-gray-200">
-              <Users className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-600 text-lg">No mentors found matching your filters</p>
-              <Button onClick={handleClearAll} variant="outline" className="mt-4">
-                Clear Filters
+            <div className="text-center py-20 bg-white rounded-2xl border border-gray-200">
+              <Users className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+              <p className="text-gray-600 text-lg font-medium">No mentors match your filters</p>
+              <p className="text-gray-400 text-sm mt-1">Try adjusting your search criteria</p>
+              <Button onClick={handleClearAll} variant="outline" className="mt-6 rounded-full">
+                Clear All Filters
               </Button>
             </div>
           ) : (
