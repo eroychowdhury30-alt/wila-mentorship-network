@@ -145,7 +145,7 @@ export default function Layout({ children }) {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Navigation Bar */}
-      <nav className="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
+      <nav className="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm" style={{borderBottomColor:'#003262', borderBottomWidth:'2px'}}>
         <div className="max-w-7xl mx-auto px-6 py-3">
           <div className="flex items-center justify-between">
             <Link 
@@ -222,7 +222,7 @@ export default function Layout({ children }) {
                       <p className="text-sm font-medium">{user.full_name}</p>
                       <p className="text-xs text-gray-500">{user.email}</p>
                       <div className="flex items-center gap-2 mt-2">
-                        <Badge className="bg-purple-100 text-purple-700 text-xs capitalize">{user.user_type}</Badge>
+                        <Badge className="text-xs capitalize" style={{background:'#EDF2F8', color:'#003262'}}>{user.user_type}</Badge>
                         {user.role === 'admin' && (
                           <Badge className="bg-orange-100 text-orange-700 text-xs">Admin</Badge>
                         )}
