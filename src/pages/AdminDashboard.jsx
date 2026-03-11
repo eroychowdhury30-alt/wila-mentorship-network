@@ -12,6 +12,8 @@ import { createPageUrl } from '@/utils';
 
 export default function AdminDashboard() {
   const [user, setUser] = useState(null);
+  const [editingMentor, setEditingMentor] = useState(null);
+  const [editMentorData, setEditMentorData] = useState(null);
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
@@ -138,6 +140,18 @@ export default function AdminDashboard() {
     },
   });
 
+  const editMentorMutation = useMutation({
+    mutationFn: (data) => base44.entities.Mentor.update(editingMentor.id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['pending-mentors']);
+      queryClient.invalidateQueries(['approved-mentors']);
+      queryClient.invalidateQueries(['paused-mentors']);
+      toast.success('Mentor profile updated');
+      setEditingMentor(null);
+      setEditMentorData(null);
+    },
+  });
+
   const canRemoveAdmin = user?.role === 'superadmin';
 
   if (!user || (user.role !== 'admin' && user.role !== 'superadmin')) {
@@ -236,9 +250,15 @@ export default function AdminDashboard() {
               Pending ({pendingMentors.length})
             </TabsTrigger>
             <TabsTrigger value="active" className="gap-2">
-              <UserCheck className="w-4 h-4" />
-              Active ({activeMentors})
-            </TabsTrigger>
+                <UserCheck className="w-4 h-4" />
+                Active ({activeMentors})
+              </TabsTrigger>
+              {user?.role === 'superadmin' && (
+                <TabsTrigger value="edit-mentors" className="gap-2">
+                  <Users className="w-4 h-4" />
+                  Edit Mentors
+                </TabsTrigger>
+              )}
             <TabsTrigger value="paused" className="gap-2">
               <Pause className="w-4 h-4" />
               Paused ({pausedMentors.length})
