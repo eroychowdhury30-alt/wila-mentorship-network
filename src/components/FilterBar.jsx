@@ -30,7 +30,7 @@ export default function FilterBar({ filters, onFilterChange, onClearAll }) {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
         <div>
-          <label className="text-xs font-semibold text-gray-700 mb-2 block uppercase tracking-wide">
+          <label className="text-xs font-medium text-gray-500 mb-1.5 block">
             Sort By
           </label>
           <Select
