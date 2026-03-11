@@ -137,7 +137,7 @@ export default function Layout({ children }) {
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2" style={{borderColor:'#003262'}}></div>
       </div>
     );
   }
@@ -157,13 +157,13 @@ export default function Layout({ children }) {
                 alt="WILA Logo" 
                 className="h-10 w-auto"
               />
-              <span className="text-xl font-bold text-gray-900 group-hover:text-purple-600 transition-colors hidden sm:inline">WILA Mentorship Network</span>
+              <span className="text-xl font-bold hidden sm:inline transition-colors" style={{color:'#003262'}}>WILA Mentorship Network</span>
             </Link>
 
             <div className="flex items-center gap-2">
               {user?.role === 'admin' && (
                 <Link to={createPageUrl('AdminDashboard')}>
-                  <Button variant="ghost" className="gap-2 hover:bg-purple-50 hover:text-purple-600">
+                  <Button variant="ghost" className="gap-2 hover:bg-blue-50" style={{}} onMouseEnter={e=>e.currentTarget.style.color='#003262'} onMouseLeave={e=>e.currentTarget.style.color=''}>
                     <Shield className="w-4 h-4" />
                     <span className="hidden md:inline">Admin</span>
                   </Button>
@@ -173,13 +173,13 @@ export default function Layout({ children }) {
               {user?.user_type === 'mentee' && (
                 <>
                   <Link to={createPageUrl('Home')}>
-                    <Button variant="ghost" className="gap-2 hover:bg-purple-50 hover:text-purple-600">
+                    <Button variant="ghost" className="gap-2 hover:bg-blue-50 hover:text-[#003262]">
                       <Users className="w-4 h-4" />
                       <span className="hidden md:inline">Mentors</span>
                     </Button>
                   </Link>
                   <Link to={createPageUrl('Sessions')}>
-                    <Button variant="ghost" className="gap-2 hover:bg-purple-50 hover:text-purple-600">
+                    <Button variant="ghost" className="gap-2 hover:bg-blue-50 hover:text-[#003262]">
                       <Calendar className="w-4 h-4" />
                       <span className="hidden md:inline">Sessions</span>
                     </Button>
@@ -190,13 +190,13 @@ export default function Layout({ children }) {
               {user?.user_type === 'mentor' && (
                 <>
                   <Link to={createPageUrl('MentorDashboard')}>
-                    <Button variant="ghost" className="gap-2 hover:bg-purple-50 hover:text-purple-600">
+                    <Button variant="ghost" className="gap-2 hover:bg-blue-50 hover:text-[#003262]">
                       <LayoutDashboard className="w-4 h-4" />
                       <span className="hidden md:inline">Dashboard</span>
                     </Button>
                   </Link>
                   <Link to={createPageUrl('Home')}>
-                    <Button variant="ghost" className="gap-2 hover:bg-purple-50 hover:text-purple-600">
+                    <Button variant="ghost" className="gap-2 hover:bg-blue-50 hover:text-[#003262]">
                       <Users className="w-4 h-4" />
                       <span className="hidden md:inline">Mentors</span>
                     </Button>
@@ -208,7 +208,7 @@ export default function Layout({ children }) {
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="outline" className="gap-2 hover:bg-gray-50 ml-2">
-                      <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-purple-600 rounded-full flex items-center justify-center text-white text-sm font-semibold shadow-sm">
+                      <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-semibold shadow-sm" style={{background:'linear-gradient(135deg, #003262, #004080)'}}>
                         {user.full_name?.split(' ').map(n => n[0]).join('') || 'U'}
                       </div>
                       <div className="text-left hidden lg:block">
