@@ -251,6 +251,12 @@ export default function AdminDashboard() {
               <Users className="w-4 h-4" />
               Users ({allUsers.length})
             </TabsTrigger>
+            {user?.role === 'superadmin' && (
+              <TabsTrigger value="admins" className="gap-2">
+                <Crown className="w-4 h-4" />
+                Admins ({allAdmins.length})
+              </TabsTrigger>
+            )}
           </TabsList>
 
           {/* Pending Mentors */}
