@@ -59,6 +59,7 @@ export default function AdminDashboard() {
   const { data: allUsers = [] } = useQuery({
     queryKey: ['all-users'],
     queryFn: () => base44.entities.User.list(),
+    enabled: !!user,
   });
 
   const { data: allAdmins = [] } = useQuery({
@@ -67,6 +68,7 @@ export default function AdminDashboard() {
       const users = await base44.entities.User.list();
       return users.filter(u => u.role === 'admin' || u.role === 'superadmin');
     },
+    enabled: !!user,
   });
 
   const { data: allSessions = [] } = useQuery({
