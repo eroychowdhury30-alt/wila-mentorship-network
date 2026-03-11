@@ -3,6 +3,7 @@ import { base44 } from '@/api/base44Client';
 import { createPageUrl } from '@/utils';
 import { Button } from '@/components/ui/button';
 import { Users, UserCheck, ArrowRight, CheckCircle } from 'lucide-react';
+import MatchingModal from '../components/MatchingModal';
 
 export default function Welcome() {
   const [showMatchingModal, setShowMatchingModal] = useState(false);
