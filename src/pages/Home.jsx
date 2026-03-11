@@ -92,7 +92,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
-      <div className="relative overflow-hidden bg-gradient-to-br from-purple-900 via-purple-700 to-purple-600 text-white">
+      <div className="relative overflow-hidden bg-gradient-to-br from-[#001a35] via-haas-blue to-[#003262] text-white">
         <div className="absolute inset-0 opacity-10" style={{backgroundImage: 'radial-gradient(circle at 20% 50%, white 1px, transparent 1px), radial-gradient(circle at 80% 20%, white 1px, transparent 1px)', backgroundSize: '60px 60px'}} />
         <div className="relative max-w-6xl mx-auto px-6 py-24 md:py-32">
           <div className="flex flex-col items-center text-center">
