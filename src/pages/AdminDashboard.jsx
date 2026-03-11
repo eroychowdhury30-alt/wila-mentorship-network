@@ -591,8 +591,100 @@ export default function AdminDashboard() {
               </Card>
             </div>
           </TabsContent>
-        </Tabs>
-      </div>
-    </div>
-  );
-}
+
+          {user?.role === 'superadmin' && (
+            <TabsContent value="admins">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Crown className="w-5 h-5 text-amber-500" />
+                    Admin Management (SuperAdmin Only)
+                  </CardTitle>
+                  <p className="text-sm text-gray-600 mt-2">Manage admin roles and privileges</p>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-6">
+                    <div>
+                      <h3 className="text-lg font-semibold mb-4">Current Admins & SuperAdmins</h3>
+                      {allAdmins.length === 0 ? (
+                        <p className="text-center text-gray-500 py-8">No admins yet</p>
+                      ) : (
+                        <div className="space-y-3">
+                          {allAdmins.map((admin) => (
+                            <div key={admin.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50">
+                              <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center text-amber-600 font-semibold text-sm">
+                                  {admin.full_name.split(' ').map(n => n[0]).join('')}
+                                </div>
+                                <div>
+                                  <p className="font-medium">{admin.full_name}</p>
+                                  <p className="text-sm text-gray-600">{admin.email}</p>
+                                </div>
+                                <Badge className={admin.role === 'superadmin' ? 'bg-amber-600 text-white' : 'bg-purple-600 text-white'}>
+                                  {admin.role === 'superadmin' ? '👑 SuperAdmin' : 'Admin'}
+                                </Badge>
+                              </div>
+                              {admin.id !== user?.id && admin.role !== 'superadmin' && (
+                                <Button
+                                  onClick={() => {
+                                    if (confirm(`Remove admin privileges from ${admin.full_name}?`)) {
+                                      removeAdminMutation.mutate(admin.id);
+                                    }
+                                  }}
+                                  variant="ghost"
+                                  size="sm"
+                                  className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                                  disabled={removeAdminMutation.isPending}
+                                >
+                                  <UserX className="w-4 h-4 mr-2" />
+                                  Remove Admin
+                                </Button>
+                              )}
+                              {admin.id === user?.id && (
+                                <Badge className="bg-green-100 text-green-700">You</Badge>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="border-t pt-6">
+                      <h3 className="text-lg font-semibold mb-4">Make User an Admin</h3>
+                      <div className="space-y-3">
+                        {allUsers.filter(u => u.role === 'user').map((user) => (
+                          <div key={user.id} className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50">
+                            <div>
+                              <p className="font-medium">{user.full_name}</p>
+                              <p className="text-sm text-gray-600">{user.email}</p>
+                            </div>
+                            <Button
+                              onClick={() => {
+                                if (confirm(`Make ${user.full_name} an admin?`)) {
+                                  makeAdminMutation.mutate(user.id);
+                                }
+                              }}
+                              className="bg-green-600 hover:bg-green-700"
+                              size="sm"
+                              disabled={makeAdminMutation.isPending}
+                            >
+                              <Shield className="w-4 h-4 mr-2" />
+                              Make Admin
+                            </Button>
+                          </div>
+                        ))}
+                        {allUsers.filter(u => u.role === 'user').length === 0 && (
+                          <p className="text-center text-gray-500 py-4">All users are already admins</p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          )}
+          </Tabs>
+          </div>
+          </div>
+          );
+          }
