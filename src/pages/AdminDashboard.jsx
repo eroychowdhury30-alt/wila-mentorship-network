@@ -51,6 +51,11 @@ export default function AdminDashboard() {
     queryFn: () => base44.entities.Mentor.filter({ status: 'paused' }),
   });
 
+  const { data: rejectedMentors = [] } = useQuery({
+    queryKey: ['rejected-mentors'],
+    queryFn: () => base44.entities.Mentor.filter({ status: 'rejected' }),
+  });
+
   const { data: allUsers = [] } = useQuery({
     queryKey: ['all-users'],
     queryFn: () => base44.entities.User.list(),
