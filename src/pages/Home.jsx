@@ -207,6 +207,43 @@ export default function Home() {
         </div>
       </div>
 
+      {/* Matched Results Section */}
+      {matchedMentors.length > 0 && (
+        <div id="matched-results" className="py-16 px-6 bg-gradient-to-br from-blue-50 to-blue-100">
+          <div className="max-w-7xl mx-auto">
+            <div className="mb-10 flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+              <div>
+                <h2 className="text-3xl font-bold text-gray-900 mb-1">Your Smart Matches</h2>
+                <p className="text-gray-600">
+                  We found <span className="font-semibold text-purple-600">{matchedMentors.length}</span> mentors perfectly suited for you
+                </p>
+              </div>
+              <Button
+                onClick={() => {
+                  setMatchedMentors([]);
+                  scrollToMentors();
+                }}
+                variant="outline"
+                className="rounded-full"
+              >
+                View All Mentors
+              </Button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {matchedMentors.map((mentor) => (
+                <MentorCard
+                  key={mentor.id}
+                  mentor={mentor}
+                  isMentee={user?.user_type === 'mentee'}
+                  hasAvailability={mentorsWithAvailability.has(mentor.full_name)}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Mentor Directory Section */}
       <div id="mentor-directory" className="py-16 px-6 bg-gray-50">
         <div className="max-w-7xl mx-auto">
