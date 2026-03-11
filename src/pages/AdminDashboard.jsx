@@ -441,6 +441,90 @@ export default function AdminDashboard() {
             </Card>
           </TabsContent>
 
+          {/* SuperAdmin: Edit Mentors */}
+          {user?.role === 'superadmin' && (
+            <TabsContent value="edit-mentors">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Edit Mentor Profiles (SuperAdmin Only)</CardTitle>
+                  <p className="text-sm text-gray-600 mt-1">Directly edit any mentor's profile information</p>
+                </CardHeader>
+                <CardContent>
+                  {editingMentor && editMentorData ? (
+                    <div className="space-y-4 pb-6">
+                      <div className="bg-blue-50 p-4 rounded-lg mb-4">
+                        <h3 className="font-semibold text-blue-900 mb-2">Editing: {editMentorData.full_name}</h3>
+                        <Input
+                          placeholder="Full Name"
+                          value={editMentorData.full_name}
+                          onChange={(e) => setEditMentorData({...editMentorData, full_name: e.target.value})}
+                          className="mb-3"
+                        />
+                        <Input
+                          placeholder="Email"
+                          value={editMentorData.email}
+                          onChange={(e) => setEditMentorData({...editMentorData, email: e.target.value})}
+                          className="mb-3"
+                        />
+                        <Input
+                          placeholder="Title"
+                          value={editMentorData.title}
+                          onChange={(e) => setEditMentorData({...editMentorData, title: e.target.value})}
+                          className="mb-3"
+                        />
+                        <Input
+                          placeholder="Company"
+                          value={editMentorData.company}
+                          onChange={(e) => setEditMentorData({...editMentorData, company: e.target.value})}
+                          className="mb-3"
+                        />
+                        <div className="flex gap-3">
+                          <Button
+                            onClick={() => editMentorMutation.mutate(editMentorData)}
+                            disabled={editMentorMutation.isPending}
+                            className="bg-green-600 hover:bg-green-700"
+                          >
+                            Save Changes
+                          </Button>
+                          <Button
+                            onClick={() => {
+                              setEditingMentor(null);
+                              setEditMentorData(null);
+                            }}
+                            variant="outline"
+                          >
+                            Cancel
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {[...pendingMentors, ...approvedMentors, ...pausedMentors, ...rejectedMentors].map((mentor) => (
+                        <div key={mentor.id} className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50">
+                          <div>
+                            <p className="font-medium">{mentor.full_name}</p>
+                            <p className="text-sm text-gray-600">{mentor.title} at {mentor.company}</p>
+                          </div>
+                          <Button
+                            onClick={() => {
+                              setEditingMentor(mentor);
+                              setEditMentorData({...mentor});
+                            }}
+                            size="sm"
+                            className="bg-blue-600 hover:bg-blue-700"
+                          >
+                            Edit Profile
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+          )}
+
           {/* Paused Mentors */}
           <TabsContent value="paused">
             <Card>
