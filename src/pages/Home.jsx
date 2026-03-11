@@ -92,7 +92,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
-      <div className="relative overflow-hidden bg-gradient-to-br from-[#001a35] via-haas-blue to-[#003262] text-white">
+      <div className="relative overflow-hidden text-white" style={{background: 'linear-gradient(135deg, #001a35 0%, #003262 60%, #004080 100%)'}}>
         <div className="absolute inset-0 opacity-10" style={{backgroundImage: 'radial-gradient(circle at 20% 50%, white 1px, transparent 1px), radial-gradient(circle at 80% 20%, white 1px, transparent 1px)', backgroundSize: '60px 60px'}} />
         <div className="relative max-w-6xl mx-auto px-6 py-24 md:py-32">
           <div className="flex flex-col items-center text-center">
@@ -109,7 +109,7 @@ export default function Home() {
               <Button
                 size="lg"
                 onClick={scrollToMentors}
-                className="bg-white text-purple-700 hover:bg-purple-50 font-semibold px-8 h-12 text-base shadow-lg rounded-full"
+                className="font-semibold px-8 h-12 text-base shadow-lg rounded-full hover:opacity-90" style={{background: '#FDB515', color: '#003262'}}
               >
                 Browse Mentors
               </Button>
@@ -164,14 +164,14 @@ export default function Home() {
 
           {isLoading ? (
             <div className="text-center py-20">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto" style={{borderColor:'#003262'}}></div>
             </div>
           ) : sortedMentors.length === 0 ? (
             <div className="text-center py-20 bg-white rounded-2xl border border-gray-200">
               <Users className="w-16 h-16 text-gray-300 mx-auto mb-4" />
               <p className="text-gray-600 text-lg font-medium">No mentors match your filters</p>
               <p className="text-gray-400 text-sm mt-1">Try adjusting your search criteria</p>
-              <Button onClick={handleClearAll} variant="outline" className="mt-6 rounded-full">
+              <Button onClick={handleClearAll} variant="outline" className="mt-6 rounded-full border-[#003262] text-[#003262]">
                 Clear All Filters
               </Button>
             </div>
