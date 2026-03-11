@@ -380,23 +380,23 @@ export default function Sessions() {
       <div className="py-16 px-6">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-purple-600 rounded-full mb-6">
-              <Calendar className="w-8 h-8 text-white" />
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full mb-6" style={{background:'#003262'}}>
+            <Calendar className="w-8 h-8 text-white" />
             </div>
-            <h1 className="text-4xl font-bold text-purple-600 mb-6">
+            <h1 className="text-4xl font-bold mb-6" style={{color:'#003262'}}>
               Mentorship Day Session Sign Up
             </h1>
                               {selectedMentor ? (
                                 <div className="mb-4">
-                                  <div className="inline-flex items-center gap-2 bg-purple-100 px-4 py-2 rounded-lg">
-                                    <span className="text-lg font-semibold text-purple-900">
+                                  <div className="inline-flex items-center gap-2 px-4 py-2 rounded-lg" style={{background:'#EDF2F8'}}>
+                                    <span className="text-lg font-semibold" style={{color:'#003262'}}>
                                       Viewing schedule for: {selectedMentor}
                                     </span>
                                     <Button
                                       variant="ghost"
                                       size="sm"
                                       onClick={handleClearFilter}
-                                      className="text-purple-700 hover:text-purple-900"
+                                      style={{color:'#003262'}}
                                     >
                                       <ArrowLeft className="w-4 h-4 mr-1" />
                                       View All Mentors
@@ -442,9 +442,9 @@ export default function Sessions() {
               <h2 className="text-xl font-semibold text-gray-900">
                 {selectedMentor ? `${selectedMentor}'s Schedule - ${formatDate(selectedDate)}` : `Mentorship Day - ${formatDate(selectedDate)}`}
               </h2>
-              <div className="flex items-center gap-2 px-4 py-2 bg-purple-100 rounded-lg">
-                                    <Calendar className="h-4 w-4 text-purple-600" />
-                                    <span className="font-medium text-purple-900">{formatDate(selectedDate)}</span>
+              <div className="flex items-center gap-2 px-4 py-2 rounded-lg" style={{background:'#EDF2F8'}}>
+                                <Calendar className="h-4 w-4" style={{color:'#003262'}} />
+                                <span className="font-medium" style={{color:'#003262'}}>{formatDate(selectedDate)}</span>
                                   </div>
             </div>
 
@@ -460,7 +460,7 @@ export default function Sessions() {
 
             {sessionsLoading ? (
               <div className="text-center py-12">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto" style={{borderColor:'#003262'}}></div>
               </div>
             ) : sessions.length === 0 ? (
               <div className="text-center py-12">
@@ -542,7 +542,7 @@ export default function Sessions() {
                                   {selectedSession && formatDate(new Date(selectedSession.date + 'T12:00:00'))}, {selectedSession?.time_slot}
                                 </p>
                                 <div className="mt-2">
-                                  <span className="inline-block bg-purple-600 text-white text-xs px-3 py-1 rounded">
+                                  <span className="inline-block text-white text-xs px-3 py-1 rounded" style={{background:'#003262'}}>
                                     WILA Mentorship Day
                                   </span>
                                 </div>
@@ -603,7 +603,7 @@ export default function Sessions() {
               <Button
                                     onClick={handleSignup}
                                     disabled={bookSessionMutation.isPending || hasBookedSession || !sessionGoal.trim() || !menteeName.trim() || !menteeLinkedin.trim()}
-                                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3"
+                                    className="w-full text-white font-semibold py-3 hover:opacity-90" style={{background:'#003262'}}
                                   >
                                     <Calendar className="w-4 h-4 mr-2" />
                                     {hasBookedSession ? 'Already Booked a Session Today' : bookSessionMutation.isPending ? 'Booking...' : 'Sign Up'}
