@@ -110,9 +110,9 @@ export default function MentorCard({ mentor, isMentee = false, hasAvailability =
         <div className="flex gap-2 pt-4 border-t border-gray-100">
           {mentor.linkedin_url && (
             <Button
-              variant="outline"
               size="sm"
-              className="h-9 px-3 border-gray-200 hover:border-[#003262] hover:text-[#003262]"
+              className="h-9 px-3 text-white hover:opacity-90"
+              style={{background:'#003262'}}
               onClick={() => window.open(mentor.linkedin_url, '_blank')}
             >
               <Linkedin className="w-4 h-4" />
