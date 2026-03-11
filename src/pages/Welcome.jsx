@@ -11,7 +11,7 @@ export default function Welcome() {
 
   const handleMentorClick = () => {
     localStorage.setItem('intended_user_type', 'mentor');
-    base44.auth.redirectToLogin(createPageUrl('MentorDashboard'));
+    base44.auth.redirectToLogin(window.location.origin + createPageUrl('MentorDashboard'));
   };
 
   return (
