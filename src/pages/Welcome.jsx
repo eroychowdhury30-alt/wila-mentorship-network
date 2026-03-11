@@ -28,25 +28,37 @@ export default function Welcome() {
           <div className="bg-white rounded-2xl p-8 max-w-md w-full shadow-2xl">
             <h3 className="text-2xl font-bold text-gray-900 mb-4">How would you like to find a mentor?</h3>
             <div className="space-y-3">
-              <Button
-                onClick={() => {
-                  setShowMatchingModal(false);
-                  window.location.href = createPageUrl('Home');
-                }}
-                className="w-full h-12 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold rounded-lg"
-              >
-                Smart Matching
-              </Button>
-              <Button
-                onClick={() => {
-                  setShowMatchingModal(false);
-                  window.location.href = createPageUrl('Home');
-                }}
-                variant="outline"
-                className="w-full h-12 text-gray-900 border-2 border-gray-300 hover:bg-gray-50 font-semibold rounded-lg"
-              >
-                Browse All Mentors
-              </Button>
+             <Button
+               onClick={() => {
+                 setShowMatchingModal(false);
+                 localStorage.setItem('intended_user_type', 'mentee');
+                 const isAuth = base44.auth.isAuthenticated();
+                 if (isAuth) {
+                   window.location.href = `${createPageUrl('Home')}?mode=smart`;
+                 } else {
+                   base44.auth.redirectToLogin(window.location.origin + createPageUrl('Home') + '?mode=smart');
+                 }
+               }}
+               className="w-full h-12 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold rounded-lg"
+             >
+               Smart Matching
+             </Button>
+             <Button
+               onClick={() => {
+                 setShowMatchingModal(false);
+                 localStorage.setItem('intended_user_type', 'mentee');
+                 const isAuth = base44.auth.isAuthenticated();
+                 if (isAuth) {
+                   window.location.href = createPageUrl('Home');
+                 } else {
+                   base44.auth.redirectToLogin(window.location.origin + createPageUrl('Home'));
+                 }
+               }}
+               variant="outline"
+               className="w-full h-12 text-gray-900 border-2 border-gray-300 hover:bg-gray-50 font-semibold rounded-lg"
+             >
+               Browse All Mentors
+             </Button>
               <Button
                 onClick={() => setShowMatchingModal(false)}
                 variant="ghost"
