@@ -23,6 +23,42 @@ export default function Welcome() {
 
   return (
     <div className="min-h-screen flex flex-col" style={{background: 'linear-gradient(160deg, #001f3f 0%, #003262 50%, #004080 100%)'}}>
+      {showMatchingModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-8 max-w-md w-full shadow-2xl">
+            <h3 className="text-2xl font-bold text-gray-900 mb-4">How would you like to find a mentor?</h3>
+            <div className="space-y-3">
+              <Button
+                onClick={() => {
+                  setShowMatchingModal(false);
+                  window.location.href = createPageUrl('Home');
+                }}
+                className="w-full h-12 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold rounded-lg"
+              >
+                Smart Matching
+              </Button>
+              <Button
+                onClick={() => {
+                  setShowMatchingModal(false);
+                  window.location.href = createPageUrl('Home');
+                }}
+                variant="outline"
+                className="w-full h-12 text-gray-900 border-2 border-gray-300 hover:bg-gray-50 font-semibold rounded-lg"
+              >
+                Browse All Mentors
+              </Button>
+              <Button
+                onClick={() => setShowMatchingModal(false)}
+                variant="ghost"
+                className="w-full h-10 text-gray-600 hover:bg-gray-100"
+              >
+                Cancel
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Top gold accent bar */}
       <div className="h-1 w-full" style={{background: '#FDB515'}} />
 
