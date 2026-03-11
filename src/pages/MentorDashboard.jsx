@@ -405,8 +405,10 @@ export default function MentorDashboard() {
     );
   }
 
-  const bookedSessions = existingSessions.filter(s => s.is_booked);
-  const availableSessions = existingSessions.filter(s => !s.is_booked);
+  const selectedDateStr = selectedDate.toISOString().split('T')[0];
+  const sessionsForSelectedDate = existingSessions.filter(s => s.date === selectedDateStr);
+  const bookedSessions = sessionsForSelectedDate.filter(s => s.is_booked);
+  const availableSessions = sessionsForSelectedDate.filter(s => !s.is_booked);
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
@@ -689,11 +691,11 @@ export default function MentorDashboard() {
                 <div className="lg:col-span-2 space-y-6">
                   <Card>
                     <CardHeader>
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <CardTitle>Set Your Availability</CardTitle>
-                          <p className="text-sm text-gray-600 mt-1">Choose a date and select time slots</p>
-                        </div>
+                       <div className="flex items-center justify-between">
+                         <div>
+                           <CardTitle>Set Your Availability</CardTitle>
+                           <p className="text-sm text-gray-600 mt-1">Pick any date and select available time slots</p>
+                         </div>
                         <Popover>
                           <PopoverTrigger asChild>
                             <Button variant="outline" className="gap-2">
