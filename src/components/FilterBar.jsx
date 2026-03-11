@@ -11,24 +11,24 @@ import {
 
 export default function FilterBar({ filters, onFilterChange, onClearAll }) {
   return (
-    <div className="bg-white border border-gray-200 rounded-xl p-6 mb-8 shadow-sm">
-      <div className="flex items-center justify-between mb-5">
+    <div className="bg-white border border-gray-100 rounded-2xl p-5 mb-8 shadow-sm">
+      <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <Filter className="w-5 h-5 text-purple-600" />
-          <h3 className="font-semibold text-gray-900">Filter Mentors</h3>
+          <Filter className="w-4 h-4 text-purple-500" />
+          <h3 className="text-sm font-semibold text-gray-700">Filter & Sort</h3>
         </div>
         <Button
           variant="ghost"
           size="sm"
           onClick={onClearAll}
-          className="text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+          className="text-xs text-gray-400 hover:text-gray-700 hover:bg-gray-100 h-7 px-2"
         >
-          <X className="w-4 h-4 mr-1" />
-          Clear All
+          <X className="w-3 h-3 mr-1" />
+          Reset
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
         <div>
           <label className="text-xs font-semibold text-gray-700 mb-2 block uppercase tracking-wide">
             Sort By
