@@ -126,12 +126,12 @@ export default function MentorCard({ mentor, isMentee = false, hasAvailability =
              </Button>
            </Link>
           ) : (
-           <Link to={createPageUrl('Sessions')} className="flex-1">
-             <Button className="flex-1 h-9 text-sm text-white rounded-lg hover:opacity-90" style={{background:'#9CA3AF'}}>
-               <Calendar className="w-3.5 h-3.5 mr-2" />
-               Check Availability
-             </Button>
-           </Link>
+            <Link to={createPageUrl('Sessions')} className="flex-1">
+              <Button className="flex-1 h-9 text-sm text-white rounded-lg hover:opacity-90" style={{background:'#003262'}}>
+                <Calendar className="w-3.5 h-3.5 mr-2" />
+                Check Availability
+              </Button>
+            </Link>
           )}
         </div>
       </div>
