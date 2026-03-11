@@ -70,7 +70,7 @@ export default function FilterBar({ filters, onFilterChange, onClearAll }) {
         </div>
 
         <div>
-          <label className="text-xs font-semibold text-gray-700 mb-2 block uppercase tracking-wide">
+          <label className="text-xs font-medium text-gray-500 mb-1.5 block">
             Area of Expertise
           </label>
           <Select
