@@ -6,10 +6,10 @@ import { Linkedin, Calendar, MapPin, Award } from 'lucide-react';
 
 export default function MentorCard({ mentor, isMentee = false, hasAvailability = true }) {
   const avatarColors = [
-    'from-purple-500 to-purple-700',
-    'from-indigo-500 to-purple-600',
-    'from-violet-500 to-indigo-600',
-    'from-fuchsia-500 to-purple-600',
+    'from-[#003262] to-[#004080]',
+    'from-[#002244] to-[#003262]',
+    'from-[#003262] to-[#005090]',
+    'from-[#001a35] to-[#003262]',
   ];
   const colorIndex = mentor.full_name?.length % avatarColors.length || 0;
   const gradientClass = avatarColors[colorIndex];
@@ -17,7 +17,7 @@ export default function MentorCard({ mentor, isMentee = false, hasAvailability =
   return (
     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 overflow-hidden flex flex-col">
       {/* Top accent bar */}
-      <div className="h-1.5 bg-gradient-to-r from-purple-500 to-purple-700" />
+      <div className="h-1.5" style={{background: 'linear-gradient(to right, #003262, #FDB515)'}} />
 
       <div className="p-6 flex flex-col flex-1">
         {/* Header */}
@@ -37,7 +37,7 @@ export default function MentorCard({ mentor, isMentee = false, hasAvailability =
             <h3 className="text-base font-semibold text-gray-900 leading-tight">
               {mentor.full_name}
             </h3>
-            <p className="text-sm text-purple-600 font-medium mt-0.5 leading-snug">
+            <p className="text-sm font-medium mt-0.5 leading-snug" style={{color:'#003262'}}>
               {mentor.title}
             </p>
             <p className="text-sm text-gray-400 mt-0.5">{mentor.company}</p>
@@ -47,7 +47,7 @@ export default function MentorCard({ mentor, isMentee = false, hasAvailability =
         {/* Experience */}
         {mentor.experience_years && (
           <div className="flex items-center gap-1.5 mb-4">
-            <Award className="w-3.5 h-3.5 text-purple-400" />
+            <Award className="w-3.5 h-3.5" style={{color:'#FDB515'}} />
             <span className="text-xs text-gray-500 font-medium">{mentor.experience_years} experience</span>
           </div>
         )}
@@ -63,7 +63,7 @@ export default function MentorCard({ mentor, isMentee = false, hasAvailability =
             <p className="text-xs font-semibold text-gray-400 mb-2 uppercase tracking-wider">Expertise</p>
             <div className="flex flex-wrap gap-1.5">
               {mentor.expertise.slice(0, 3).map((exp, idx) => (
-                <span key={idx} className="text-xs text-purple-700 bg-purple-50 border border-purple-100 px-2.5 py-1 rounded-full font-medium">
+                <span key={idx} className="text-xs px-2.5 py-1 rounded-full font-medium border" style={{color:'#003262', background:'#EDF2F8', borderColor:'#c5d4e8'}}>
                   {exp}
                 </span>
               ))}
@@ -112,7 +112,7 @@ export default function MentorCard({ mentor, isMentee = false, hasAvailability =
             <Button
               variant="outline"
               size="sm"
-              className="h-9 px-3 border-gray-200 hover:border-purple-300 hover:text-purple-600"
+              className="h-9 px-3 border-gray-200 hover:border-[#003262] hover:text-[#003262]"
               onClick={() => window.open(mentor.linkedin_url, '_blank')}
             >
               <Linkedin className="w-4 h-4" />
@@ -120,7 +120,7 @@ export default function MentorCard({ mentor, isMentee = false, hasAvailability =
           )}
           {hasAvailability ? (
             <Link to={`${createPageUrl('Sessions')}?mentor=${encodeURIComponent(mentor.full_name)}`} className="flex-1">
-              <Button className="w-full h-9 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-lg">
+              <Button className="w-full h-9 text-white text-sm font-medium rounded-lg hover:opacity-90" style={{background:'#003262'}}>
                 <Calendar className="w-3.5 h-3.5 mr-2" />
                 Book Session
               </Button>
