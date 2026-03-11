@@ -351,10 +351,10 @@ export default function MentorDashboard() {
               Your mentor application has been submitted and is awaiting admin approval. 
               You'll receive access to the dashboard once your profile is reviewed.
             </p>
-            <div className="bg-purple-50 p-4 rounded-lg">
-              <p className="text-sm font-medium text-purple-900 mb-2">Your Application:</p>
-              <p className="text-sm text-purple-700">{profileData.full_name}</p>
-              <p className="text-xs text-purple-600">{profileData.title} at {profileData.company}</p>
+            <div className="p-4 rounded-lg" style={{background:'#EDF2F8'}}>
+              <p className="text-sm font-medium mb-2" style={{color:'#003262'}}>Your Application:</p>
+              <p className="text-sm" style={{color:'#003262'}}>{profileData.full_name}</p>
+              <p className="text-xs" style={{color:'#004080'}}>{profileData.title} at {profileData.company}</p>
             </div>
             <Button onClick={() => setIsEditing(true)} variant="outline" className="w-full">
               Edit Application
@@ -619,7 +619,7 @@ export default function MentorDashboard() {
                         <Button
                           onClick={handleSaveProfile}
                           disabled={saveProfileMutation.isPending}
-                          className="bg-purple-600 hover:bg-purple-700"
+                          className="text-white hover:opacity-90" style={{background:'#003262'}}
                         >
                           {saveProfileMutation.isPending ? 'Saving...' : 'Save Profile'}
                         </Button>
@@ -648,7 +648,7 @@ export default function MentorDashboard() {
                     </CardHeader>
                     <CardContent className="space-y-4">
                       <div className="text-center">
-                        <div className="w-20 h-20 mx-auto bg-purple-100 rounded-full flex items-center justify-center text-purple-600 text-2xl font-bold mb-3">
+                        <div className="w-20 h-20 mx-auto rounded-full flex items-center justify-center text-white text-2xl font-bold mb-3" style={{background:'#003262'}}>
                           {profileData.full_name.split(' ').map(n => n[0]).join('')}
                         </div>
                         <h3 className="font-semibold text-lg">{profileData.full_name}</h3>
@@ -734,7 +734,7 @@ export default function MentorDashboard() {
                                 key={slot}
                                 variant={isSelected ? 'default' : 'outline'}
                                 onClick={() => !isAlreadyBooked && toggleTimeSlot(slot)}
-                                className={isSelected ? 'bg-purple-600 hover:bg-purple-700' : ''}
+                                style={isSelected ? {background:'#003262', color:'white'} : {}}
                                 disabled={isAlreadyBooked}
                               >
                                 {slot}
@@ -783,19 +783,19 @@ export default function MentorDashboard() {
                           {bookedSessions.map(session => (
                             <div 
                               key={session.id} 
-                              className="flex items-center gap-3 p-4 bg-purple-50 border border-purple-200 rounded-lg hover:shadow-md transition-shadow cursor-pointer"
+                              className="flex items-center gap-3 p-4 rounded-lg hover:shadow-md transition-shadow cursor-pointer border" style={{background:'#EDF2F8', borderColor:'#c5d4e8'}}
                               onClick={() => handleViewMentee(session)}
                             >
                               <div className="flex-shrink-0">
-                                <div className="w-12 h-12 bg-purple-600 rounded-full flex items-center justify-center text-white font-semibold">
+                                <div className="w-12 h-12 rounded-full flex items-center justify-center text-white font-semibold" style={{background:'#003262'}}>
                                   {session.mentee_name?.split(' ').map(n => n[0]).join('') || 'M'}
                                 </div>
                               </div>
                               <div className="flex-1">
                                 <div className="flex items-center gap-2 mb-1">
-                                  <Clock className="w-4 h-4 text-purple-600" />
+                                  <Clock className="w-4 h-4" style={{color:'#003262'}} />
                                   <span className="font-semibold text-gray-900">{session.time_slot}</span>
-                                  <Badge className="bg-purple-600 text-white text-xs">Booked</Badge>
+                                  <Badge className="text-white text-xs" style={{background:'#003262'}}>Booked</Badge>
                                 </div>
                                 <p className="text-sm text-gray-700 font-medium">{session.mentee_name || 'Mentee Name'}</p>
                                 <p className="text-xs text-gray-500">{session.booked_by}</p>
@@ -899,7 +899,7 @@ export default function MentorDashboard() {
           
           <div className="space-y-6 py-4">
             <div className="text-center">
-              <div className="w-20 h-20 mx-auto bg-purple-100 rounded-full flex items-center justify-center text-purple-600 text-2xl font-bold mb-3">
+              <div className="w-20 h-20 mx-auto rounded-full flex items-center justify-center text-white text-2xl font-bold mb-3" style={{background:'#003262'}}>
                 {selectedMenteeSession?.mentee_name?.split(' ').map(n => n[0]).join('') || 'M'}
               </div>
               <h3 className="text-xl font-semibold text-gray-900">{selectedMenteeSession?.mentee_name}</h3>
@@ -920,9 +920,9 @@ export default function MentorDashboard() {
               )}
             </div>
 
-            <div className="bg-purple-50 p-4 rounded-lg">
+            <div className="p-4 rounded-lg" style={{background:'#EDF2F8'}}>
               <div className="flex items-center gap-2 mb-2">
-                <Clock className="w-5 h-5 text-purple-600" />
+                <Clock className="w-5 h-5" style={{color:'#003262'}} />
                 <span className="font-semibold text-gray-900">Session Details</span>
               </div>
               <p className="text-sm text-gray-700">
