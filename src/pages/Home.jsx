@@ -109,7 +109,7 @@ export default function Home() {
   const handleQuestionnaireSubmit = async (responses) => {
     setIsMatchingLoading(true);
     try {
-      const matched = await base44.functions.invoke('smartMatchMentor', {
+      const response = await base44.functions.invoke('smartMatchMentor', {
         mentee_goals: responses.goals,
         experience_level: responses.experience_level,
         industries: responses.industries,
@@ -118,7 +118,7 @@ export default function Home() {
         mentors: mentors
       });
       
-      setMatchedMentors(matched.matched_mentors || []);
+      setMatchedMentors(response.data?.matched_mentors || []);
       setShowQuestionnaire(false);
       
       // Scroll to results after a brief delay
