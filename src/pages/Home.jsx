@@ -118,7 +118,7 @@ export default function Home() {
         mentors: mentors
       });
       
-      setMatchedMentors(matched.data.matched_mentors || []);
+      setMatchedMentors(matched.matched_mentors || []);
       setShowQuestionnaire(false);
       
       // Scroll to results after a brief delay
