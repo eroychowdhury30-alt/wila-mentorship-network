@@ -75,6 +75,7 @@ export default function MentorDashboard() {
           });
   const [availableSlots, setAvailableSlots] = useState([]);
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const [sessionDuration, setSessionDuration] = useState(30);
   const queryClient = useQueryClient();
 
   useEffect(() => {
@@ -185,10 +186,11 @@ export default function MentorDashboard() {
   });
 
   const saveAvailabilityMutation = useMutation({
-    mutationFn: async (slots) => {
+    mutationFn: async ({ slots, duration }) => {
       const sessionData = slots.map(slot => ({
         mentor_name: profileData.full_name,
         time_slot: slot,
+        duration: duration,
         date: selectedDate.toISOString().split('T')[0],
         is_booked: false
       }));
@@ -278,7 +280,7 @@ export default function MentorDashboard() {
       toast.error('Please select at least one time slot');
       return;
     }
-    saveAvailabilityMutation.mutate(availableSlots);
+    saveAvailabilityMutation.mutate({ slots: availableSlots, duration: sessionDuration });
   };
 
   const handleDeleteSession = (sessionId) => {
@@ -716,6 +718,25 @@ export default function MentorDashboard() {
                     </CardHeader>
                     <CardContent className="space-y-4">
                       <div>
+                        <Label>Session Duration</Label>
+                        <Select
+                          value={sessionDuration.toString()}
+                          onValueChange={(value) => setSessionDuration(parseInt(value))}
+                        >
+                          <SelectTrigger className="mt-2">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="30">30 minutes</SelectItem>
+                            <SelectItem value="60">60 minutes (1 hour)</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <p className="text-xs text-gray-500 mt-1">
+                          Choose the duration for the slots you're about to add
+                        </p>
+                      </div>
+
+                      <div>
                         <Label>Select Time Slots to Add</Label>
                         <div className="grid grid-cols-3 gap-2 mt-3">
                           {TIME_SLOTS.map(slot => {
@@ -741,15 +762,15 @@ export default function MentorDashboard() {
                       </div>
 
                       {availableSlots.length > 0 && (
-                        <Button
-                          onClick={handleSaveAvailability}
-                          disabled={saveAvailabilityMutation.isPending}
-                          className="w-full bg-green-600 hover:bg-green-700"
-                          size="lg"
-                        >
-                          <Plus className="w-4 h-4 mr-2" />
-                          {saveAvailabilityMutation.isPending ? 'Saving...' : `Add ${availableSlots.length} Time Slot${availableSlots.length > 1 ? 's' : ''}`}
-                        </Button>
+                       <Button
+                         onClick={handleSaveAvailability}
+                         disabled={saveAvailabilityMutation.isPending}
+                         className="w-full bg-green-600 hover:bg-green-700"
+                         size="lg"
+                       >
+                         <Plus className="w-4 h-4 mr-2" />
+                         {saveAvailabilityMutation.isPending ? 'Saving...' : `Add ${availableSlots.length} ${sessionDuration}-min Slot${availableSlots.length > 1 ? 's' : ''}`}
+                       </Button>
                       )}
                     </CardContent>
                   </Card>
@@ -861,7 +882,10 @@ export default function MentorDashboard() {
                         <div className="space-y-2">
                           {availableSessions.map(session => (
                             <div key={session.id} className="flex items-center justify-between p-2 bg-gray-50 rounded hover:bg-gray-100 transition">
-                              <span className="text-sm font-medium">{session.time_slot}</span>
+                              <div className="flex items-center gap-2">
+                                <span className="text-sm font-medium">{session.time_slot}</span>
+                                <Badge variant="outline" className="text-xs">{session.duration || 30}min</Badge>
+                              </div>
                               <Button
                                 variant="ghost"
                                 size="icon"
