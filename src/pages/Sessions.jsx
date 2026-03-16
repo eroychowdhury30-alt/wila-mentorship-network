@@ -27,7 +27,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 export default function Sessions() {
   const [selectedSession, setSelectedSession] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(new Date('2025-12-12T12:00:00'));
+  const [selectedDate, setSelectedDate] = useState(new Date('2026-04-17T12:00:00'));
   const [currentUser, setCurrentUser] = useState(null);
   const [selectedMentor, setSelectedMentor] = useState(null);
   const [sessionGoal, setSessionGoal] = useState('');
@@ -468,6 +468,15 @@ export default function Sessions() {
 
             <div className="mb-4 text-sm font-medium text-gray-700 bg-gray-50 p-2 rounded">
               WILA Mentorship Day
+            </div>
+
+            {/* Kick-off banner for 9-10am */}
+            <div className="mb-4 p-3 rounded-lg border-2 border-yellow-300 bg-yellow-50 flex items-center gap-3">
+              <span className="text-2xl">🎉</span>
+              <div>
+                <p className="font-semibold text-yellow-900">9:00 – 10:00 AM · Kick-off & Panel</p>
+                <p className="text-sm text-yellow-700">All-hands opening session — no 1-on-1 mentoring during this hour.</p>
+              </div>
             </div>
 
             {sessionsLoading ? (
