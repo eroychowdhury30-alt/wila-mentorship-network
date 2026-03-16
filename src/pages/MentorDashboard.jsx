@@ -75,7 +75,7 @@ export default function MentorDashboard() {
             status: 'pending'
           });
   const [availableSlots, setAvailableSlots] = useState([]);
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState(new Date('2026-04-17T12:00:00'));
   const [sessionDuration, setSessionDuration] = useState(30);
   const queryClient = useQueryClient();
 
@@ -694,11 +694,11 @@ export default function MentorDashboard() {
                 <div className="lg:col-span-2 space-y-6">
                   <Card>
                     <CardHeader>
-                       <div className="flex items-center justify-between">
-                         <div>
-                           <CardTitle>Set Your Availability</CardTitle>
-                           <p className="text-sm text-gray-600 mt-1">Pick any date and select available time slots</p>
-                         </div>
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <CardTitle>Set Your Availability</CardTitle>
+                          <p className="text-sm text-gray-600 mt-1">Mentorship Day is <strong>April 17th, 2026</strong>. Mentoring slots: 10am–4pm PT.</p>
+                        </div>
                         <Popover>
                           <PopoverTrigger asChild>
                             <Button variant="outline" className="gap-2">
