@@ -455,6 +455,7 @@ export default function Sessions() {
                     mode="single"
                     selected={selectedDate}
                     onSelect={(date) => setSelectedDate(date || new Date())}
+                    defaultMonth={new Date('2026-04-17T12:00:00')}
                   />
                 </PopoverContent>
               </Popover>
