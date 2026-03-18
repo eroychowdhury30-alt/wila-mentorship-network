@@ -40,7 +40,6 @@ export default function Layout({ children }) {
       if (!isAuthenticated) {
         // Not logged in - only redirect to Welcome from protected pages
         setUser(null);
-        setIsLoading(false);
         const protectedPages = ['MentorDashboard', 'AdminDashboard', 'Onboarding', 'MenteeQuestionnaire'];
         if (protectedPages.includes(currentPage)) {
           navigate(createPageUrl('Welcome'), { replace: true });
@@ -206,8 +205,8 @@ export default function Layout({ children }) {
                 </>
               )}
 
-              {/* Show public nav links always */}
-              {!user && (
+              {/* Show public nav links for unauthenticated users */}
+              {!user && !isLoading && (
                 <>
                   <Link to={createPageUrl('Home')}>
                     <Button variant="ghost" className="gap-2 hover:bg-blue-50 hover:text-[#003262]">
