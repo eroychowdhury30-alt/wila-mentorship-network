@@ -28,28 +28,28 @@ export default function Welcome() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col" style={{background: 'linear-gradient(160deg, #001f3f 0%, #003262 50%, #004080 100%)'}}>
+    <div className="min-h-screen flex flex-col" style={{ background: 'linear-gradient(160deg, #001f3f 0%, #003262 50%, #004080 100%)' }}>
       <MatchingModal
         open={showMatchingModal}
         onOpenChange={setShowMatchingModal}
-        onSelectMode={handleMatchingModeSelect}
-      />
+        onSelectMode={handleMatchingModeSelect} />
+      
 
       {/* Top gold accent bar */}
-      <div className="h-1 w-full" style={{background: '#FDB515'}} />
+      <div className="h-1 w-full" style={{ background: '#FDB515' }} />
 
       {/* Header */}
-      <header className="px-8 py-5 flex items-center justify-between max-w-7xl mx-auto w-full">
-        <div className="flex items-center gap-3">
-          <img
-            src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68fd42c0ae0bd67c5e62c6ca/6b67e9115_ScreenShot2025-11-29at60408PM.png"
-            alt="WILA Logo"
-            className="h-10 w-auto"
-          />
-          <span className="text-white font-bold text-xl hidden sm:inline tracking-wide">WILA Mentorship Network</span>
-        </div>
-        <div className="text-sm text-blue-200">UC Berkeley Haas</div>
-      </header>
+      
+
+
+
+
+
+
+
+
+
+      
 
       {/* Hero */}
       <main className="flex-1 flex flex-col items-center justify-center px-6 py-12">
@@ -57,12 +57,12 @@ export default function Welcome() {
 
           {/* Hero text */}
           <div className="text-center mb-16">
-            <div className="inline-block px-4 py-1.5 rounded-full text-sm font-semibold mb-6 tracking-wider uppercase" style={{background: 'rgba(253,181,21,0.15)', color: '#FDB515', border: '1px solid rgba(253,181,21,0.3)'}}>
+            <div className="inline-block px-4 py-1.5 rounded-full text-sm font-semibold mb-6 tracking-wider uppercase" style={{ background: 'rgba(253,181,21,0.15)', color: '#FDB515', border: '1px solid rgba(253,181,21,0.3)' }}>
               Berkeley Haas Community
             </div>
             <h1 className="text-5xl md:text-6xl font-extrabold text-white mb-6 leading-tight">
               Welcome to<br />
-              <span style={{color: '#FDB515'}}>WILA Mentorship</span>
+              <span style={{ color: '#FDB515' }}>WILA Mentorship</span>
             </h1>
             <p className="text-xl text-blue-200 max-w-2xl mx-auto leading-relaxed">
               Connecting Berkeley Haas women in leadership with the next generation of ambitious professionals.
@@ -74,14 +74,14 @@ export default function Welcome() {
             {/* Mentee Card */}
             <div
               className="rounded-2xl overflow-hidden cursor-pointer group transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl"
-              style={{background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.15)', backdropFilter: 'blur(12px)'}}
-              onClick={handleMenteeClick}
-            >
-              <div className="p-1" style={{background: 'linear-gradient(90deg, #003262, #0052a5)'}} />
+              style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.15)', backdropFilter: 'blur(12px)' }}
+              onClick={handleMenteeClick}>
+              
+              <div className="p-1" style={{ background: 'linear-gradient(90deg, #003262, #0052a5)' }} />
               <div className="p-8">
                 <div className="flex items-center gap-4 mb-6">
-                  <div className="w-14 h-14 rounded-xl flex items-center justify-center" style={{background: 'rgba(253,181,21,0.15)'}}>
-                    <Users className="w-7 h-7" style={{color: '#FDB515'}} />
+                  <div className="w-14 h-14 rounded-xl flex items-center justify-center" style={{ background: 'rgba(253,181,21,0.15)' }}>
+                    <Users className="w-7 h-7" style={{ color: '#FDB515' }} />
                   </div>
                   <div>
                     <h2 className="text-2xl font-bold text-white">I'm a Mentee</h2>
@@ -94,20 +94,20 @@ export default function Welcome() {
                 </p>
 
                 <ul className="space-y-3 mb-8">
-                  {['Browse mentor profiles', 'Book 1-on-1 sessions', 'Get career guidance', 'Access mentorship resources'].map(item => (
-                    <li key={item} className="flex items-center gap-3 text-sm text-blue-100">
-                      <CheckCircle className="w-4 h-4 flex-shrink-0" style={{color: '#FDB515'}} />
+                  {['Browse mentor profiles', 'Book 1-on-1 sessions', 'Get career guidance', 'Access mentorship resources'].map((item) =>
+                  <li key={item} className="flex items-center gap-3 text-sm text-blue-100">
+                      <CheckCircle className="w-4 h-4 flex-shrink-0" style={{ color: '#FDB515' }} />
                       {item}
                     </li>
-                  ))}
+                  )}
                 </ul>
 
                 <Button
                   onClick={handleMenteeClick}
                   className="w-full text-white font-semibold py-3 text-base rounded-xl group-hover:opacity-95 transition-all flex items-center justify-center gap-2"
-                  style={{background: 'linear-gradient(135deg, #003262, #0052a5)'}}
-                  size="lg"
-                >
+                  style={{ background: 'linear-gradient(135deg, #003262, #0052a5)' }}
+                  size="lg">
+                  
                   Browse Mentors
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </Button>
@@ -117,14 +117,14 @@ export default function Welcome() {
             {/* Mentor Card */}
             <div
               className="rounded-2xl overflow-hidden cursor-pointer group transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl"
-              style={{background: 'rgba(253,181,21,0.06)', border: '1px solid rgba(253,181,21,0.25)', backdropFilter: 'blur(12px)'}}
-              onClick={handleMentorClick}
-            >
-              <div className="p-1" style={{background: 'linear-gradient(90deg, #FDB515, #e8a510)'}} />
+              style={{ background: 'rgba(253,181,21,0.06)', border: '1px solid rgba(253,181,21,0.25)', backdropFilter: 'blur(12px)' }}
+              onClick={handleMentorClick}>
+              
+              <div className="p-1" style={{ background: 'linear-gradient(90deg, #FDB515, #e8a510)' }} />
               <div className="p-8">
                 <div className="flex items-center gap-4 mb-6">
-                  <div className="w-14 h-14 rounded-xl flex items-center justify-center" style={{background: 'rgba(253,181,21,0.15)'}}>
-                    <UserCheck className="w-7 h-7" style={{color: '#FDB515'}} />
+                  <div className="w-14 h-14 rounded-xl flex items-center justify-center" style={{ background: 'rgba(253,181,21,0.15)' }}>
+                    <UserCheck className="w-7 h-7" style={{ color: '#FDB515' }} />
                   </div>
                   <div>
                     <h2 className="text-2xl font-bold text-white">I'm a Mentor</h2>
@@ -137,20 +137,20 @@ export default function Welcome() {
                 </p>
 
                 <ul className="space-y-3 mb-8">
-                  {['Create your mentor profile', 'Set your availability', 'Share your expertise', 'Make a difference'].map(item => (
-                    <li key={item} className="flex items-center gap-3 text-sm text-blue-100">
-                      <CheckCircle className="w-4 h-4 flex-shrink-0" style={{color: '#FDB515'}} />
+                  {['Create your mentor profile', 'Set your availability', 'Share your expertise', 'Make a difference'].map((item) =>
+                  <li key={item} className="flex items-center gap-3 text-sm text-blue-100">
+                      <CheckCircle className="w-4 h-4 flex-shrink-0" style={{ color: '#FDB515' }} />
                       {item}
                     </li>
-                  ))}
+                  )}
                 </ul>
 
                 <Button
                   onClick={handleMentorClick}
                   className="w-full font-semibold py-3 text-base rounded-xl transition-all flex items-center justify-center gap-2 hover:opacity-90"
-                  style={{background: '#FDB515', color: '#003262'}}
-                  size="lg"
-                >
+                  style={{ background: '#FDB515', color: '#003262' }}
+                  size="lg">
+                  
                   Sign Up / Sign In
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </Button>
@@ -166,7 +166,7 @@ export default function Welcome() {
       </footer>
 
       {/* Bottom gold accent bar */}
-      <div className="h-1 w-full" style={{background: '#FDB515'}} />
-    </div>
-  );
+      <div className="h-1 w-full" style={{ background: '#FDB515' }} />
+    </div>);
+
 }
