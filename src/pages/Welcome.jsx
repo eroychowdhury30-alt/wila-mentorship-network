@@ -23,12 +23,7 @@ export default function Welcome() {
   };
 
   const handleMatchingModeSelect = async (mode) => {
-    localStorage.setItem('intended_user_type', 'mentee');
-    const isAuth = await base44.auth.isAuthenticated();
-    if (!isAuth) {
-      base44.auth.redirectToLogin(window.location.origin + createPageUrl('Home'));
-      return;
-    }
+    // Mentees can browse without logging in — login only required to book
     window.location.href = createPageUrl('Home');
   };
 
