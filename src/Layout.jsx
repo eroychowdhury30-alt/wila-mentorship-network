@@ -47,7 +47,6 @@ export default function Layout({ children }) {
         }
         setIsLoading(false);
         return;
-        return;
       }
       
       const currentUser = await base44.auth.me();
@@ -135,8 +134,9 @@ export default function Layout({ children }) {
     return <div className="min-h-screen">{children}</div>;
   }
 
-  // Show minimal loading for protected pages
-  if (isLoading) {
+  // For public pages, don't block rendering while auth loads
+  const publicPages = ['Home', 'Sessions'];
+  if (isLoading && !publicPages.includes(currentPage)) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2" style={{borderColor:'#003262'}}></div>
