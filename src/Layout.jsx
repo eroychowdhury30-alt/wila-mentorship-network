@@ -26,7 +26,7 @@ export default function Layout({ children }) {
 
   const loadUser = async () => {
     const currentPage = location.pathname.split('/').pop() || 'Welcome';
-    const publicPages = ['Welcome', 'Home', 'Sessions']; // Public pages that don't require login
+    const publicPages = ['Welcome', 'Home', 'Sessions', '']; // Public pages that don't require login
     
     // If on root path with no page, redirect to Welcome
     if (!currentPage || currentPage === '' || location.pathname === '/') {
@@ -45,6 +45,8 @@ export default function Layout({ children }) {
         if (protectedPages.includes(currentPage)) {
           navigate(createPageUrl('Welcome'), { replace: true });
         }
+        setIsLoading(false);
+        return;
         return;
       }
       
