@@ -206,6 +206,32 @@ export default function Layout({ children }) {
                 </>
               )}
 
+              {/* Show public nav links always */}
+              {!user && (
+                <>
+                  <Link to={createPageUrl('Home')}>
+                    <Button variant="ghost" className="gap-2 hover:bg-blue-50 hover:text-[#003262]">
+                      <Users className="w-4 h-4" />
+                      <span className="hidden md:inline">Mentors</span>
+                    </Button>
+                  </Link>
+                  <Link to={createPageUrl('Sessions')}>
+                    <Button variant="ghost" className="gap-2 hover:bg-blue-50 hover:text-[#003262]">
+                      <Calendar className="w-4 h-4" />
+                      <span className="hidden md:inline">Sessions</span>
+                    </Button>
+                  </Link>
+                  <Button
+                    onClick={() => base44.auth.redirectToLogin(window.location.href)}
+                    className="text-white hover:opacity-90 ml-2"
+                    style={{background:'#003262'}}
+                    size="sm"
+                  >
+                    Sign In
+                  </Button>
+                </>
+              )}
+
               {user && (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
