@@ -741,7 +741,7 @@ export default function MentorDashboard() {
                         <Label>Select Time Slots to Add</Label>
                         <div className="grid grid-cols-3 gap-2 mt-3">
                           {TIME_SLOTS.map(slot => {
-                            const isAlreadyBooked = existingSessions.some(s => s.time_slot === slot);
+                            const isAlreadyBooked = sessionsForSelectedDate.some(s => s.time_slot === slot);
                             const isSelected = availableSlots.includes(slot);
                             return (
                               <Button
