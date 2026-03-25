@@ -50,7 +50,7 @@ const MENTEE_OPTIONS = [
   'Highschool Students'
 ];
 
-const TIME_SLOTS = ['10am-11am', '11am-12pm', '12pm-1pm', '1pm-2pm', '2pm-3pm', '3pm-4pm'];
+const TIME_SLOTS = ['10am-10:30am', '10:30am-11am', '11am-11:30am', '11:30am-12pm', '12pm-12:30pm', '12:30pm-1pm', '1pm-1:30pm', '1:30pm-2pm', '2pm-2:30pm', '2:30pm-3pm', '3pm-3:30pm', '3:30pm-4pm'];
 const MENTORSHIP_DATE = '2026-04-17';
 
 export default function MentorDashboard() {
