@@ -354,8 +354,23 @@ export default function Sessions() {
   const timeSlots = ['9am-10am', '10am-10:30am', '10:30am-11am', '11am-11:30am', '11:30am-12pm', '12pm-12:30pm', '12:30pm-1pm', '1pm-1:30pm', '1:30pm-2pm', '2pm-2:30pm', '2:30pm-3pm', '3pm-3:30pm', '3:30pm-4pm'];
   const KICK_OFF_SLOT = '9am-10am';
   
+  // Maps old 1-hr slots to their 30-min sub-slots
+  const OLD_SLOT_MAP = {
+    '10am-11am': ['10am-10:30am', '10:30am-11am'],
+    '11am-12pm': ['11am-11:30am', '11:30am-12pm'],
+    '12pm-1pm': ['12pm-12:30pm', '12:30pm-1pm'],
+    '1pm-2pm': ['1pm-1:30pm', '1:30pm-2pm'],
+    '2pm-3pm': ['2pm-2:30pm', '2:30pm-3pm'],
+    '3pm-4pm': ['3pm-3:30pm', '3:30pm-4pm'],
+  };
+
   const getSessionsForTimeSlot = (time) => {
-    return sessions.filter(s => s.time_slot === time);
+    return sessions.filter(s => {
+      if (s.time_slot === time) return true;
+      // Check if this old 1-hr slot maps to this 30-min slot
+      const mapped = OLD_SLOT_MAP[s.time_slot];
+      return mapped && mapped.includes(time);
+    });
   };
 
   const formatDate = (date) => {

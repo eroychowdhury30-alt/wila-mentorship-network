@@ -431,6 +431,15 @@ export default function MentorDashboard() {
   const bookedSessions = sessionsForSelectedDate.filter(s => s.is_booked);
   const availableSessions = sessionsForSelectedDate.filter(s => !s.is_booked);
 
+  // Expand old 1-hr sessions into two 30-min display entries
+  const availableDisplaySlots = availableSessions.flatMap(session => {
+    const mapped = OLD_SLOT_MAP[session.time_slot];
+    if (mapped) {
+      return mapped.map(slot => ({ ...session, display_slot: slot }));
+    }
+    return [{ ...session, display_slot: session.time_slot }];
+  });
+
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-6xl mx-auto">
@@ -885,11 +894,11 @@ export default function MentorDashboard() {
                       </CardHeader>
                       <CardContent>
                         <div className="space-y-2">
-                          {availableSessions.map(session => (
-                            <div key={session.id} className="flex items-center justify-between p-2 bg-gray-50 rounded hover:bg-gray-100 transition">
+                          {availableDisplaySlots.map((session, idx) => (
+                            <div key={`${session.id}-${idx}`} className="flex items-center justify-between p-2 bg-gray-50 rounded hover:bg-gray-100 transition">
                               <div className="flex items-center gap-2">
-                                <span className="text-sm font-medium">{session.time_slot}</span>
-                                <Badge variant="outline" className="text-xs">{session.duration || 30}min</Badge>
+                                <span className="text-sm font-medium">{session.display_slot}</span>
+                                <Badge variant="outline" className="text-xs">30min</Badge>
                               </div>
                               <Button
                                 variant="ghost"
