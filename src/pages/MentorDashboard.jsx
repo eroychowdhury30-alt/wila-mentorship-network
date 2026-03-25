@@ -51,6 +51,24 @@ const MENTEE_OPTIONS = [
 ];
 
 const TIME_SLOTS = ['10am-10:30am', '10:30am-11am', '11am-11:30am', '11:30am-12pm', '12pm-12:30pm', '12:30pm-1pm', '1pm-1:30pm', '1:30pm-2pm', '2pm-2:30pm', '2:30pm-3pm', '3pm-3:30pm', '3:30pm-4pm'];
+
+// Maps old 1-hour slots to the two 30-min slots they cover
+const OLD_SLOT_MAP = {
+  '10am-11am': ['10am-10:30am', '10:30am-11am'],
+  '11am-12pm': ['11am-11:30am', '11:30am-12pm'],
+  '12pm-1pm': ['12pm-12:30pm', '12:30pm-1pm'],
+  '1pm-2pm': ['1pm-1:30pm', '1:30pm-2pm'],
+  '2pm-3pm': ['2pm-2:30pm', '2:30pm-3pm'],
+  '3pm-4pm': ['3pm-3:30pm', '3:30pm-4pm'],
+};
+
+const isSlotCovered = (slot, sessions) => {
+  return sessions.some(s => {
+    if (s.time_slot === slot) return true;
+    const mapped = OLD_SLOT_MAP[s.time_slot];
+    return mapped && mapped.includes(slot);
+  });
+};
 const MENTORSHIP_DATE = '2026-04-17';
 
 export default function MentorDashboard() {
@@ -727,7 +745,7 @@ export default function MentorDashboard() {
                         <Label>Select Time Slots to Add</Label>
                         <div className="grid grid-cols-3 gap-2 mt-3">
                           {TIME_SLOTS.map(slot => {
-                            const isAlreadyBooked = sessionsForSelectedDate.some(s => s.time_slot === slot);
+                            const isAlreadyBooked = isSlotCovered(slot, sessionsForSelectedDate);
                             const isSelected = availableSlots.includes(slot);
                             return (
                               <Button
