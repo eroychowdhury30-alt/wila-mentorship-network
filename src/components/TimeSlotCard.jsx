@@ -3,17 +3,17 @@ import { Button } from '@/components/ui/button';
 
 export default function TimeSlotCard({ session, displaySlot, onClick, disabled = false }) {
   const isDisabled = session.is_booked || disabled;
-  const duration = session.duration || 30;
-  
+
   return (
     <Button
       onClick={onClick}
       disabled={isDisabled}
-      className="w-full text-white text-xs px-2 py-1.5 h-auto rounded justify-start font-normal disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-90"
-      style={isDisabled ? {} : {background: '#003262'}}
+      className="text-white text-sm px-4 py-2 h-auto rounded-lg font-medium disabled:opacity-40 disabled:cursor-not-allowed hover:opacity-90 shadow-sm"
+      style={isDisabled ? {background: '#9ca3af'} : {background: '#003262'}}
     >
-      <span className="truncate">
-        {displaySlot || session.time_slot} {session.mentor_name} ({duration}min)
+      <span>
+        {session.mentor_name}
+        {session.is_booked ? ' · Booked' : ''}
       </span>
     </Button>
   );

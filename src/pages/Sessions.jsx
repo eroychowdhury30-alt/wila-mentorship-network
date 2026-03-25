@@ -510,56 +510,45 @@ export default function Sessions() {
                 </p>
                 <p className="text-sm text-gray-400 mt-1">Please select a different date</p>
                 {selectedMentor && (
-                  <Button
-                    variant="outline"
-                    className="mt-4"
-                    onClick={handleClearFilter}
-                  >
+                  <Button variant="outline" className="mt-4" onClick={handleClearFilter}>
                     <ArrowLeft className="w-4 h-4 mr-2" />
                     View All Mentors
                   </Button>
                 )}
               </div>
             ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full border-collapse">
-                  <thead>
-                    <tr className="border-b border-gray-200">
-                      <th className="text-left p-2 text-sm font-medium text-gray-700 bg-gray-50"></th>
-                      {timeSlots.map(time => (
-                        <th key={time} className="text-center p-2 text-sm font-medium text-gray-700 bg-gray-50 min-w-[140px]">
-                          {time}
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td className="p-2"></td>
-                      {timeSlots.map(time => (
-                        <td key={time} className="p-2 align-top">
-                          <div className="space-y-1">
-                            {getSessionsForTimeSlot(time).map(session => (
-                              <TimeSlotCard
-                                key={`${session.id}-${time}`}
-                                session={session}
-                                displaySlot={session.display_slot}
-                                onClick={() => handleSessionClick(session)}
-                                disabled={hasBookedSession}
-                              />
-                            ))}
-                          </div>
-                        </td>
-                      ))}
-                    </tr>
-                  </tbody>
-                </table>
+              <div className="space-y-2">
+                {timeSlots.filter(time => time !== KICK_OFF_SLOT).map(time => {
+                  const slotSessions = getSessionsForTimeSlot(time);
+                  return (
+                    <div key={time} className="flex items-start gap-3 py-2 border-b border-gray-100 last:border-0">
+                      <div className="w-28 flex-shrink-0 pt-1">
+                        <span className="text-sm font-semibold text-gray-700">{time}</span>
+                      </div>
+                      <div className="flex flex-wrap gap-2 flex-1">
+                        {slotSessions.length === 0 ? (
+                          <span className="text-sm text-gray-300 italic">No sessions</span>
+                        ) : (
+                          slotSessions.map(session => (
+                            <TimeSlotCard
+                              key={`${session.id}-${time}`}
+                              session={session}
+                              displaySlot={session.display_slot}
+                              onClick={() => handleSessionClick(session)}
+                              disabled={hasBookedSession}
+                            />
+                          ))
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             )}
 
-            <div className="mt-6 text-right text-sm text-gray-500">
-                                <span className="text-blue-600">Pacific Time (US)</span>
-                              </div>
+            <div className="mt-4 text-right text-sm text-gray-500">
+              <span className="text-blue-600">Pacific Time (US)</span>
+            </div>
           </div>
         </div>
       </div>
