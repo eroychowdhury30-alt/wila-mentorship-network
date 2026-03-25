@@ -365,12 +365,13 @@ export default function Sessions() {
   };
 
   const getSessionsForTimeSlot = (time) => {
-    return sessions.filter(s => {
-      if (s.time_slot === time) return true;
-      // Check if this old 1-hr slot maps to this 30-min slot
-      const mapped = OLD_SLOT_MAP[s.time_slot];
-      return mapped && mapped.includes(time);
-    });
+    return sessions
+      .filter(s => {
+        if (s.time_slot === time) return true;
+        const mapped = OLD_SLOT_MAP[s.time_slot];
+        return mapped && mapped.includes(time);
+      })
+      .map(s => ({ ...s, display_slot: time }));
   };
 
   const formatDate = (date) => {
@@ -540,8 +541,9 @@ export default function Sessions() {
                           <div className="space-y-1">
                             {getSessionsForTimeSlot(time).map(session => (
                               <TimeSlotCard
-                                key={session.id}
+                                key={`${session.id}-${time}`}
                                 session={session}
+                                displaySlot={session.display_slot}
                                 onClick={() => handleSessionClick(session)}
                                 disabled={hasBookedSession}
                               />

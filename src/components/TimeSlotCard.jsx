@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 
-export default function TimeSlotCard({ session, onClick, disabled = false }) {
+export default function TimeSlotCard({ session, displaySlot, onClick, disabled = false }) {
   const isDisabled = session.is_booked || disabled;
   const duration = session.duration || 30;
   
@@ -13,7 +13,7 @@ export default function TimeSlotCard({ session, onClick, disabled = false }) {
       style={isDisabled ? {} : {background: '#003262'}}
     >
       <span className="truncate">
-        {session.time_slot} {session.mentor_name} ({duration}min)
+        {displaySlot || session.time_slot} {session.mentor_name} ({duration}min)
       </span>
     </Button>
   );
