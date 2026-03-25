@@ -76,7 +76,7 @@ export default function MentorDashboard() {
           });
   const [availableSlots, setAvailableSlots] = useState([]);
   const [selectedDate, setSelectedDate] = useState(new Date('2026-04-17T12:00:00'));
-  const [sessionDuration, setSessionDuration] = useState(30);
+  const sessionDuration = 30;
   const queryClient = useQueryClient();
 
   useEffect(() => {
@@ -718,23 +718,9 @@ export default function MentorDashboard() {
                       </div>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                      <div>
-                        <Label>Session Duration</Label>
-                        <Select
-                          value={sessionDuration.toString()}
-                          onValueChange={(value) => setSessionDuration(parseInt(value))}
-                        >
-                          <SelectTrigger className="mt-2">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="30">30 minutes</SelectItem>
-                            <SelectItem value="60">60 minutes (1 hour)</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <p className="text-xs text-gray-500 mt-1">
-                          Choose the duration for the slots you're about to add
-                        </p>
+                      <div className="p-3 rounded-lg bg-blue-50 border border-blue-200">
+                        <p className="text-sm font-medium text-blue-900">Session Duration: <span className="font-bold">30 minutes</span></p>
+                        <p className="text-xs text-blue-600 mt-1">All sessions are 30 minutes</p>
                       </div>
 
                       <div>
