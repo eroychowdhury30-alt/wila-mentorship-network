@@ -67,7 +67,7 @@ export default function AdminDashboard() {
     queryKey: ['all-admins'],
     queryFn: async () => {
       const users = await base44.entities.User.list();
-      return users.filter(u => u.role === 'admin' || u.role === 'superadmin');
+      return users.filter(u => ['admin', 'superadmin', 'moderator'].includes(u.role));
     },
     enabled: !!user,
   });
@@ -808,8 +808,8 @@ export default function AdminDashboard() {
                                   <p className="font-medium">{admin.full_name}</p>
                                   <p className="text-sm text-gray-600">{admin.email}</p>
                                 </div>
-                                <Badge className={admin.role === 'superadmin' ? 'bg-amber-600 text-white' : 'bg-purple-600 text-white'}>
-                                  {admin.role === 'superadmin' ? '👑 SuperAdmin' : 'Admin'}
+                                <Badge className={admin.role === 'superadmin' ? 'bg-amber-600 text-white' : admin.role === 'moderator' ? 'bg-blue-600 text-white' : 'bg-purple-600 text-white'}>
+                                 {admin.role === 'superadmin' ? '👑 SuperAdmin' : admin.role === 'moderator' ? '🛡 Moderator' : 'Admin'}
                                 </Badge>
                               </div>
                               {admin.id !== user?.id && admin.role !== 'superadmin' && (
@@ -840,7 +840,7 @@ export default function AdminDashboard() {
                     <div className="border-t pt-6">
                       <h3 className="text-lg font-semibold mb-4">Make User an Admin</h3>
                       <div className="space-y-3">
-                        {allUsers.filter(u => u.role === 'user').map((user) => (
+                        {allUsers.filter(u => !['admin', 'superadmin', 'moderator'].includes(u.role)).map((user) => (
                           <div key={user.id} className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50">
                                   <div>
                                     <p className="font-medium">{user.full_name}</p>
@@ -890,7 +890,7 @@ export default function AdminDashboard() {
                                   </div>
                                 </div>
                         ))}
-                        {allUsers.filter(u => u.role === 'user').length === 0 && (
+                        {allUsers.filter(u => !['admin', 'superadmin', 'moderator'].includes(u.role)).length === 0 && (
                           <p className="text-center text-gray-500 py-4">All users are already admins</p>
                         )}
                       </div>
