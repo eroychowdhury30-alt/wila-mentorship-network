@@ -162,11 +162,19 @@ export default function Layout({ children }) {
             </Link>
 
             <div className="flex items-center gap-2">
-              {(user?.role === 'admin' || user?.role === 'superadmin' || user?.role === 'moderator') && (
+              {(user?.role === 'admin' || user?.role === 'superadmin') && (
                 <Link to={createPageUrl('AdminDashboard')}>
                   <Button variant="ghost" className="gap-2 hover:bg-blue-50" style={{}} onMouseEnter={e=>e.currentTarget.style.color='#003262'} onMouseLeave={e=>e.currentTarget.style.color=''}>
                     <Shield className="w-4 h-4" />
                     <span className="hidden md:inline">Admin</span>
+                  </Button>
+                </Link>
+              )}
+              {user?.role === 'moderator' && (
+                <Link to={createPageUrl('ModeratorDashboard')}>
+                  <Button variant="ghost" className="gap-2 hover:bg-blue-50" style={{}} onMouseEnter={e=>e.currentTarget.style.color='#003262'} onMouseLeave={e=>e.currentTarget.style.color=''}>
+                    <Shield className="w-4 h-4" />
+                    <span className="hidden md:inline">Moderator</span>
                   </Button>
                 </Link>
               )}
