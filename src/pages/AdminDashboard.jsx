@@ -6,7 +6,13 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Shield, Users, UserCheck, UserX, Clock, CheckCircle, XCircle, Trash2, Pause, Play, Calendar, ExternalLink, Crown } from 'lucide-react';
+import { Shield, Users, UserCheck, UserX, Clock, CheckCircle, XCircle, Trash2, Pause, Play, Calendar, ExternalLink, Crown, Lock } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
@@ -14,6 +20,10 @@ import { createPageUrl } from '@/utils';
 export default function AdminDashboard() {
   const [user, setUser] = useState(null);
   const [editingMentor, setEditingMentor] = useState(null);
+  const [promoteDialog, setPromoteDialog] = useState(null); // { userId, role, name }
+  const [promotePassword, setPromotePassword] = useState('');
+  const [promoteError, setPromoteError] = useState('');
+  const [promoteLoading, setPromoteLoading] = useState(false);
   const [editMentorData, setEditMentorData] = useState(null);
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -138,6 +148,38 @@ export default function AdminDashboard() {
       toast.success('Admin privileges removed');
     },
   });
+
+  const handlePromoteClick = (userId, role, name) => {
+    setPromoteDialog({ userId, role, name });
+    setPromotePassword('');
+    setPromoteError('');
+  };
+
+  const handlePromoteConfirm = async () => {
+    if (!promoteDialog) return;
+    setPromoteLoading(true);
+    setPromoteError('');
+    try {
+      const res = await base44.functions.invoke('promoteUser', {
+        userId: promoteDialog.userId,
+        role: promoteDialog.role,
+        password: promotePassword,
+      });
+      if (res.data?.success) {
+        queryClient.invalidateQueries(['all-users']);
+        queryClient.invalidateQueries(['all-admins']);
+        const label = promoteDialog.role === 'superadmin' ? 'SuperAdmin' : promoteDialog.role === 'moderator' ? 'Moderator' : 'Admin';
+        toast.success(`User promoted to ${label}`);
+        setPromoteDialog(null);
+      } else {
+        setPromoteError('Promotion failed');
+      }
+    } catch (err) {
+      setPromoteError(err?.response?.data?.error || 'Incorrect password');
+    } finally {
+      setPromoteLoading(false);
+    }
+  };
 
   const makeAdminMutation = useMutation({
     mutationFn: ({ userId, role }) => base44.entities.User.update(userId, { role }),
@@ -848,41 +890,26 @@ export default function AdminDashboard() {
                                   </div>
                                   <div className="flex gap-2">
                                     <Button
-                                      onClick={() => {
-                                        if (confirm(`Make ${user.full_name} a Moderator (limited admin)?`)) {
-                                          makeAdminMutation.mutate({ userId: user.id, role: 'moderator' });
-                                        }
-                                      }}
+                                      onClick={() => handlePromoteClick(user.id, 'moderator', user.full_name)}
                                       variant="outline"
                                       size="sm"
                                       className="text-blue-600 border-blue-300 hover:bg-blue-50"
-                                      disabled={makeAdminMutation.isPending}
                                     >
                                       <Shield className="w-4 h-4 mr-1" />
                                       Moderator
                                     </Button>
                                     <Button
-                                      onClick={() => {
-                                        if (confirm(`Make ${user.full_name} an Admin?`)) {
-                                          makeAdminMutation.mutate({ userId: user.id, role: 'admin' });
-                                        }
-                                      }}
+                                      onClick={() => handlePromoteClick(user.id, 'admin', user.full_name)}
                                       className="bg-purple-600 hover:bg-purple-700"
                                       size="sm"
-                                      disabled={makeAdminMutation.isPending}
                                     >
                                       <Shield className="w-4 h-4 mr-1" />
                                       Admin
                                     </Button>
                                     <Button
-                                      onClick={() => {
-                                        if (confirm(`Make ${user.full_name} a SuperAdmin? This grants full platform control.`)) {
-                                          makeAdminMutation.mutate({ userId: user.id, role: 'superadmin' });
-                                        }
-                                      }}
+                                      onClick={() => handlePromoteClick(user.id, 'superadmin', user.full_name)}
                                       className="bg-amber-600 hover:bg-amber-700"
                                       size="sm"
-                                      disabled={makeAdminMutation.isPending}
                                     >
                                       <Crown className="w-4 h-4 mr-1" />
                                       SuperAdmin
@@ -901,7 +928,43 @@ export default function AdminDashboard() {
             </TabsContent>
           )}
           </Tabs>
+      </div>
+
+      {/* Promote Password Dialog */}
+      <Dialog open={!!promoteDialog} onOpenChange={(open) => !open && setPromoteDialog(null)}>
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Lock className="w-5 h-5 text-amber-600" />
+              Confirm Promotion
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <p className="text-sm text-gray-600">
+              Promoting <strong>{promoteDialog?.name}</strong> to <strong>{promoteDialog?.role}</strong>. Enter the promotion password to continue.
+            </p>
+            <Input
+              type="password"
+              placeholder="Enter promotion password"
+              value={promotePassword}
+              onChange={(e) => setPromotePassword(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handlePromoteConfirm()}
+              autoFocus
+            />
+            {promoteError && <p className="text-sm text-red-600">{promoteError}</p>}
+            <div className="flex gap-2 justify-end">
+              <Button variant="outline" onClick={() => setPromoteDialog(null)}>Cancel</Button>
+              <Button
+                onClick={handlePromoteConfirm}
+                disabled={promoteLoading || !promotePassword}
+                className="bg-amber-600 hover:bg-amber-700"
+              >
+                {promoteLoading ? 'Verifying...' : 'Confirm'}
+              </Button>
+            </div>
           </div>
-          </div>
-          );
-          }
+        </DialogContent>
+      </Dialog>
+    </div>
+    );
+    }
