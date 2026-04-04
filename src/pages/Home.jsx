@@ -20,7 +20,8 @@ export default function Home() {
     sortBy: 'firstName',
     experience: 'all',
     expertise: 'all',
-    mentees: 'all'
+    mentees: 'all',
+    availability: 'all'
   });
   const navigate = useNavigate();
 
@@ -49,7 +50,7 @@ export default function Home() {
   const { data: sessions = [] } = useQuery({
     queryKey: ['sessions-availability'],
     queryFn: async () => {
-      return base44.entities.Session.filter({ date: '2025-12-12', is_booked: false });
+      return base44.entities.Session.filter({ date: '2026-04-17', is_booked: false });
     },
   });
 
@@ -65,7 +66,8 @@ export default function Home() {
       sortBy: 'firstName',
       experience: 'all',
       expertise: 'all',
-      mentees: 'all'
+      mentees: 'all',
+      availability: 'all'
     });
   };
 
@@ -77,6 +79,9 @@ export default function Home() {
       return false;
     }
     if (filters.mentees !== 'all' && !mentor.mentors_to?.includes(filters.mentees)) {
+      return false;
+    }
+    if (filters.availability === 'available' && !mentorsWithAvailability.has(mentor.full_name)) {
       return false;
     }
     return true;

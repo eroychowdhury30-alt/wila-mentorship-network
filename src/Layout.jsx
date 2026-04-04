@@ -202,6 +202,12 @@ export default function Layout({ children }) {
                       <span className="hidden md:inline">Mentors</span>
                     </Button>
                   </Link>
+                  <Link to={createPageUrl('Sessions')}>
+                    <Button variant="ghost" className="gap-2 hover:bg-blue-50 hover:text-[#003262]">
+                      <Calendar className="w-4 h-4" />
+                      <span className="hidden md:inline">Sessions</span>
+                    </Button>
+                  </Link>
                 </>
               )}
 

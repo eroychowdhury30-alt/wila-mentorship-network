@@ -9,6 +9,11 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 
+const AVAILABILITY_OPTIONS = [
+  { value: 'all', label: 'All Mentors' },
+  { value: 'available', label: 'Available Only' },
+];
+
 export default function FilterBar({ filters, onFilterChange, onClearAll }) {
   return (
     <div className="bg-white border border-gray-100 rounded-2xl p-5 mb-8 shadow-sm">
@@ -28,7 +33,7 @@ export default function FilterBar({ filters, onFilterChange, onClearAll }) {
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
         <div>
           <label className="text-xs font-medium text-gray-500 mb-1.5 block">
             Sort By
@@ -108,6 +113,25 @@ export default function FilterBar({ filters, onFilterChange, onClearAll }) {
               <SelectItem value="Mid-career leaders">Mid-career leaders</SelectItem>
               <SelectItem value="Entrepreneurs/Founders">Entrepreneurs/Founders</SelectItem>
               <SelectItem value="College/Graduate Students">College/Graduate Students</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div>
+          <label className="text-xs font-medium text-gray-500 mb-1.5 block">
+            Availability
+          </label>
+          <Select
+            value={filters.availability || 'all'}
+            onValueChange={(value) => onFilterChange('availability', value)}
+          >
+            <SelectTrigger className="h-10">
+              <SelectValue placeholder="All Mentors" />
+            </SelectTrigger>
+            <SelectContent>
+              {AVAILABILITY_OPTIONS.map(opt => (
+                <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
