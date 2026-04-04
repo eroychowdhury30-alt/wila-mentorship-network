@@ -107,7 +107,7 @@ export default function Sessions() {
   const bookedSession = activeBookedSessions[0];
 
   const bookSessionMutation = useMutation({
-            mutationFn: async ({ sessionId, goal, name, linkedin }) => {
+            mutationFn: async ({ sessionId, goal, name, linkedin, displaySlot }) => {
               const user = await base44.auth.me();
 
               // Double-check user hasn't already booked for this date
@@ -167,7 +167,7 @@ export default function Sessions() {
                                     mentor_email: mentorEmailAddress,
                                     mentee_email: menteeEmailAddress,
                                     session_date: sessionDate,
-                                    session_time: updatedSession.time_slot,
+                                    session_time: displaySlot || updatedSession.time_slot,
                                     meeting_link: meetingLink,
                                     mentee_response: updatedSession.session_goal || '',
                                     mentee_linkedin: linkedin || '',
@@ -189,7 +189,7 @@ export default function Sessions() {
                                     mentor_email: mentorEmailAddress || '',
                                     mentee_email: menteeEmailAddress,
                                     session_date: sessionDate,
-                                    session_time: updatedSession.time_slot,
+                                    session_time: displaySlot || updatedSession.time_slot,
                                     meeting_link: meetingLink,
                                     mentee_response: goal || '',
                                     mentee_linkedin: linkedin || '',
@@ -341,7 +341,8 @@ export default function Sessions() {
                 sessionId: selectedSession.id, 
                 goal: sessionGoal,
                 name: menteeName,
-                linkedin: menteeLinkedin
+                linkedin: menteeLinkedin,
+                displaySlot: selectedSession.display_slot || selectedSession.time_slot
               });
             }
           };
