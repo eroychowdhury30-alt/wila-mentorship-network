@@ -25,7 +25,7 @@ export default function AdminDashboard() {
   const checkAdmin = async () => {
     try {
       const currentUser = await base44.auth.me();
-      if (currentUser.role !== 'admin' && currentUser.role !== 'superadmin') {
+      if (!['admin', 'superadmin', 'moderator'].includes(currentUser.role)) {
         toast.error('Access denied - Admin only');
         navigate(createPageUrl('Home'));
         return;
@@ -140,11 +140,12 @@ export default function AdminDashboard() {
   });
 
   const makeAdminMutation = useMutation({
-    mutationFn: (userId) => base44.entities.User.update(userId, { role: 'admin' }),
-    onSuccess: () => {
+    mutationFn: ({ userId, role }) => base44.entities.User.update(userId, { role }),
+    onSuccess: (_, { role }) => {
       queryClient.invalidateQueries(['all-users']);
       queryClient.invalidateQueries(['all-admins']);
-      toast.success('User promoted to admin');
+      const label = role === 'superadmin' ? 'SuperAdmin' : role === 'moderator' ? 'Moderator' : 'Admin';
+      toast.success(`User promoted to ${label}`);
     },
   });
 
@@ -171,8 +172,10 @@ export default function AdminDashboard() {
   });
 
   const canRemoveAdmin = user?.role === 'superadmin';
+  const isModerator = user?.role === 'moderator';
+  const isSuperAdmin = user?.role === 'superadmin';
 
-  if (!user || (user.role !== 'admin' && user.role !== 'superadmin')) {
+  if (!user || !['admin', 'superadmin', 'moderator'].includes(user.role)) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
@@ -190,10 +193,15 @@ export default function AdminDashboard() {
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">
-            {user?.role === 'superadmin' ? (
+            {isSuperAdmin ? (
               <>
                 <Crown className="w-8 h-8 text-amber-500" />
                 <h1 className="text-3xl font-bold text-gray-900">SuperAdmin Dashboard</h1>
+              </>
+            ) : isModerator ? (
+              <>
+                <Shield className="w-8 h-8 text-blue-500" />
+                <h1 className="text-3xl font-bold text-gray-900">Moderator Dashboard</h1>
               </>
             ) : (
               <>
@@ -203,7 +211,7 @@ export default function AdminDashboard() {
             )}
           </div>
           <p className="text-gray-600">
-            {user?.role === 'superadmin' ? 'Full platform control' : 'Manage mentors, mentees, and platform operations'}
+            {isSuperAdmin ? 'Full platform control' : isModerator ? 'Review mentor applications and view platform data' : 'Manage mentors, mentees, and platform operations'}
           </p>
         </div>
 
@@ -412,6 +420,7 @@ export default function AdminDashboard() {
                             <p className="text-sm text-gray-600">{mentor.title} at {mentor.company}</p>
                           </div>
                         </div>
+                        {!isModerator && (
                         <div className="flex gap-2">
                           <Button
                             onClick={() => {
@@ -440,6 +449,7 @@ export default function AdminDashboard() {
                             Remove
                           </Button>
                         </div>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -707,23 +717,25 @@ export default function AdminDashboard() {
                     <div className="space-y-2">
                       {menteeUsers.map((mentee) => (
                         <div key={mentee.id} className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50">
-                          <div>
-                            <p className="font-medium">{mentee.full_name}</p>
-                            <p className="text-sm text-gray-600">{mentee.email}</p>
-                          </div>
-                          <Button
-                            onClick={() => {
-                              if (confirm(`Remove ${mentee.full_name} from the platform?`)) {
-                                deleteUserMutation.mutate(mentee.id);
-                              }
-                            }}
-                            variant="ghost"
-                            size="sm"
-                            className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                          >
-                            <UserX className="w-4 h-4 mr-2" />
-                            Remove
-                          </Button>
+                         <div>
+                           <p className="font-medium">{mentee.full_name}</p>
+                           <p className="text-sm text-gray-600">{mentee.email}</p>
+                         </div>
+                         {!isModerator && (
+                         <Button
+                           onClick={() => {
+                             if (confirm(`Remove ${mentee.full_name} from the platform?`)) {
+                               deleteUserMutation.mutate(mentee.id);
+                             }
+                           }}
+                           variant="ghost"
+                           size="sm"
+                           className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                         >
+                           <UserX className="w-4 h-4 mr-2" />
+                           Remove
+                         </Button>
+                         )}
                         </div>
                       ))}
                     </div>
@@ -830,24 +842,53 @@ export default function AdminDashboard() {
                       <div className="space-y-3">
                         {allUsers.filter(u => u.role === 'user').map((user) => (
                           <div key={user.id} className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50">
-                            <div>
-                              <p className="font-medium">{user.full_name}</p>
-                              <p className="text-sm text-gray-600">{user.email}</p>
-                            </div>
-                            <Button
-                              onClick={() => {
-                                if (confirm(`Make ${user.full_name} an admin?`)) {
-                                  makeAdminMutation.mutate(user.id);
-                                }
-                              }}
-                              className="bg-green-600 hover:bg-green-700"
-                              size="sm"
-                              disabled={makeAdminMutation.isPending}
-                            >
-                              <Shield className="w-4 h-4 mr-2" />
-                              Make Admin
-                            </Button>
-                          </div>
+                                  <div>
+                                    <p className="font-medium">{user.full_name}</p>
+                                    <p className="text-sm text-gray-600">{user.email}</p>
+                                  </div>
+                                  <div className="flex gap-2">
+                                    <Button
+                                      onClick={() => {
+                                        if (confirm(`Make ${user.full_name} a Moderator (limited admin)?`)) {
+                                          makeAdminMutation.mutate({ userId: user.id, role: 'moderator' });
+                                        }
+                                      }}
+                                      variant="outline"
+                                      size="sm"
+                                      className="text-blue-600 border-blue-300 hover:bg-blue-50"
+                                      disabled={makeAdminMutation.isPending}
+                                    >
+                                      <Shield className="w-4 h-4 mr-1" />
+                                      Moderator
+                                    </Button>
+                                    <Button
+                                      onClick={() => {
+                                        if (confirm(`Make ${user.full_name} an Admin?`)) {
+                                          makeAdminMutation.mutate({ userId: user.id, role: 'admin' });
+                                        }
+                                      }}
+                                      className="bg-purple-600 hover:bg-purple-700"
+                                      size="sm"
+                                      disabled={makeAdminMutation.isPending}
+                                    >
+                                      <Shield className="w-4 h-4 mr-1" />
+                                      Admin
+                                    </Button>
+                                    <Button
+                                      onClick={() => {
+                                        if (confirm(`Make ${user.full_name} a SuperAdmin? This grants full platform control.`)) {
+                                          makeAdminMutation.mutate({ userId: user.id, role: 'superadmin' });
+                                        }
+                                      }}
+                                      className="bg-amber-600 hover:bg-amber-700"
+                                      size="sm"
+                                      disabled={makeAdminMutation.isPending}
+                                    >
+                                      <Crown className="w-4 h-4 mr-1" />
+                                      SuperAdmin
+                                    </Button>
+                                  </div>
+                                </div>
                         ))}
                         {allUsers.filter(u => u.role === 'user').length === 0 && (
                           <p className="text-center text-gray-500 py-4">All users are already admins</p>

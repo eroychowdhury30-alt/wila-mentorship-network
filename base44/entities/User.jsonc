@@ -1,0 +1,29 @@
+{
+  "name": "User",
+  "type": "object",
+  "properties": {
+    "role": {
+      "type": "string",
+      "enum": [
+        "user",
+        "moderator",
+        "admin",
+        "superadmin"
+      ],
+      "default": "user",
+      "description": "User role: user, moderator (limited admin), admin, or superadmin"
+    },
+    "user_type": {
+      "type": "string",
+      "enum": [
+        "mentor",
+        "mentee"
+      ],
+      "description": "Whether the user is a mentor or mentee"
+    },
+    "onboarding_completed": {
+      "type": "boolean",
+      "default": false
+    }
+  }
+}
