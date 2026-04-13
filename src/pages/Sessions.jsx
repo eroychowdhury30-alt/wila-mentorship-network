@@ -103,21 +103,35 @@ export default function Sessions() {
   });
 
   const activeBookedSessions = userBookedSessions.filter(s => s.status === 'scheduled' || !s.status);
-  const hasBookedSession = activeBookedSessions.length > 0;
+  const hasReachedLimit = activeBookedSessions.length >= 2;
   const bookedSession = activeBookedSessions[0];
 
   const bookSessionMutation = useMutation({
             mutationFn: async ({ sessionId, goal, name, linkedin, displaySlot }) => {
               const user = await base44.auth.me();
 
-              // Double-check user hasn't already booked for this date
+              // Double-check user hasn't already hit the 2-session limit for this date
               const existingBookings = await base44.entities.Session.filter({
                 booked_by: user.email,
                 date: selectedDate.toISOString().split('T')[0]
               });
               const activeBookings = existingBookings.filter(s => s.status !== 'cancelled');
-              if (activeBookings.length > 0) {
-                throw new Error('You have already booked a session for this date');
+              if (activeBookings.length >= 2) {
+                throw new Error('You have already booked 2 sessions for this date');
+              }
+
+              // Check for time conflict with existing bookings
+              const sessionToBook = await base44.entities.Session.filter({ id: sessionId });
+              const newSlot = sessionToBook[0]?.time_slot;
+              const hasTimeConflict = activeBookings.some(s => s.time_slot === newSlot);
+              if (hasTimeConflict) {
+                throw new Error('You already have a session booked at this time slot');
+              }
+
+              // Double-check the session itself hasn't been booked by someone else
+              const freshSession = await base44.entities.Session.filter({ id: sessionId });
+              if (freshSession[0]?.is_booked) {
+                throw new Error('Sorry, this session was just booked by someone else');
               }
 
               // Update the session
@@ -305,8 +319,16 @@ export default function Sessions() {
       return;
     }
     
-    if (hasBookedSession) {
-      toast.error('You have already booked a session for this date. You can only book one 30-minute session per day.');
+    if (hasReachedLimit) {
+      toast.error('You have already booked 2 sessions for this date. That is the maximum allowed.');
+      return;
+    }
+
+    // Check for time conflict with already-booked sessions
+    const newSlot = session.time_slot;
+    const hasTimeConflict = activeBookedSessions.some(s => s.time_slot === newSlot);
+    if (hasTimeConflict) {
+      toast.error('You already have a session booked at this time slot. Please choose a different time.');
       return;
     }
     
@@ -316,8 +338,8 @@ export default function Sessions() {
   };
 
   const handleSignup = () => {
-            if (hasBookedSession) {
-              toast.error('You have already booked a session for this date.');
+            if (hasReachedLimit) {
+              toast.error('You have already booked 2 sessions for this date.');
               return;
             }
 
@@ -428,27 +450,35 @@ export default function Sessions() {
                               )}
           </div>
 
-          {/* Already Booked Alert with Cancel Option */}
-          {hasBookedSession && bookedSession && (
+          {/* Already Booked Alert with Cancel Options */}
+          {activeBookedSessions.length > 0 && (
             <Alert className="mb-6 border-green-200 bg-green-50">
               <AlertCircle className="h-4 w-4 text-green-600" />
-              <AlertTitle className="text-green-900">Session Already Booked!</AlertTitle>
+              <AlertTitle className="text-green-900">
+                {activeBookedSessions.length === 2 ? 'Maximum Sessions Booked (2/2)' : `Session Booked (${activeBookedSessions.length}/2)`}
+              </AlertTitle>
               <AlertDescription className="text-green-800">
-                <div className="flex items-center justify-between">
-                  <span>
-                    You have booked a session with <strong>{bookedSession.mentor_name}</strong> at{' '}
-                    <strong>{bookedSession.time_slot}</strong> on {formatDate(selectedDate)}.
-                  </span>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleCancelSession(bookedSession)}
-                    disabled={cancelSessionMutation.isPending}
-                    className="ml-4 text-red-600 border-red-300 hover:bg-red-50"
-                  >
-                    <XCircle className="w-4 h-4 mr-1" />
-                    {cancelSessionMutation.isPending ? 'Cancelling...' : 'Cancel Session'}
-                  </Button>
+                <div className="space-y-2 mt-1">
+                  {activeBookedSessions.map((s) => (
+                    <div key={s.id} className="flex items-center justify-between">
+                      <span>
+                        <strong>{s.mentor_name}</strong> at <strong>{s.time_slot}</strong>
+                      </span>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleCancelSession(s)}
+                        disabled={cancelSessionMutation.isPending}
+                        className="ml-4 text-red-600 border-red-300 hover:bg-red-50"
+                      >
+                        <XCircle className="w-4 h-4 mr-1" />
+                        Cancel
+                      </Button>
+                    </div>
+                  ))}
+                  {activeBookedSessions.length < 2 && (
+                    <p className="text-sm text-green-700 mt-1">You can still book 1 more session with a different mentor at a different time.</p>
+                  )}
                 </div>
               </AlertDescription>
             </Alert>
@@ -536,7 +566,7 @@ export default function Sessions() {
                               session={session}
                               displaySlot={session.display_slot}
                               onClick={() => handleSessionClick(session)}
-                              disabled={hasBookedSession}
+                              disabled={hasReachedLimit}
                             />
                           ))
                         )}
@@ -619,11 +649,11 @@ export default function Sessions() {
                               </p>
                             </div>
 
-            {hasBookedSession && (
+            {hasReachedLimit && (
               <Alert className="border-red-200 bg-red-50">
                 <AlertCircle className="h-4 w-4 text-red-600" />
                 <AlertDescription className="text-red-800">
-                  You have already booked a session for this date. You can only book one session per day.
+                  You have already booked 2 sessions for this date. That is the maximum allowed.
                 </AlertDescription>
               </Alert>
             )}
@@ -631,11 +661,11 @@ export default function Sessions() {
             <div className="space-y-3 pt-4">
               <Button
                                     onClick={handleSignup}
-                                    disabled={bookSessionMutation.isPending || hasBookedSession || !sessionGoal.trim() || !menteeName.trim() || !menteeLinkedin.trim()}
+                                    disabled={bookSessionMutation.isPending || hasReachedLimit || !sessionGoal.trim() || !menteeName.trim() || !menteeLinkedin.trim()}
                                     className="w-full text-white font-semibold py-3 hover:opacity-90" style={{background:'#003262'}}
                                   >
                                     <Calendar className="w-4 h-4 mr-2" />
-                                    {hasBookedSession ? 'Already Booked a Session Today' : bookSessionMutation.isPending ? 'Booking...' : 'Sign Up'}
+                                    {hasReachedLimit ? 'Maximum Sessions Reached (2/2)' : bookSessionMutation.isPending ? 'Booking...' : 'Sign Up'}
                                   </Button>
             </div>
           </div>
