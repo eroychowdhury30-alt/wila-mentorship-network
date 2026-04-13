@@ -225,10 +225,18 @@ export default function AdminDashboard() {
     );
   }
 
-  const menteeUsers = allUsers.filter(u => u.user_type === 'mentee');
-  const mentorUsers = allUsers.filter(u => u.user_type === 'mentor');
   const bookedSessions = allSessions.filter(s => s.is_booked);
   const activeMentors = approvedMentors.length;
+
+  // Derive unique mentees from booked sessions (source of truth)
+  const menteeMap = {};
+  bookedSessions.forEach(s => {
+    if (s.booked_by && !menteeMap[s.booked_by]) {
+      menteeMap[s.booked_by] = { email: s.booked_by, name: s.mentee_name || s.booked_by };
+    }
+  });
+  const menteeUsers = Object.values(menteeMap);
+  const mentorUsers = allUsers.filter(u => u.user_type === 'mentor');
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
@@ -304,7 +312,7 @@ export default function AdminDashboard() {
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold text-blue-600">{menteeUsers.length}</div>
-              <p className="text-xs text-gray-500 mt-1">Registered mentees</p>
+              <p className="text-xs text-gray-500 mt-1">Unique mentees booked</p>
             </CardContent>
           </Card>
 
@@ -759,38 +767,23 @@ export default function AdminDashboard() {
             <div className="space-y-6">
               <Card>
                 <CardHeader>
-                  <CardTitle>Mentees ({menteeUsers.length})</CardTitle>
+                 <CardTitle>Mentees ({menteeUsers.length})</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  {menteeUsers.length === 0 ? (
-                    <p className="text-center text-gray-500 py-8">No mentees registered</p>
-                  ) : (
-                    <div className="space-y-2">
-                      {menteeUsers.map((mentee) => (
-                        <div key={mentee.id} className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50">
-                         <div>
-                           <p className="font-medium">{mentee.full_name}</p>
-                           <p className="text-sm text-gray-600">{mentee.email}</p>
-                         </div>
-                         {!isModerator && (
-                         <Button
-                           onClick={() => {
-                             if (confirm(`Remove ${mentee.full_name} from the platform?`)) {
-                               deleteUserMutation.mutate(mentee.id);
-                             }
-                           }}
-                           variant="ghost"
-                           size="sm"
-                           className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                         >
-                           <UserX className="w-4 h-4 mr-2" />
-                           Remove
-                         </Button>
-                         )}
+                 {menteeUsers.length === 0 ? (
+                   <p className="text-center text-gray-500 py-8">No mentees have booked sessions yet</p>
+                 ) : (
+                   <div className="space-y-2">
+                     {menteeUsers.map((mentee) => (
+                       <div key={mentee.email} className="flex items-center p-3 border rounded-lg hover:bg-gray-50">
+                        <div>
+                          <p className="font-medium">{mentee.name}</p>
+                          <p className="text-sm text-gray-600">{mentee.email}</p>
                         </div>
-                      ))}
-                    </div>
-                  )}
+                       </div>
+                     ))}
+                   </div>
+                 )}
                 </CardContent>
               </Card>
 
@@ -938,7 +931,6 @@ export default function AdminDashboard() {
           )}
           </Tabs>
       </div>
-      </div>
 
       {/* Promote Password Dialog */}
       <Dialog open={!!promoteDialog} onOpenChange={(open) => !open && setPromoteDialog(null)}>
@@ -975,5 +967,6 @@ export default function AdminDashboard() {
           </div>
         </DialogContent>
       </Dialog>
+    </div>
   );
 }
