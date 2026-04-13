@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Shield, Users, UserCheck, UserX, Clock, CheckCircle, XCircle, Trash2, Pause, Play, Calendar, ExternalLink, Crown, Lock } from 'lucide-react';
+import { Shield, Users, UserCheck, UserX, Clock, CheckCircle, XCircle, Trash2, Pause, Play, Calendar, ExternalLink, Crown, Lock, Download } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -14,7 +14,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { toast } from 'sonner';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 
 export default function AdminDashboard() {
@@ -234,7 +234,8 @@ export default function AdminDashboard() {
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">
-          <div className="flex items-center gap-3 mb-2">
+          <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-3">
             {isSuperAdmin ? (
               <>
                 <Crown className="w-8 h-8 text-amber-500" />
@@ -251,6 +252,14 @@ export default function AdminDashboard() {
                 <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
               </>
             )}
+          </div>
+          </div>
+            <Link to={createPageUrl('MenteeExport')}>
+              <Button variant="outline" className="gap-2" style={{borderColor:'#003262', color:'#003262'}}>
+                <Download className="w-4 h-4" />
+                Export Mentee List
+              </Button>
+            </Link>
           </div>
           <p className="text-gray-600">
             {isSuperAdmin ? 'Full platform control' : isModerator ? 'Review mentor applications and view platform data' : 'Manage mentors, mentees, and platform operations'}
@@ -929,6 +938,7 @@ export default function AdminDashboard() {
           )}
           </Tabs>
       </div>
+      </div>
 
       {/* Promote Password Dialog */}
       <Dialog open={!!promoteDialog} onOpenChange={(open) => !open && setPromoteDialog(null)}>
@@ -965,6 +975,5 @@ export default function AdminDashboard() {
           </div>
         </DialogContent>
       </Dialog>
-    </div>
   );
 }
