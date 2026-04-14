@@ -77,7 +77,8 @@ Deno.serve(async (req) => {
                     meeting_link: meeting_link || '',
                     mentee_response: mentee_response || '',
                     mentee_reason: mentee_response || '',
-                    mentee_linkedin: mentee_linkedin || ''
+                    mentee_linkedin: mentee_linkedin || '',
+                    duration: '30 minutes'
                 }
             })
         });
