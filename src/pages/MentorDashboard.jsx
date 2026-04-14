@@ -552,7 +552,6 @@ export default function MentorDashboard() {
                                                 <Label htmlFor="linkedin_url">LinkedIn URL</Label>
                                                 <Input
                                                   id="linkedin_url"
-                                                  type="url"
                                                   placeholder="https://linkedin.com/in/yourprofile"
                                                   value={profileData.linkedin_url}
                                                   onChange={(e) => setProfileData({ ...profileData, linkedin_url: e.target.value })}
@@ -564,7 +563,6 @@ export default function MentorDashboard() {
                                                 <Label htmlFor="meeting_link">Meeting Link for Online Sessions *</Label>
                                                 <Input
                                                   id="meeting_link"
-                                                  type="url"
                                                   placeholder="https://zoom.us/j/... or https://meet.google.com/..."
                                                   value={profileData.meeting_link}
                                                   onChange={(e) => setProfileData({ ...profileData, meeting_link: e.target.value })}
@@ -577,7 +575,6 @@ export default function MentorDashboard() {
                                                 <Label htmlFor="photo_url">Photo URL (optional)</Label>
                                                 <Input
                                                   id="photo_url"
-                                                  type="url"
                                                   placeholder="https://example.com/your-photo.jpg"
                                                   value={profileData.photo_url}
                                                   onChange={(e) => setProfileData({ ...profileData, photo_url: e.target.value })}
