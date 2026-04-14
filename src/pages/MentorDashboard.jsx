@@ -63,7 +63,7 @@ const OLD_SLOT_MAP = {
 };
 
 const isSlotCovered = (slot, sessions) => {
-  return sessions.some(s => {
+  return sessions.filter(s => s.status !== 'cancelled').some(s => {
     if (s.time_slot === slot) return true;
     const mapped = OLD_SLOT_MAP[s.time_slot];
     return mapped && mapped.includes(slot);
@@ -956,9 +956,10 @@ export default function MentorDashboard() {
                 <span className="font-semibold text-gray-900">Session Details</span>
               </div>
               <p className="text-sm text-gray-700">
-                {selectedMenteeSession && formatDate(new Date(selectedMenteeSession.date))}
+                {selectedMenteeSession && formatDate(new Date(selectedMenteeSession.date + 'T12:00:00'))}
               </p>
               <p className="text-sm text-gray-700">Time: {selectedMenteeSession?.time_slot}</p>
+              <p className="text-sm text-gray-700">Duration: 30 minutes</p>
             </div>
 
             {selectedMenteeSession?.session_goal && (
