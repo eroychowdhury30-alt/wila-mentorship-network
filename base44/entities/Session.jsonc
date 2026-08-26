@@ -1,0 +1,72 @@
+{
+  "name": "Session",
+  "type": "object",
+  "properties": {
+    "mentor_name": {
+      "type": "string",
+      "description": "Name of the mentor"
+    },
+    "mentor_email": {
+      "type": "string",
+      "description": "Email of the mentor"
+    },
+    "meeting_link": {
+      "type": "string",
+      "description": "Meeting link for the session"
+    },
+    "time_slot": {
+      "type": "string",
+      "description": "Time slot (e.g., 9am, 10am, 1pm)"
+    },
+    "duration": {
+      "type": "number",
+      "enum": [
+        30,
+        60
+      ],
+      "default": 30,
+      "description": "Session duration in minutes (30 or 60)"
+    },
+    "date": {
+      "type": "string",
+      "format": "date",
+      "description": "Session date"
+    },
+    "is_booked": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether the session is booked"
+    },
+    "booked_by": {
+      "type": "string",
+      "description": "Email of user who booked"
+    },
+    "mentee_name": {
+      "type": "string",
+      "description": "Name of the mentee who booked"
+    },
+    "mentee_linkedin": {
+      "type": "string",
+      "description": "LinkedIn profile of the mentee"
+    },
+    "session_goal": {
+      "type": "string",
+      "description": "What the mentee is looking for from this session"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "scheduled",
+        "cancelled",
+        "completed"
+      ],
+      "default": "scheduled",
+      "description": "Status of the session"
+    }
+  },
+  "required": [
+    "mentor_name",
+    "time_slot",
+    "date"
+  ]
+}

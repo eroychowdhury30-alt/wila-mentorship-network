@@ -1,0 +1,81 @@
+{
+  "name": "Mentor",
+  "type": "object",
+  "properties": {
+    "full_name": {
+      "type": "string",
+      "description": "Mentor's full name"
+    },
+    "email": {
+      "type": "string",
+      "description": "Mentor's email address for notifications"
+    },
+    "title": {
+      "type": "string",
+      "description": "Job title"
+    },
+    "company": {
+      "type": "string",
+      "description": "Current company"
+    },
+    "photo_url": {
+      "type": "string",
+      "description": "Profile photo URL"
+    },
+    "meeting_link": {
+      "type": "string",
+      "description": "Meeting link for hosting online sessions (Zoom, Google Meet, etc.)"
+    },
+    "linkedin_url": {
+      "type": "string",
+      "description": "LinkedIn profile URL"
+    },
+    "experience_years": {
+      "type": "string",
+      "description": "Years of experience range"
+    },
+    "expertise": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Areas of expertise"
+    },
+    "mentors_to": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Target mentee groups"
+    },
+    "bio": {
+      "type": "string",
+      "description": "Short bio"
+    },
+    "initials": {
+      "type": "string",
+      "description": "Initials for avatar"
+    },
+    "avatar_color": {
+      "type": "string",
+      "description": "Color for avatar background"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "approved",
+        "rejected",
+        "paused"
+      ],
+      "default": "pending",
+      "description": "Approval status: pending, approved, rejected, or paused"
+    }
+  },
+  "required": [
+    "full_name",
+    "title",
+    "company",
+    "meeting_link"
+  ]
+}
