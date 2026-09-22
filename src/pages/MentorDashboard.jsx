@@ -69,7 +69,7 @@ const isSlotCovered = (slot, sessions) => {
     return mapped && mapped.includes(slot);
   });
 };
-const MENTORSHIP_DATE = '2026-04-17';
+const MENTORSHIP_DATE = '2026-10-30';
 
 export default function MentorDashboard() {
   const [user, setUser] = useState(null);
@@ -93,7 +93,7 @@ export default function MentorDashboard() {
             status: 'pending'
           });
   const [availableSlots, setAvailableSlots] = useState([]);
-  const [selectedDate, setSelectedDate] = useState(new Date('2026-04-17T12:00:00'));
+  const [selectedDate, setSelectedDate] = useState(new Date('2026-10-30T12:00:00'));
   const sessionDuration = 30;
   const queryClient = useQueryClient();
 
@@ -721,7 +721,7 @@ export default function MentorDashboard() {
                       <div className="flex items-center justify-between">
                         <div>
                           <CardTitle>Set Your Availability</CardTitle>
-                          <p className="text-sm text-gray-600 mt-1">Mentorship Day is <strong>April 17th, 2026</strong>. Mentoring slots: 10am–4pm PT.</p>
+                          <p className="text-sm text-gray-600 mt-1">Mentorship Day is <strong>October 30th, 2026</strong>. Mentoring slots: 10am–4pm PT.</p>
                         </div>
                         <Popover>
                           <PopoverTrigger asChild>

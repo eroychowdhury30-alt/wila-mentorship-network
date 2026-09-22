@@ -27,7 +27,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 export default function Sessions() {
   const [selectedSession, setSelectedSession] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(new Date('2026-04-17T12:00:00'));
+  const [selectedDate, setSelectedDate] = useState(new Date('2026-10-30T12:00:00'));
   const [currentUser, setCurrentUser] = useState(null);
   const [selectedMentor, setSelectedMentor] = useState(null);
   const [sessionGoal, setSessionGoal] = useState('');
@@ -50,8 +50,8 @@ export default function Sessions() {
       if (pendingSessionId) {
         localStorage.removeItem('pending_session_id');
         // Fetch the session and open modal
-        const allSessions = await base44.entities.Session.filter({ date: '2025-12-13' });
-        const pendingSession = allSessions.find(s => s.id === pendingSessionId);
+        const allSessions = await base44.entities.Session.filter({ id: pendingSessionId });
+        const pendingSession = allSessions[0];
         if (pendingSession && !pendingSession.is_booked) {
           setSelectedSession(pendingSession);
           setShowModal(true);
@@ -502,7 +502,7 @@ export default function Sessions() {
                     mode="single"
                     selected={selectedDate}
                     onSelect={(date) => setSelectedDate(date || new Date())}
-                    defaultMonth={new Date('2026-04-17T12:00:00')}
+                    defaultMonth={new Date('2026-10-30T12:00:00')}
                   />
                 </PopoverContent>
               </Popover>
