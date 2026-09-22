@@ -4,17 +4,15 @@ import { createPageUrl } from '@/utils';
 import { Button } from '@/components/ui/button';
 import { Linkedin, Calendar, MapPin, Award, X } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import MentorAvatar from '@/components/MentorAvatar';
 
 export default function MentorCard({ mentor, isMentee = false, hasAvailability = true }) {
   const [showProfile, setShowProfile] = useState(false);
-  const avatarColors = [
-    'from-[#003262] to-[#004080]',
-    'from-[#002244] to-[#003262]',
-    'from-[#003262] to-[#005090]',
-    'from-[#001a35] to-[#003262]',
-  ];
-  const colorIndex = mentor.full_name?.length % avatarColors.length || 0;
-  const gradientClass = avatarColors[colorIndex];
+
+  const openLinkedIn = () => {
+    const url = mentor.linkedin_url?.startsWith('http') ? mentor.linkedin_url : `https://${mentor.linkedin_url}`;
+    window.open(url, '_blank');
+  };
 
   return (
     <><div className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 overflow-hidden flex flex-col">
@@ -24,17 +22,7 @@ export default function MentorCard({ mentor, isMentee = false, hasAvailability =
       <div className="p-6 flex flex-col flex-1">
         {/* Header */}
         <div className="flex items-start gap-4 mb-5">
-          {mentor.photo_url ? (
-            <img
-              src={mentor.photo_url}
-              alt={mentor.full_name}
-              className="w-16 h-16 rounded-xl object-cover shadow-sm flex-shrink-0"
-            />
-          ) : (
-            <div className={`w-16 h-16 rounded-xl bg-gradient-to-br ${gradientClass} flex items-center justify-center text-white text-xl font-bold shadow-sm flex-shrink-0`}>
-              {mentor.initials || mentor.full_name?.split(' ').map(n => n[0]).join('').slice(0, 2)}
-            </div>
-          )}
+          <MentorAvatar mentor={mentor} />
           <div className="flex-1 min-w-0">
             <h3 className="text-base font-semibold text-gray-900 leading-tight">
               {mentor.full_name}
@@ -120,7 +108,7 @@ export default function MentorCard({ mentor, isMentee = false, hasAvailability =
               size="sm"
               className="h-9 px-3 text-white hover:opacity-90"
               style={{background:'#003262'}}
-              onClick={() => window.open(mentor.linkedin_url, '_blank')}
+              onClick={openLinkedIn}
             >
               <Linkedin className="w-4 h-4" />
             </Button>
@@ -153,13 +141,7 @@ export default function MentorCard({ mentor, isMentee = false, hasAvailability =
           </DialogHeader>
           <div className="space-y-4 py-2">
             <div className="flex items-start gap-4">
-              {mentor.photo_url ? (
-                <img src={mentor.photo_url} alt={mentor.full_name} className="w-20 h-20 rounded-xl object-cover shadow-sm flex-shrink-0" />
-              ) : (
-                <div className={`w-20 h-20 rounded-xl bg-gradient-to-br ${gradientClass} flex items-center justify-center text-white text-2xl font-bold flex-shrink-0`}>
-                  {mentor.initials || mentor.full_name?.split(' ').map(n => n[0]).join('').slice(0, 2)}
-                </div>
-              )}
+              <MentorAvatar mentor={mentor} sizeClass="w-20 h-20" textClass="text-2xl" />
               <div>
                 <h3 className="text-lg font-semibold text-gray-900">{mentor.full_name}</h3>
                 <p className="text-sm font-medium" style={{color:'#003262'}}>{mentor.title}</p>
@@ -205,7 +187,7 @@ export default function MentorCard({ mentor, isMentee = false, hasAvailability =
 
             <div className="flex gap-2 pt-2 border-t border-gray-100">
               {mentor.linkedin_url && (
-                <Button size="sm" className="text-white hover:opacity-90" style={{background:'#003262'}} onClick={() => window.open(mentor.linkedin_url, '_blank')}>
+                <Button size="sm" className="text-white hover:opacity-90" style={{background:'#003262'}} onClick={openLinkedIn}>
                   <Linkedin className="w-4 h-4 mr-2" /> LinkedIn
                 </Button>
               )}

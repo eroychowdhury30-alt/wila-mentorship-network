@@ -50,7 +50,9 @@ export default function Home() {
   const { data: sessions = [] } = useQuery({
     queryKey: ['sessions-availability'],
     queryFn: async () => {
-      return base44.entities.Session.filter({ date: '2026-04-17', is_booked: false });
+      const today = new Date().toISOString().split('T')[0];
+      const all = await base44.entities.Session.list();
+      return all.filter(s => s.date >= today && !s.is_booked && s.status !== 'cancelled');
     },
   });
 
