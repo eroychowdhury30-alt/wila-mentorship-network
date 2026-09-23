@@ -88,11 +88,24 @@ export default function AdminDashboard() {
   });
 
   const approveMentorMutation = useMutation({
-    mutationFn: (mentorId) => base44.entities.Mentor.update(mentorId, { status: 'approved' }),
+    mutationFn: async (mentorId) => {
+      const mentor = await base44.entities.Mentor.get(mentorId);
+      await base44.entities.Mentor.update(mentorId, { status: 'approved' });
+      // Send approval email - don't block approval if email fails
+      try {
+        await base44.functions.invoke('sendMentorApprovalEmail', {
+          to: mentor.email,
+          full_name: mentor.full_name
+        });
+      } catch (e) {
+        console.error('Failed to send approval email:', e);
+        toast.error('Mentor approved, but the approval email failed to send');
+      }
+    },
     onSuccess: () => {
       queryClient.invalidateQueries(['pending-mentors']);
       queryClient.invalidateQueries(['approved-mentors']);
-      toast.success('Mentor approved!');
+      toast.success('Mentor approved! Approval email sent.');
     },
   });
 
