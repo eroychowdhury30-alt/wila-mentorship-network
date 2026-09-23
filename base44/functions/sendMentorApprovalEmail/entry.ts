@@ -37,6 +37,9 @@ export default async function(req) {
         template_id: templateId,
         user_id: publicKey,
         template_params: {
+          'mentor email': to,
+          'first name': firstName,
+          'mentor name': full_name || '',
           to_email: to,
           email: to,
           mentor_name: full_name || '',
