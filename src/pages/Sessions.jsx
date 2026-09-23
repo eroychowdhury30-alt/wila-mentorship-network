@@ -450,6 +450,14 @@ export default function Sessions() {
                               )}
           </div>
 
+          {/* Schedule availability notice */}
+          <Alert className="mb-6 border-blue-200 bg-blue-50">
+            <AlertCircle className="h-4 w-4 text-blue-600" />
+            <AlertDescription className="text-blue-900 font-medium">
+              Mentor schedules will be made available after Oct 12.
+            </AlertDescription>
+          </Alert>
+
           {/* Already Booked Alert with Cancel Options */}
           {activeBookedSessions.length > 0 && (
             <Alert className="mb-6 border-green-200 bg-green-50">

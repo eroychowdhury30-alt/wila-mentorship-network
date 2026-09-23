@@ -193,6 +193,11 @@ export default function Home() {
                 </Button>
               </Link>
             </div>
+            {/* Schedule availability notice */}
+            <div className="mt-8 inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white/15 border border-white/30 backdrop-blur-sm text-sm font-medium text-white">
+              <span className="h-2 w-2 rounded-full bg-yellow-300"></span>
+              Mentor schedules will be made available after Oct 12.
+            </div>
           </div>
         </div>
         {/* Stats bar */}
