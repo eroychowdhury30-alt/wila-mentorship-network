@@ -16,8 +16,8 @@ export default async function(req) {
       return Response.json({ error: 'Missing mentor email' }, { status: 400 });
     }
 
-    const serviceId = secrets.get("EMAILJS_SERVICE_ID");
-    const publicKey = secrets.get("EMAILJS_PUBLIC_KEY");
+    const serviceId = secrets.get("EMAILJS_APPROVAL_SERVICE_ID");
+    const publicKey = secrets.get("EMAILJS_APPROVAL_PUBLIC_KEY");
     const templateId = secrets.get("EMAILJS_APPROVAL_TEMPLATE_ID");
 
     if (!serviceId || !publicKey || !templateId) {
