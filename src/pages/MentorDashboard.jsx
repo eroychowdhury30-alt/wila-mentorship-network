@@ -108,6 +108,9 @@ export default function MentorDashboard() {
       await loadMentorProfile(currentUser);
     } catch (error) {
       console.error('Error loading user:', error);
+      if (error?.message?.includes('not registered') || error?.code === 'user_not_registered') {
+        toast.error('Your account is not registered yet. Please contact an admin.');
+      }
     }
   };
 
