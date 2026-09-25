@@ -11,6 +11,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Calendar, Briefcase, Users, Clock, ExternalLink, Plus, Trash2, XCircle, Pause, Mail, User } from 'lucide-react';
 import { toast } from 'sonner';
+import PhotoUpload from '@/components/PhotoUpload';
 import {
   Select,
   SelectContent,
@@ -574,17 +575,11 @@ export default function MentorDashboard() {
                                                 <p className="text-xs text-gray-500 mt-1">Your Zoom, Google Meet, or other video meeting link</p>
                                               </div>
 
-                                              <div>
-                                                <Label htmlFor="photo_url">Photo URL (optional)</Label>
-                                                <Input
-                                                  id="photo_url"
-                                                  placeholder="https://example.com/your-photo.jpg"
-                                                  value={profileData.photo_url}
-                                                  onChange={(e) => setProfileData({ ...profileData, photo_url: e.target.value })}
-                                                  disabled={!isEditing}
-                                                />
-                                                <p className="text-xs text-gray-500 mt-1">Direct link to your profile photo</p>
-                                              </div>
+                                              <PhotoUpload
+                                                photoUrl={profileData.photo_url}
+                                                onPhotoChange={(url) => setProfileData({ ...profileData, photo_url: url })}
+                                                disabled={!isEditing}
+                                              />
 
                                               <div>
                                                 <Label htmlFor="bio">Bio</Label>
@@ -670,8 +665,12 @@ export default function MentorDashboard() {
                     </CardHeader>
                     <CardContent className="space-y-4">
                       <div className="text-center">
-                        <div className="w-20 h-20 mx-auto rounded-full flex items-center justify-center text-white text-2xl font-bold mb-3" style={{background:'#003262'}}>
-                          {profileData.full_name.split(' ').map(n => n[0]).join('')}
+                        <div className="w-20 h-20 mx-auto rounded-full overflow-hidden flex items-center justify-center text-white text-2xl font-bold mb-3" style={{background:'#003262'}}>
+                          {profileData.photo_url ? (
+                            <img src={profileData.photo_url} alt={profileData.full_name} className="w-full h-full object-cover" />
+                          ) : (
+                            profileData.full_name.split(' ').map(n => n[0]).join('')
+                          )}
                         </div>
                         <h3 className="font-semibold text-lg">{profileData.full_name}</h3>
                         <p className="text-sm text-gray-600">{profileData.title}</p>
