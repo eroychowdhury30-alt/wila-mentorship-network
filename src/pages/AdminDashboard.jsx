@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Shield, Users, UserCheck, UserX, Clock, CheckCircle, XCircle, Trash2, Pause, Play, Calendar, ExternalLink, Crown, Lock, Download } from 'lucide-react';
+import { Shield, Users, UserCheck, UserX, Clock, CheckCircle, XCircle, Trash2, Pause, Play, Calendar, ExternalLink, Crown, Lock, Download, Mail } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -16,6 +16,9 @@ import {
 import { toast } from 'sonner';
 import { useNavigate, Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
+import AnnouncementComposer from '@/components/admin/AnnouncementComposer';
+import SessionAdminControls from '@/components/admin/SessionAdminControls';
+import AllUsersAdmin from '@/components/admin/AllUsersAdmin';
 
 export default function AdminDashboard() {
   const [user, setUser] = useState(null);
@@ -372,6 +375,12 @@ export default function AdminDashboard() {
               <Users className="w-4 h-4" />
               Users ({allUsers.length})
             </TabsTrigger>
+            {user?.role === 'superadmin' && (
+              <TabsTrigger value="announcements" className="gap-2">
+                <Mail className="w-4 h-4" />
+                Announcements
+              </TabsTrigger>
+            )}
             {user?.role === 'superadmin' && (
               <TabsTrigger value="admins" className="gap-2">
                 <Crown className="w-4 h-4" />
@@ -765,6 +774,9 @@ export default function AdminDashboard() {
                               </div>
                             )}
                           </div>
+                          {isSuperAdmin && (
+                            <SessionAdminControls session={session} approvedMentors={approvedMentors} />
+                          )}
                         </div>
                       </div>
                     ))}
@@ -832,9 +844,47 @@ export default function AdminDashboard() {
                     </div>
                   )}
                 </CardContent>
+                </Card>
+
+                {isSuperAdmin && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Crown className="w-5 h-5 text-amber-500" />
+                      All Platform Users (SuperAdmin Only)
+                    </CardTitle>
+                    <p className="text-sm text-gray-600 mt-1">Edit or delete any user account</p>
+                  </CardHeader>
+                  <CardContent>
+                    <AllUsersAdmin users={allUsers} currentUserId={user?.id} />
+                  </CardContent>
+                </Card>
+                )}
+                </div>
+                </TabsContent>
+
+          {user?.role === 'superadmin' && (
+            <TabsContent value="announcements">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Mail className="w-5 h-5 text-amber-500" />
+                    Announcement Emails (SuperAdmin Only)
+                  </CardTitle>
+                  <p className="text-sm text-gray-600 mt-1">Send an announcement to all mentors, all mentees, or everyone at once</p>
+                </CardHeader>
+                <CardContent>
+                  <AnnouncementComposer
+                    counts={{
+                      all: allUsers.length,
+                      mentors: allUsers.filter(u => u.user_type === 'mentor').length,
+                      mentees: allUsers.filter(u => u.user_type === 'mentee').length,
+                    }}
+                  />
+                </CardContent>
               </Card>
-            </div>
-          </TabsContent>
+            </TabsContent>
+          )}
 
           {user?.role === 'superadmin' && (
             <TabsContent value="admins">
