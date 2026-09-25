@@ -445,7 +445,7 @@ export default function Sessions() {
                                 </div>
                               ) : (
                                 <p className="text-lg text-gray-700 max-w-3xl mx-auto leading-relaxed">
-                                  On Mentorship Day, mentors offer (free) 1-on-1 sessions up to an hour. A bright purple indicates that the slot is available. You can click on the name to sign up. You will receive a confirmation email with meeting details after the booking. Time displayed is in Pacific Time (US).
+                                  On Haas Women Mentorship Day, our mentors offer (free) 1-on-1 sessions up to an hour. Dark blue indicates the specific slot is available. You can click on the name to sign up. You will receive a confirmation email with meeting details after the booking. The time displayed is in Pacific Time (US).
                                 </p>
                               )}
           </div>

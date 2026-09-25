@@ -166,12 +166,10 @@ export default function Home() {
         <div className="absolute inset-0 opacity-10" style={{backgroundImage: 'radial-gradient(circle at 20% 50%, white 1px, transparent 1px), radial-gradient(circle at 80% 20%, white 1px, transparent 1px)', backgroundSize: '60px 60px'}} />
         <div className="relative max-w-6xl mx-auto px-6 py-24 md:py-32">
           <div className="flex flex-col items-center text-center">
-            <img 
-              src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68fd42c0ae0bd67c5e62c6ca/6b67e9115_ScreenShot2025-11-29at60408PM.png" 
-              alt="WILA Logo" 
-              className="h-24 w-auto mb-8 mx-auto drop-shadow-lg"
-            />
-            <h1 className="text-4xl md:text-6xl font-bold mb-5 tracking-tight">Mentorship Network</h1>
+            <h1 className="text-4xl md:text-6xl font-bold mb-5 tracking-tight">Welcome to Haas Women Mentorship Network</h1>
+            <p className="text-lg md:text-xl font-medium text-yellow-200 mb-5 max-w-3xl mx-auto leading-relaxed">
+              Our next Haas Women Mentorship Day is Oct 30, 2026. Alumnae Panel &amp; Kickoff from 9-10AM PT, and 1:1 mentorship sessions from 10-4PM PT. Come back after Oct 12 for session sign up details.
+            </p>
             <p className="text-lg md:text-xl text-purple-100 mb-10 max-w-2xl leading-relaxed">
               Connect with accomplished women leaders from the Berkeley Haas alumni community who are ready to guide your professional journey.
             </p>

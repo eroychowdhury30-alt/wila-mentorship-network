@@ -154,7 +154,7 @@ export default function Layout({ children }) {
                             className="flex items-center gap-3 group"
                           >
               <img 
-                src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68fd42c0ae0bd67c5e62c6ca/6b67e9115_ScreenShot2025-11-29at60408PM.png" 
+                src="https://media.base44.com/images/public/68fd42c0ae0bd67c5e62c6ca/c1b85684f_Screenshot2026-09-24at53106PM.png" 
                 alt="WILA Logo" 
                 className="h-10 w-auto"
               />
