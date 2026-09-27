@@ -2,11 +2,11 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { Button } from '@/components/ui/button';
-import { Linkedin, Calendar, MapPin, Award, X } from 'lucide-react';
+import { Linkedin, Calendar, MapPin, Award, X, Trash2 } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import MentorAvatar from '@/components/MentorAvatar';
 
-export default function MentorCard({ mentor, isMentee = false, hasAvailability = true }) {
+export default function MentorCard({ mentor, isMentee = false, hasAvailability = true, isSuperAdmin = false, onDelete = null }) {
   const [showProfile, setShowProfile] = useState(false);
 
   const openLinkedIn = () => {
@@ -127,6 +127,18 @@ export default function MentorCard({ mentor, isMentee = false, hasAvailability =
                 Check Availability
               </Button>
             </Link>
+          )}
+
+          {isSuperAdmin && onDelete && (
+            <Button
+              size="sm"
+              variant="outline"
+              className="w-full h-8 text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700 mt-2"
+              onClick={() => onDelete(mentor)}
+            >
+              <Trash2 className="w-3.5 h-3.5 mr-1.5" />
+              Delete Mentor
+            </Button>
           )}
         </div>
       </div>

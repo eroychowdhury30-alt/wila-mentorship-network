@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 import { Link, useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { Button } from '@/components/ui/button';
@@ -24,6 +25,19 @@ export default function Home() {
     availability: 'all'
   });
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
+  const handleDeleteMentor = async (mentor) => {
+    if (!confirm(`Delete ${mentor.full_name}'s mentor profile? This cannot be undone.`)) return;
+    try {
+      await base44.entities.Mentor.delete(mentor.id);
+      queryClient.invalidateQueries({ queryKey: ['mentors'] });
+      toast.success('Mentor deleted');
+    } catch (error) {
+      console.error('Error deleting mentor:', error);
+      toast.error('Failed to delete mentor: ' + error.message);
+    }
+  };
 
   useEffect(() => {
     loadUser();
@@ -247,6 +261,8 @@ export default function Home() {
                   mentor={mentor}
                   isMentee={user?.user_type === 'mentee'}
                   hasAvailability={mentorsWithAvailability.has(mentor.full_name)}
+                  isSuperAdmin={user?.role === 'superadmin'}
+                  onDelete={handleDeleteMentor}
                 />
               ))}
             </div>
@@ -293,6 +309,8 @@ export default function Home() {
                   mentor={mentor} 
                   isMentee={user?.user_type === 'mentee'} 
                   hasAvailability={mentorsWithAvailability.has(mentor.full_name)}
+                  isSuperAdmin={user?.role === 'superadmin'}
+                  onDelete={handleDeleteMentor}
                 />
               ))}
             </div>
