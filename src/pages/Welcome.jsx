@@ -67,6 +67,25 @@ export default function Welcome() {
             <p className="text-xl text-blue-200 max-w-2xl mx-auto leading-relaxed">
               Connecting Berkeley Haas women in leadership with the next generation of ambitious professionals.
             </p>
+
+            <div className="mt-8 max-w-xl mx-auto rounded-xl px-6 py-5 text-center" style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.15)' }}>
+              <p className="text-lg font-semibold text-white mb-2">Our next Haas Women Mentorship Day is Oct 30 2026.</p>
+              <p className="text-blue-200 text-sm">
+                Alumnae Panel &amp; Kickoff from 9-10AM PT{' '}
+                <a
+                  href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=Haas%20Women%20Mentorship%20Day%20-%20Alumnae%20Panel%20%26%20Kickoff&dates=20261030T160000Z/20261030T170000Z&details=Alumnae%20Panel%20%26%20Kickoff%20from%209-10AM%20PT"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-semibold underline hover:opacity-80"
+                  style={{ color: '#FDB515' }}
+                >
+                  [Add to Calendar]
+                </a>
+              </p>
+              <p className="text-blue-200 text-sm mt-1">
+                1:1 mentorship sessions from 10-4PM PT <span className="text-blue-300">[Come back after Oct 12 to sign up]</span>
+              </p>
+            </div>
           </div>
 
           {/* Cards */}
