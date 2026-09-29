@@ -62,7 +62,7 @@ export default function Welcome() {
             </div>
             <h1 className="text-5xl md:text-6xl font-extrabold text-white mb-6 leading-tight">
               Welcome to<br />
-              <span style={{ color: '#FDB515' }}>WILA Mentorship</span>
+              <span style={{ color: '#FDB515' }}>Haas Women Mentorship Network</span>
             </h1>
             <p className="text-xl text-blue-200 max-w-2xl mx-auto leading-relaxed">
               Connecting Berkeley Haas women in leadership with the next generation of ambitious professionals.
