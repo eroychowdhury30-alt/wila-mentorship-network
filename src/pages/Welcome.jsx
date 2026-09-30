@@ -151,9 +151,13 @@ export default function Welcome() {
                   </div>
                 </div>
 
-                <p className="text-blue-200 mb-6 leading-relaxed">
+                <p className="text-blue-200 mb-4 leading-relaxed">
                   Share your expertise and help guide the next generation of women in leadership and business.
                 </p>
+
+                <div className="mb-6 p-3 rounded-lg" style={{ background: 'rgba(253,181,21,0.15)', border: '1px solid rgba(253,181,21,0.3)' }}>
+                  <p className="text-sm font-semibold" style={{ color: '#FDB515' }}>Availability is due by October 8.</p>
+                </div>
 
                 <ul className="space-y-3 mb-8">
                   {['Create your mentor profile', 'Set your availability', 'Share your expertise', 'Make a difference'].map((item) =>

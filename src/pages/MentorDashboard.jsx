@@ -457,6 +457,13 @@ export default function MentorDashboard() {
           </div>
         </div>
 
+        <div className="mb-6 p-4 rounded-lg flex items-center gap-3" style={{ background: '#EDF2F8', border: '1px solid rgba(0,50,98,0.2)' }}>
+          <Calendar className="w-5 h-5 flex-shrink-0" style={{ color: '#003262' }} />
+          <p className="text-sm font-medium" style={{ color: '#003262' }}>
+            Availability is due by October 8.
+          </p>
+        </div>
+
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="grid w-full grid-cols-2 max-w-md">
             <TabsTrigger value="profile">
