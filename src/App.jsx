@@ -13,6 +13,7 @@ import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 
 import ModeratorDashboard from './pages/ModeratorDashboard.jsx';
 import MenteeExport from './pages/MenteeExport.jsx';
+import MentorExport from './pages/MentorExport.jsx';
 const { Pages, Layout, mainPage } = pagesConfig;
 const mainPageKey = mainPage ?? Object.keys(Pages)[0];
 const MainPage = mainPageKey ? Pages[mainPageKey] : <></>;
@@ -56,6 +57,7 @@ const AuthenticatedApp = () => {
         ))}
         <Route path="/ModeratorDashboard" element={<LayoutWrapper currentPageName="ModeratorDashboard"><ModeratorDashboard /></LayoutWrapper>} />
         <Route path="/MenteeExport" element={<LayoutWrapper currentPageName="MenteeExport"><MenteeExport /></LayoutWrapper>} />
+        <Route path="/MentorExport" element={<LayoutWrapper currentPageName="MentorExport"><MentorExport /></LayoutWrapper>} />
         <Route path="*" element={<PageNotFound />} />
       </Routes>
     </LayoutWrapper>

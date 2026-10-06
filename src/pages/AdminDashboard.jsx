@@ -93,7 +93,10 @@ export default function AdminDashboard() {
   const approveMentorMutation = useMutation({
     mutationFn: async (mentorId) => {
       const mentor = await base44.entities.Mentor.get(mentorId);
-      await base44.entities.Mentor.update(mentorId, { status: 'approved' });
+      await base44.entities.Mentor.update(mentorId, {
+        status: 'approved',
+        approved_date: new Date().toISOString().split('T')[0],
+      });
       // Send approval email - don't block approval if email fails
       try {
         await base44.functions.invoke('sendMentorApprovalEmail', {
@@ -130,7 +133,9 @@ export default function AdminDashboard() {
   });
 
   const activateMentorMutation = useMutation({
-    mutationFn: (mentorId) => base44.entities.Mentor.update(mentorId, { status: 'approved' }),
+    mutationFn: (mentor) => base44.entities.Mentor.update(mentor.id, mentor.approved_date
+      ? { status: 'approved' }
+      : { status: 'approved', approved_date: new Date().toISOString().split('T')[0] }),
     onSuccess: () => {
       queryClient.invalidateQueries(['approved-mentors']);
       queryClient.invalidateQueries(['paused-mentors']);
@@ -277,12 +282,20 @@ export default function AdminDashboard() {
               </>
             )}
           </div>
-            <Link to={createPageUrl('MenteeExport')}>
-              <Button variant="outline" className="gap-2" style={{borderColor:'#003262', color:'#003262'}}>
-                <Download className="w-4 h-4" />
-                Export Mentee List
-              </Button>
-            </Link>
+            <div className="flex gap-2">
+              <Link to={createPageUrl('MenteeExport')}>
+                <Button variant="outline" className="gap-2" style={{borderColor:'#003262', color:'#003262'}}>
+                  <Download className="w-4 h-4" />
+                  Export Mentee List
+                </Button>
+              </Link>
+              <Link to={createPageUrl('MentorExport')}>
+                <Button variant="outline" className="gap-2" style={{borderColor:'#003262', color:'#003262'}}>
+                  <Download className="w-4 h-4" />
+                  Export Mentor List
+                </Button>
+              </Link>
+            </div>
           </div>
           <p className="text-gray-600">
             {isSuperAdmin ? 'Full platform control' : isModerator ? 'Review mentor applications and view platform data' : 'Manage mentors, mentees, and platform operations'}
@@ -651,7 +664,7 @@ export default function AdminDashboard() {
                           <Button
                             onClick={() => {
                               if (confirm(`Activate ${mentor.full_name}'s account?`)) {
-                                activateMentorMutation.mutate(mentor.id);
+                                activateMentorMutation.mutate(mentor);
                               }
                             }}
                             className="bg-green-600 hover:bg-green-700"

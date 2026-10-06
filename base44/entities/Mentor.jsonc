@@ -70,6 +70,11 @@
       ],
       "default": "pending",
       "description": "Approval status: pending, approved, rejected, or paused"
+    },
+    "approved_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date the mentor application was approved"
     }
   },
   "required": [
