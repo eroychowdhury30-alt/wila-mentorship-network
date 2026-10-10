@@ -238,45 +238,49 @@ export default function Sessions() {
       });
 
       // Get mentor info for email
-      const mentors = await base44.entities.Mentor.filter({ 
-        full_name: session.mentor_name 
+      const mentors = await base44.entities.Mentor.filter({
+        full_name: session.mentor_name
       });
-      
-      const sessionDate = new Date(session.date).toLocaleDateString('en-US', { 
-        weekday: 'long', 
-        year: 'numeric', 
-        month: 'long', 
-        day: 'numeric' 
-      });
-      if (mentors.length > 0) {
-        const mentor = mentors[0];
-        
-        // Email mentor about cancellation
-        try {
-          await base44.functions.invoke('sendEmail', {
-            to: mentor.email || mentor.created_by,
-            mentor_name: mentor.full_name,
-            mentee_name: session.mentee_name,
-            session_date: sessionDate,
-            session_time: session.time_slot
-          });
-        } catch (e) {
-          console.error('Failed to send mentor cancellation email:', e);
-        }
-      }
 
-      // Email mentee about cancellation
-      const user = await base44.auth.me();
+      const sessionDate = new Date(session.date).toLocaleDateString('en-US', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+
+      // One universal cancellation email, sent to both mentor and mentee
       try {
-        await base44.functions.invoke('sendEmail', {
-          to: user.email,
-          mentor_name: session.mentor_name,
-          mentee_name: user.full_name,
-          session_date: sessionDate,
-          session_time: session.time_slot
-        });
+        const mentorEmailAddress = mentors[0]?.email || mentors[0]?.created_by;
+        const currentUser = await base44.auth.me();
+        const recipients = [];
+        if (mentorEmailAddress) {
+          recipients.push({
+            email: mentorEmailAddress,
+            name: mentors[0]?.full_name || session.mentor_name,
+          });
+        }
+        if (currentUser?.email) {
+          recipients.push({
+            email: currentUser.email,
+            name: currentUser.full_name || session.mentee_name,
+          });
+        }
+        if (recipients.length > 0) {
+          await base44.functions.invoke('sendSessionCancelledEmail', {
+            recipients,
+            mentor_name: session.mentor_name,
+            mentor_email: mentorEmailAddress || '',
+            mentee_name: currentUser?.full_name || session.mentee_name || '',
+            mentee_email: currentUser?.email || '',
+            session_date: sessionDate,
+            session_time: session.time_slot,
+            cancelled_by: 'mentee',
+          });
+          console.log('Universal cancellation email sent to:', recipients.map(r => r.email).join(', '));
+        }
       } catch (e) {
-        console.error('Failed to send mentee cancellation email:', e);
+        console.error('Failed to send cancellation email:', e);
       }
     },
     onSuccess: () => {

@@ -261,19 +261,30 @@ export default function MentorDashboard() {
       });
       const cancelDatetime = `${sessionDate} at ${session.time_slot}`;
 
-      // Email mentee about cancellation
-      if (menteeEmail) {
-        try {
-          await base44.functions.invoke('sendEmail', {
-            to: menteeEmail,
-            mentor_name: profileData.full_name,
-            mentee_name: menteeName,
-            session_date: sessionDate,
-            session_time: session.time_slot
-          });
-        } catch (e) {
-          console.error('Failed to send cancellation email:', e);
+      // One universal cancellation email, sent to both mentor and mentee
+      try {
+        const recipients = [];
+        if (menteeEmail) {
+          recipients.push({ email: menteeEmail, name: menteeName || '' });
         }
+        if (profileData.email) {
+          recipients.push({ email: profileData.email, name: profileData.full_name || '' });
+        }
+        if (recipients.length > 0) {
+          await base44.functions.invoke('sendSessionCancelledEmail', {
+            recipients,
+            mentor_name: profileData.full_name,
+            mentor_email: profileData.email || '',
+            mentee_name: menteeName || '',
+            mentee_email: menteeEmail || '',
+            session_date: sessionDate,
+            session_time: session.time_slot,
+            cancelled_by: 'mentor',
+          });
+          console.log('Universal cancellation email sent to:', recipients.map(r => r.email).join(', '));
+        }
+      } catch (e) {
+        console.error('Failed to send cancellation email:', e);
       }
     },
     onSuccess: () => {
