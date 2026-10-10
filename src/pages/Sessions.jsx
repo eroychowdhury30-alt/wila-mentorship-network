@@ -173,36 +173,23 @@ export default function Sessions() {
                   const meetingLink = updatedSession.meeting_link || mentor?.meeting_link || '';
 
                   try {
+                                // One universal confirmation email, sent to both mentor and mentee
+                                const recipients = [];
                                 if (mentorEmailAddress) {
-                                  await base44.functions.invoke('sendSessionBookedEmail', {
-                                    to: mentorEmailAddress,
-                                    recipient_name: mentor?.full_name || updatedSession.mentor_name,
-                                    mentor_name: mentor?.full_name || updatedSession.mentor_name,
-                                    mentee_name: name,
-                                    mentor_email: mentorEmailAddress,
-                                    mentee_email: menteeEmailAddress,
-                                    session_date: sessionDate,
-                                    session_time: displaySlot || updatedSession.time_slot,
-                                    duration: '30 minutes',
-                                    meeting_link: meetingLink,
-                                    mentee_linkedin: linkedin || '',
-                                    mentee_notes: updatedSession.session_goal || '',
+                                  recipients.push({
+                                    email: mentorEmailAddress,
+                                    name: mentor?.full_name || updatedSession.mentor_name,
                                   });
-                                  console.log('Email sent to mentor at:', mentorEmailAddress);
                                 }
-                              } catch (e) {
-                                console.error('Failed to send mentor email:', e);
-                              }
-
-                              try {
                                 if (menteeEmailAddress) {
-                                  console.log('Sending mentee email to:', menteeEmailAddress);
-                                  const menteeEmailResult = await base44.functions.invoke('sendSessionBookedEmail', {
-                                    to: menteeEmailAddress,
-                                    recipient_name: name,
+                                  recipients.push({ email: menteeEmailAddress, name });
+                                }
+                                if (recipients.length > 0) {
+                                  await base44.functions.invoke('sendSessionBookedEmail', {
+                                    recipients,
                                     mentor_name: mentor?.full_name || updatedSession.mentor_name,
-                                    mentee_name: name,
                                     mentor_email: mentorEmailAddress || '',
+                                    mentee_name: name,
                                     mentee_email: menteeEmailAddress,
                                     session_date: sessionDate,
                                     session_time: displaySlot || updatedSession.time_slot,
@@ -211,10 +198,10 @@ export default function Sessions() {
                                     mentee_linkedin: linkedin || '',
                                     mentee_notes: goal || '',
                                   });
-                                  console.log('Mentee email result:', menteeEmailResult);
+                                  console.log('Universal booking email sent to:', recipients.map(r => r.email).join(', '));
                                 }
                               } catch (e) {
-                                console.error('Failed to send mentee email:', e);
+                                console.error('Failed to send booking confirmation email:', e);
                               }
       
       return updatedSession;
