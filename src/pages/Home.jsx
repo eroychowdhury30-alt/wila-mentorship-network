@@ -2,21 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { Button } from '@/components/ui/button';
 import { Users } from 'lucide-react';
 import MentorCard from '../components/MentorCard';
 import FilterBar from '../components/FilterBar';
-import MatchingModal from '../components/MatchingModal';
-import MenteeQuestionnaire from '../components/MenteeQuestionnaire';
 
 export default function Home() {
   const [user, setUser] = useState(null);
-  const [showMatchingModal, setShowMatchingModal] = useState(false);
-  const [showQuestionnaire, setShowQuestionnaire] = useState(false);
-  const [isMatchingLoading, setIsMatchingLoading] = useState(false);
-  const [matchedMentors, setMatchedMentors] = useState([]);
   const [filters, setFilters] = useState({
     sortBy: 'availability',
     experience: 'all',
@@ -24,7 +18,6 @@ export default function Home() {
     mentees: 'all',
     availability: 'all'
   });
-  const navigate = useNavigate();
   const queryClient = useQueryClient();
 
   const handleDeleteMentor = async (mentor) => {
@@ -123,64 +116,8 @@ export default function Home() {
     }
   };
 
-  const handleMatchingModeSelect = (mode) => {
-    if (mode === 'manual') {
-      setShowMatchingModal(false);
-      scrollToMentors();
-    } else {
-      setShowMatchingModal(false);
-      setShowQuestionnaire(true);
-    }
-  };
-
-  const handleQuestionnaireSubmit = async (responses) => {
-    setIsMatchingLoading(true);
-    try {
-      const response = await base44.functions.invoke('smartMatchMentor', {
-        mentee_goals: responses.goals,
-        experience_level: responses.experience_level,
-        industries: responses.industries,
-        skills: responses.skills_to_develop,
-        mentoring_style: responses.mentoring_style,
-        mentors: mentors
-      });
-      
-      setMatchedMentors(response.data?.matched_mentors || []);
-      setShowQuestionnaire(false);
-      
-      // Scroll to results after a brief delay
-      setTimeout(() => {
-        const resultsSection = document.getElementById('matched-results');
-        if (resultsSection) {
-          resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-      }, 300);
-    } catch (error) {
-      console.error('Matching error:', error);
-      alert('Error finding matches. Please try again.');
-    } finally {
-      setIsMatchingLoading(false);
-    }
-  };
-
-  if (showQuestionnaire) {
-    return (
-      <MenteeQuestionnaire
-        onBack={() => setShowQuestionnaire(false)}
-        onSubmit={handleQuestionnaireSubmit}
-        isLoading={isMatchingLoading}
-      />
-    );
-  }
-
   return (
     <div className="min-h-screen bg-white">
-      <MatchingModal
-        open={showMatchingModal}
-        onOpenChange={setShowMatchingModal}
-        onSelectMode={handleMatchingModeSelect}
-      />
-
       {/* Hero Section */}
       <div className="relative overflow-hidden text-white" style={{background: 'linear-gradient(135deg, #001a35 0%, #003262 60%, #004080 100%)'}}>
         <div className="absolute inset-0 opacity-10" style={{backgroundImage: 'radial-gradient(circle at 20% 50%, white 1px, transparent 1px), radial-gradient(circle at 80% 20%, white 1px, transparent 1px)', backgroundSize: '60px 60px'}} />
@@ -196,7 +133,7 @@ export default function Home() {
             <div className="flex flex-wrap gap-4 justify-center">
               <Button
                 size="lg"
-                onClick={() => setShowMatchingModal(true)}
+                onClick={scrollToMentors}
                 className="font-semibold px-8 h-12 text-base shadow-lg rounded-full hover:opacity-90" style={{background: '#FDB515', color: '#003262'}}
               >
                 Browse Mentors
@@ -236,45 +173,6 @@ export default function Home() {
           </div>
         </div>
       </div>
-
-      {/* Matched Results Section */}
-      {matchedMentors.length > 0 && (
-        <div id="matched-results" className="py-16 px-6 bg-gradient-to-br from-blue-50 to-blue-100">
-          <div className="max-w-7xl mx-auto">
-            <div className="mb-10 flex flex-col md:flex-row md:items-end md:justify-between gap-4">
-              <div>
-                <h2 className="text-3xl font-bold text-gray-900 mb-1">Your Smart Matches</h2>
-                <p className="text-gray-600">
-                  We found <span className="font-semibold text-purple-600">{matchedMentors.length}</span> mentors perfectly suited for you
-                </p>
-              </div>
-              <Button
-                onClick={() => {
-                  setMatchedMentors([]);
-                  scrollToMentors();
-                }}
-                variant="outline"
-                className="rounded-full"
-              >
-                View All Mentors
-              </Button>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {matchedMentors.map((mentor) => (
-                <MentorCard
-                  key={mentor.id}
-                  mentor={mentor}
-                  isMentee={user?.user_type === 'mentee'}
-                  hasAvailability={mentorsWithAvailability.has(mentor.full_name)}
-                  isSuperAdmin={user?.role === 'superadmin'}
-                  onDelete={handleDeleteMentor}
-                />
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Mentor Directory Section */}
       <div id="mentor-directory" className="py-16 px-6 bg-gray-50">

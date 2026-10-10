@@ -1,15 +1,12 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { base44 } from '@/api/base44Client';
 import { createPageUrl } from '@/utils';
 import { Button } from '@/components/ui/button';
 import { Users, UserCheck, ArrowRight, CheckCircle } from 'lucide-react';
-import MatchingModal from '../components/MatchingModal';
 
 export default function Welcome() {
-  const [showMatchingModal, setShowMatchingModal] = useState(false);
-
   const handleMenteeClick = () => {
-    setShowMatchingModal(true);
+    window.location.href = createPageUrl('Home');
   };
 
   const handleMentorClick = async () => {
@@ -22,17 +19,8 @@ export default function Welcome() {
     }
   };
 
-  const handleMatchingModeSelect = async (mode) => {
-    // Mentees can browse without logging in — login only required to book
-    window.location.href = createPageUrl('Home');
-  };
-
   return (
     <div className="min-h-screen flex flex-col" style={{ background: 'linear-gradient(160deg, #001f3f 0%, #003262 50%, #004080 100%)' }}>
-      <MatchingModal
-        open={showMatchingModal}
-        onOpenChange={setShowMatchingModal}
-        onSelectMode={handleMatchingModeSelect} />
       
 
       {/* Top gold accent bar */}
