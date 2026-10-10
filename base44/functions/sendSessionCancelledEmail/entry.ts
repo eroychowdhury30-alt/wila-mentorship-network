@@ -56,6 +56,17 @@ export default async function (req) {
       mentee_linkedin: mentee_linkedin || '',
       mentee_notes: mentee_notes || '',
       cancelled_by: cancelled_by || '',
+      // Hyphenated aliases — the EmailJS template uses {{mentor-name}} style names
+      'mentor-name': mentor_name || '',
+      'mentor-email': mentor_email || '',
+      'mentee-name': mentee_name || '',
+      'mentee-email': mentee_email || '',
+      'session-date': session_date || '',
+      'session-time': session_time || '',
+      'meeting-link': meeting_link || '',
+      'mentee-linkedin': mentee_linkedin || '',
+      'mentee-notes': mentee_notes || '',
+      'cancelled-by': cancelled_by || '',
     };
 
     const results = [];
