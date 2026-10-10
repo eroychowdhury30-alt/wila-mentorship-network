@@ -149,8 +149,10 @@ export default function Layout({ children }) {
       <nav className="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm" style={{borderBottomColor:'#003262', borderBottomWidth:'2px'}}>
         <div className="max-w-7xl mx-auto px-6 py-3">
           <div className="flex items-center justify-between">
-            <Link 
-                            to={createPageUrl('Welcome')} 
+            <a
+                            href="https://wila.haasalumni.org/"
+                            target="_blank"
+                            rel="noopener noreferrer"
                             className="flex items-center gap-3 group"
                           >
               <img 
@@ -159,7 +161,7 @@ export default function Layout({ children }) {
                 className="h-10 w-auto"
               />
               <span className="text-xl font-bold hidden sm:inline transition-colors" style={{color:'#003262'}}>WILA Mentorship Network</span>
-            </Link>
+            </a>
 
             <div className="flex items-center gap-2">
               {(user?.role === 'admin' || user?.role === 'superadmin') && (
