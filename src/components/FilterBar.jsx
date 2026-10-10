@@ -43,9 +43,10 @@ export default function FilterBar({ filters, onFilterChange, onClearAll }) {
             onValueChange={(value) => onFilterChange('sortBy', value)}
           >
             <SelectTrigger className="h-10">
-              <SelectValue placeholder="First Name" />
+              <SelectValue placeholder="Availability" />
             </SelectTrigger>
             <SelectContent>
+              <SelectItem value="availability">Availability</SelectItem>
               <SelectItem value="firstName">First Name</SelectItem>
               <SelectItem value="lastName">Last Name</SelectItem>
               <SelectItem value="experience">Experience</SelectItem>

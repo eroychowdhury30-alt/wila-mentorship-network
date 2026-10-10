@@ -18,7 +18,7 @@ export default function Home() {
   const [isMatchingLoading, setIsMatchingLoading] = useState(false);
   const [matchedMentors, setMatchedMentors] = useState([]);
   const [filters, setFilters] = useState({
-    sortBy: 'firstName',
+    sortBy: 'availability',
     experience: 'all',
     expertise: 'all',
     mentees: 'all',
@@ -79,7 +79,7 @@ export default function Home() {
 
   const handleClearAll = () => {
     setFilters({
-      sortBy: 'firstName',
+      sortBy: 'availability',
       experience: 'all',
       expertise: 'all',
       mentees: 'all',
@@ -105,6 +105,12 @@ export default function Home() {
 
   const sortedMentors = [...filteredMentors].sort((a, b) => {
     if (filters.sortBy === 'firstName') {
+      return a.full_name.localeCompare(b.full_name);
+    }
+    if (filters.sortBy === 'availability') {
+      const aAvail = mentorsWithAvailability.has(a.full_name);
+      const bAvail = mentorsWithAvailability.has(b.full_name);
+      if (aAvail !== bAvail) return aAvail ? -1 : 1;
       return a.full_name.localeCompare(b.full_name);
     }
     return 0;
