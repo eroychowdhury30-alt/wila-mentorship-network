@@ -63,9 +63,15 @@ export default function MentorCard({ mentor, isMentee = false, hasAvailability =
                 </span>
               ))}
               {mentor.expertise.length > 3 && (
-                <span className="text-xs text-gray-400 bg-gray-50 border border-gray-200 px-2.5 py-1 rounded-full">
+                <button
+                  type="button"
+                  onClick={() => setShowProfile(true)}
+                  className="text-xs font-medium px-2.5 py-1 rounded-full border transition-colors hover:bg-gray-100"
+                  style={{color:'#003262', background:'#F3F4F6', borderColor:'#e5e7eb'}}
+                  title="See all expertise areas"
+                >
                   +{mentor.expertise.length - 3} more
-                </span>
+                </button>
               )}
             </div>
           </div>
