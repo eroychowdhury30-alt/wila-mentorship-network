@@ -174,18 +174,19 @@ export default function Sessions() {
 
                   try {
                                 if (mentorEmailAddress) {
-                                  await base44.functions.invoke('sendEmail', {
+                                  await base44.functions.invoke('sendSessionBookedEmail', {
                                     to: mentorEmailAddress,
+                                    recipient_name: mentor?.full_name || updatedSession.mentor_name,
                                     mentor_name: mentor?.full_name || updatedSession.mentor_name,
                                     mentee_name: name,
                                     mentor_email: mentorEmailAddress,
                                     mentee_email: menteeEmailAddress,
                                     session_date: sessionDate,
                                     session_time: displaySlot || updatedSession.time_slot,
+                                    duration: '30 minutes',
                                     meeting_link: meetingLink,
-                                    mentee_response: updatedSession.session_goal || '',
                                     mentee_linkedin: linkedin || '',
-                                    recipient_type: 'mentor'
+                                    mentee_notes: updatedSession.session_goal || '',
                                   });
                                   console.log('Email sent to mentor at:', mentorEmailAddress);
                                 }
@@ -196,18 +197,19 @@ export default function Sessions() {
                               try {
                                 if (menteeEmailAddress) {
                                   console.log('Sending mentee email to:', menteeEmailAddress);
-                                  const menteeEmailResult = await base44.functions.invoke('sendEmail', {
+                                  const menteeEmailResult = await base44.functions.invoke('sendSessionBookedEmail', {
                                     to: menteeEmailAddress,
+                                    recipient_name: name,
                                     mentor_name: mentor?.full_name || updatedSession.mentor_name,
                                     mentee_name: name,
                                     mentor_email: mentorEmailAddress || '',
                                     mentee_email: menteeEmailAddress,
                                     session_date: sessionDate,
                                     session_time: displaySlot || updatedSession.time_slot,
+                                    duration: '30 minutes',
                                     meeting_link: meetingLink,
-                                    mentee_response: goal || '',
                                     mentee_linkedin: linkedin || '',
-                                    recipient_type: 'mentee'
+                                    mentee_notes: goal || '',
                                   });
                                   console.log('Mentee email result:', menteeEmailResult);
                                 }

@@ -1,0 +1,88 @@
+<mjml>
+  <mj-head>
+    <mj-title>New session booked! Haas Women Mentorship Day Oct 30</mj-title>
+    <mj-preview>Your Haas Women Mentorship Day session details, including the video call link.</mj-preview>
+    <mj-attributes>
+      <mj-all font-family="Arial, Helvetica, sans-serif" />
+      <mj-text color="#003262" font-size="15px" line-height="1.6" padding="0 0 12px 0" />
+      <mj-button background-color="#fdb515" color="#000000" border-radius="6px" font-weight="700" font-size="15px" inner-padding="14px 28px" align="left" />
+      <mj-class name="label" color="#003262" font-size="11px" font-weight="700" letter-spacing="1px" text-transform="uppercase" padding="0 0 4px 0" />
+      <mj-class name="value" font-size="16px" font-weight="700" padding="0 0 16px 0" />
+      <mj-class name="cardtitle" font-size="13px" font-weight="700" letter-spacing="1px" text-transform="uppercase" padding="0 0 16px 0" />
+    </mj-attributes>
+  </mj-head>
+  <mj-body background-color="#ffffff">
+    <mj-section background-color="#fdb515" padding="16px 36px">
+      <mj-column width="48px" vertical-align="middle">
+        <mj-image src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68fd42c0ae0bd67c5e62c6ca/ae33957f6_ScreenShot2025-11-29at60408PM.png" width="36px" alt="WILA Mentorship Network" padding="0" />
+      </mj-column>
+      <mj-column vertical-align="middle">
+        <mj-text color="#000000" font-size="17px" font-weight="700" padding="0">WILA Mentorship Network</mj-text>
+      </mj-column>
+    </mj-section>
+
+    <mj-section padding="36px 36px 8px">
+      <mj-column>
+        <mj-text font-size="28px" font-weight="700" line-height="1.2" padding="0 0 8px 0">You have a new session booked!</mj-text>
+        <mj-text font-size="16px" padding="0 0 20px 0">Haas Women Mentorship Day, October 30, 2026</mj-text>
+        <mj-text>Hi {{recipient_name}}, you have a new session booked for the Haas Women Mentorship Day! Please see details below, and make sure to add this (including the video link), to your own calendar!</mj-text>
+      </mj-column>
+    </mj-section>
+
+    <mj-wrapper padding="0 36px">
+      <mj-section background-color="#f9fafb" border="1px solid #e5e7eb" border-radius="6px" padding="24px 24px 8px">
+        <mj-column>
+          <mj-text mj-class="label">Date</mj-text>
+          <mj-text mj-class="value">{{session_date}}</mj-text>
+          <mj-text mj-class="label">Time (Pacific Time)</mj-text>
+          <mj-text mj-class="value">{{session_time}}</mj-text>
+          <mj-text mj-class="label">Duration</mj-text>
+          <mj-text mj-class="value">{{duration}}</mj-text>
+          <mj-text mj-class="label">Video call link</mj-text>
+          <mj-text padding="0 0 16px 0"><a href="{{meeting_link}}" style="color:#003262;font-weight:700;">{{meeting_link}}</a></mj-text>
+        </mj-column>
+      </mj-section>
+    </mj-wrapper>
+
+    <mj-section padding="20px 36px 4px">
+      <mj-column>
+        <mj-button href="{{meeting_link}}">Join the video call</mj-button>
+      </mj-column>
+    </mj-section>
+
+    <mj-wrapper padding="8px 36px">
+      <mj-section background-color="#f9fafb" border="1px solid #e5e7eb" border-radius="6px" padding="24px 24px 8px">
+        <mj-column>
+          <mj-text mj-class="cardtitle">Mentor Info</mj-text>
+          <mj-text mj-class="label">Name</mj-text>
+          <mj-text mj-class="value">{{mentor_name}}</mj-text>
+          <mj-text mj-class="label">Email</mj-text>
+          <mj-text padding="0 0 16px 0"><a href="mailto:{{mentor_email}}" style="color:#003262;font-weight:700;">{{mentor_email}}</a></mj-text>
+        </mj-column>
+      </mj-section>
+    </mj-wrapper>
+
+    <mj-wrapper padding="8px 36px 24px">
+      <mj-section background-color="#f9fafb" border="1px solid #e5e7eb" border-radius="6px" padding="24px 24px 8px">
+        <mj-column>
+          <mj-text mj-class="cardtitle">Mentee Info</mj-text>
+          <mj-text mj-class="label">Name</mj-text>
+          <mj-text mj-class="value">{{mentee_name}}</mj-text>
+          <mj-text mj-class="label">Email</mj-text>
+          <mj-text mj-class="value"><a href="mailto:{{mentee_email}}" style="color:#003262;font-weight:700;">{{mentee_email}}</a></mj-text>
+          <mj-text mj-class="label">LinkedIn</mj-text>
+          <mj-text mj-class="value"><a href="{{mentee_linkedin}}" style="color:#003262;font-weight:700;">{{mentee_linkedin}}</a></mj-text>
+          <mj-text mj-class="label">Notes</mj-text>
+          <mj-text padding="0 0 16px 0">{{mentee_notes}}</mj-text>
+        </mj-column>
+      </mj-section>
+    </mj-wrapper>
+
+    <mj-section background-color="#f9fafb" padding="24px 36px">
+      <mj-column>
+        <mj-text font-size="13px" padding="0 0 4px 0">WILA Mentorship Network</mj-text>
+        <mj-text font-size="13px" padding="0"><a href="https://wilamentorship.org" style="color:#003262;">wilamentorship.org</a></mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>
