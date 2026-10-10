@@ -93,6 +93,9 @@ export default function FilterBar({ filters, onFilterChange, onClearAll }) {
               <SelectItem value="Career Advancement & Transition">Career Advancement & Transition</SelectItem>
               <SelectItem value="Entrepreneurship & Startups">Entrepreneurship & Startups</SelectItem>
               <SelectItem value="Job Application & Interview Skills">Job Application & Interview Skills</SelectItem>
+              <SelectItem value="Relationship Management">Relationship Management</SelectItem>
+              <SelectItem value="Work-Life Integration">Work-Life Integration</SelectItem>
+              <SelectItem value="Personal Development">Personal Development</SelectItem>
             </SelectContent>
           </Select>
         </div>
