@@ -279,6 +279,8 @@ export default function MentorDashboard() {
             mentee_email: menteeEmail || '',
             session_date: sessionDate,
             session_time: session.time_slot,
+            mentee_linkedin: session.mentee_linkedin || '',
+            mentee_notes: session.session_goal || '',
             cancelled_by: 'mentor',
           });
           console.log('Universal cancellation email sent to:', recipients.map(r => r.email).join(', '));
