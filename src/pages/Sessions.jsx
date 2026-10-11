@@ -242,7 +242,7 @@ export default function Sessions() {
         full_name: session.mentor_name
       });
 
-      const sessionDate = new Date(session.date).toLocaleDateString('en-US', {
+      const sessionDate = new Date(session.date + 'T12:00:00').toLocaleDateString('en-US', {
         weekday: 'long',
         year: 'numeric',
         month: 'long',
